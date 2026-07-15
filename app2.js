@@ -8,7 +8,7 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['quyen22','22 Quyền'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Đặc tính · Chức năng'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi']];
+  const sections = [['quyen22','22 Quyền'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Đặc tính · Chức năng'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi'],['duyenhe','24 Duyên hệ']];
   document.getElementById('section-switch').innerHTML = sections.map(([k,label])=>
     `<button class="${k===currentSection?'active':''}" onclick="switchSection('${k}')">${label}</button>`
   ).join('');
@@ -63,6 +63,13 @@ function switchSection(s){
     legend.style.display='none';
     document.getElementById('nav').innerHTML = '';
     renderDuyenKhoiPage();
+  } else if(s==='duyenhe'){
+    document.getElementById('page-title').textContent = '24 Duyên hệ — Paṭṭhāna';
+    document.getElementById('page-subtitle').textContent = 'Chạm vào một duyên để xem định nghĩa và chi pháp';
+    grid.style.display='none';
+    legend.style.display='none';
+    document.getElementById('nav').innerHTML = '';
+    renderDuyenHePage();
   }
   document.getElementById('main').scrollTop = 0;
 }
@@ -688,6 +695,265 @@ function openDuyenKhoiSheet(i){
     <div class="info-note" style="margin-top:10px"><b>Duyên:</b> ${d.duyen}</div>
     ${extraHtml}
   `;
+  document.getElementById('sheet-content').innerHTML = html;
+  document.getElementById('sheet').classList.add('show');
+  document.getElementById('sheet-backdrop').classList.add('show');
+}
+
+// ===== Trang "24 Duyên hệ" (Paṭṭhāna) =====
+// Định nghĩa tóm tắt + chi pháp năng duyên / sở duyên (kèm phi sở duyên)
+// theo "Khái lược Duyên Hệ" — Tỳ khưu Chánh Minh.
+
+const DUYENHE_DATA = [
+ {ten:'Nhân duyên', pali:'Hetupaccaya',
+  dn:'Mãnh lực trợ sinh, giúp đỡ bằng <b>nhân tương ưng</b> — pháp ủng hộ các pháp liên hệ như <b>gốc rễ</b> (mūla) làm cây vững vàng.',
+  nang:'6 nhân: Tham, Sân, Si, Vô tham, Vô sân, Vô si (phân rộng thành 9 nhân: 3 bất thiện, 3 thiện, 3 vô ký).',
+  so:'103 tâm hữu nhân + 52 tâm sở (trừ tâm sở Si trong 2 tâm Si) + sắc nghiệp tục sinh + sắc tâm (thời bình nhật).',
+  phiso:'18 tâm vô nhân + 12 tâm sở hợp; tâm sở Si trong 2 tâm Si; sắc tâm vô nhân, sắc nghiệp bình nhật, sắc nghiệp Vô tưởng, sắc khí hậu, sắc vật thực.'},
+ {ten:'Cảnh duyên', pali:'Ārammaṇapaccaya',
+  dn:'Mãnh lực trợ sinh bằng cách <b>làm cảnh</b> (ārammaṇa) cho tâm nhận biết — "pháp trợ giúp bằng cách làm thành cảnh, gọi là cảnh duyên" (Thanh Tịnh Đạo).',
+  nang:'Tất cả pháp khi bị tâm và tâm sở biết: 121 tâm + 52 tâm sở + 28 sắc pháp + Níp-bàn + chế định.',
+  so:'Tâm + tâm sở khi biết cảnh.',
+  phiso:'Sắc pháp + Níp-bàn + chế định (vì không biết cảnh).'},
+ {ten:'Trưởng duyên', pali:'Adhipatipaccaya',
+  dn:'Mãnh lực trợ sinh và ủng hộ bằng cách <b>lớn trội, dẫn đầu</b> — ví như Đức vua đối với quần thần.',
+  subs:[
+   {ten:'Cảnh trưởng duyên', pali:'Ārammaṇādhipatipaccaya',
+    dn:'Trợ giúp tâm – tâm sở sinh lên vững mạnh bằng cách thành <b>cảnh rất tốt</b>, cảnh "dẫn dắt" tâm.',
+    nang:'Níp-bàn + 18 sắc thành tựu (nipphannarūpa) thành cảnh tốt theo 3 thời + 116 tâm (trừ 2 tâm Sân, 2 tâm Si, tâm Thân thức thọ khổ) + 47 tâm sở (trừ 4 Sân phần + Hoài nghi).',
+    so:'Tâm Siêu thế + 8 tâm Tham + 8 tâm Đại thiện + 4 tâm Đại hạnh hợp trí, cùng 45 tâm sở hợp.'},
+   {ten:'Đồng sinh trưởng duyên', pali:'Sahajātādhipatipaccaya',
+    dn:'Một trong <b>4 pháp trưởng</b> — Dục, Cần, Tâm, Thẩm (Trí) — làm chủ đạo trợ các pháp đồng sinh; mỗi thời điểm chỉ có một pháp làm trưởng.',
+    nang:'Tâm sở Dục, tâm sở Cần, Tâm (trong 84 tâm đổng lực đa nhân), tâm sở Trí — pháp nào đang làm trưởng.',
+    so:'52 tâm đổng lực nhị/tam nhân + 52 tâm sở hợp (hoặc 51, trừ pháp đang làm trưởng) + sắc tâm trưởng.'}
+  ]},
+ {ten:'Vô gián duyên', pali:'Anantarapaccaya',
+  dn:'Mãnh lực trợ sinh bằng cách <b>không gián đoạn</b>: tâm và tâm sở vừa diệt đi, giúp tâm và tâm sở kế tiếp "có dịp" sinh lên, không hề có kẽ hở.',
+  nang:'Tâm + tâm sở sinh trước vừa diệt (trừ tâm Tử của vị Thánh Alahán).',
+  so:'Tâm + tâm sở sinh kế sau ngay đó.',
+  phiso:'Sắc pháp + Níp-bàn + chế định.'},
+ {ten:'Đẳng vô gián duyên', pali:'Samanantarapaccaya',
+  dn:'Cách trợ giúp <b>như Vô gián duyên</b>, nhấn mạnh "khít khao hoàn toàn không kẽ hở" (sama = giống như). Đức Phật thuyết thêm để củng cố Vô gián duyên — <b>trùng chi pháp</b> với Vô gián duyên.',
+  nang:'Tâm + tâm sở sinh trước (trừ tâm Tử của vị Thánh Alahán).',
+  so:'Tâm + tâm sở sinh sau.',
+  phiso:'Sắc pháp.'},
+ {ten:'Đồng sinh duyên', pali:'Sahajātapaccaya',
+  dn:'Trợ giúp bằng cách <b>cùng sinh lên</b> — ví như ngọn lửa với ánh sáng. Pháp hữu vi không bao giờ sinh riêng lẻ (danh ít nhất 8 pháp, sắc ít nhất đoàn bất ly 8 sắc).',
+  nang:'Tất cả pháp hữu vi. (Thời tục sinh cõi ngũ uẩn: 15 tâm tục sinh + sắc tục sinh; cõi Vô sắc: 4 tâm quả Vô sắc; cõi Vô tưởng: đoàn sắc mạng quyền. Thời bình nhật: tâm + tâm sở + sắc pháp.)',
+  so:'Tất cả pháp hữu vi (tương tự năng duyên).',
+  phiso:'Níp-bàn + chế định.'},
+ {ten:'Hổ tương duyên', pali:'Aññamaññapaccaya',
+  dn:'Mãnh lực trợ giúp <b>qua lại</b>: năng trợ sở và sở cũng trợ năng — như ba cây chụm đầu nương nhau. Gồm: 4 danh uẩn trợ lẫn nhau; tứ đại trợ lẫn nhau; khi nhập thai, tâm Tục sinh ↔ sắc Ý vật.',
+  nang:'Tâm + tâm sở + sắc Tứ đại + sắc Ý vật (tái tục).',
+  so:'Tâm + tâm sở + sắc Tứ đại + sắc Ý vật (tái tục).',
+  phiso:'Các sắc y sinh còn lại (nhất định); sắc Ý vật là phi sở duyên bất định (chỉ hổ tương vào thời tục sinh).'},
+ {ten:'Y duyên', pali:'Nissayapaccaya',
+  dn:'Mãnh lực trợ giúp bằng cách làm <b>chỗ nương nhờ</b> vững vàng cho pháp khác — ví như trái đất là nơi nương của người, vật, cây cối.',
+  nang:'Tứ danh uẩn + 6 sắc vật (5 sắc thần kinh + sắc Ý vật).',
+  so:'Tứ danh uẩn.',
+  phiso:'Sắc pháp.',
+  subs:[
+   {ten:'Đồng sinh y duyên', pali:'Sahajātanissayapaccaya',
+    dn:'Nương nhờ pháp cùng sinh — <b>trùng chi pháp với Đồng sinh duyên</b>.'},
+   {ten:'Vật sinh tiền y duyên', pali:'Vatthupurejātanissayapaccaya',
+    dn:'Sắc vật sinh trước làm chỗ nương cho tâm sinh sau.',
+    nang:'6 sắc vật sinh trước (5 sắc thần kinh: nương cho ngũ song thức; sắc Ý vật: nương cho 111 tâm còn lại).',
+    so:'Tâm nương vật, sinh sau.'},
+   {ten:'Vật-cảnh sinh tiền y duyên', pali:'Vatthārammaṇapurejātanissayapaccaya',
+    dn:'Sắc Ý vật cận tử vừa làm <b>chỗ nương</b> vừa làm <b>cảnh</b> cho tâm lộ cận tử.',
+    nang:'Sắc Ý vật sinh vào sát-na sinh của tâm hữu phần thứ 16 kể từ tâm Tử lui lại, làm cảnh cho tâm.',
+    so:'32 tâm khách trong lộ tử (tâm Hướng ý môn + 29 đổng lực dục giới + 2 tâm thông) + 44 tâm sở hợp (trừ Tật, Lận, Hối, Giới phần, Vô lượng phần).'}
+  ]},
+ {ten:'Cận y duyên', pali:'Upanissayapaccaya',
+  dn:'Mãnh lực trợ giúp, ủng hộ bằng cách làm chỗ nương <b>rất vững chắc, có sức mạnh lớn</b>. Y duyên ví như đất cho cây nương; Cận y duyên ví như mưa thuận gió hòa giúp cây lớn mạnh.',
+  subs:[
+   {ten:'Cảnh cận y duyên', pali:'Ārammaṇūpanissayapaccaya',
+    dn:'Trợ giúp bằng cách làm thành cảnh rất vững mạnh. <b>Chi pháp giống Cảnh trưởng duyên</b>; khác biệt: cảnh trưởng nói khía cạnh "quan trọng" (garu), cảnh cận y nói khía cạnh "sức mạnh" (bala) của cảnh.'},
+   {ten:'Vô gián cận y duyên', pali:'Anantarūpanissayapaccaya',
+    dn:'Trợ giúp bằng cách liên tiếp rất vững mạnh. <b>Chi pháp giống Vô gián duyên</b> nhưng mạnh mẽ hơn — như dòng nước chảy xiết so với dòng chảy thường.'},
+   {ten:'Thường cận y duyên', pali:'Pakatūpanissayapaccaya',
+    dn:'Trợ giúp vững mạnh theo cách <b>tự nhiên, thành thói quen</b> do thường làm, thường thực hiện.',
+    nang:'Tâm + tâm sở + sắc pháp + chế định có sức mạnh, cả 3 thời (trừ chế định nghiệp xứ).',
+    so:'Tâm + tâm sở sinh về sau.',
+    phiso:'Sắc pháp.'}
+  ]},
+ {ten:'Sinh tiền duyên', pali:'Purejātapaccaya',
+  dn:'Mãnh lực trợ giúp bằng cách <b>sinh ra trước</b> và <b>đang hiện hữu</b>, giúp pháp sinh sau vững mạnh.',
+  subs:[
+   {ten:'Vật sinh tiền duyên', pali:'Vatthupurejātapaccaya',
+    dn:'Sắc vật sinh trước làm chỗ nương — <b>như Vật sinh tiền y duyên</b> (xem Y duyên), chỉ khác khía cạnh "có nương nhờ".'},
+   {ten:'Vật-cảnh sinh tiền duyên', pali:'Vatthārammaṇapurejātapaccaya',
+    dn:'Sắc Ý vật cận tử vừa là vật vừa là cảnh — <b>như Vật-cảnh sinh tiền y duyên</b> (xem Y duyên).'},
+   {ten:'Cảnh sinh tiền duyên', pali:'Ārammaṇapurejātapaccaya',
+    dn:'Sắc pháp sinh trước, đang hiện hữu, làm <b>cảnh</b> cho tâm sinh sau nhận lấy.',
+    nang:'18 sắc thành tựu (nipphannarūpa) sinh trước, đang làm cảnh.',
+    so:'Nhất định: ngũ song thức + Ý giới. Bất định: 41 tâm Dục giới còn lại + 2 tâm thông và 50 tâm sở hợp (trừ Vô lượng phần).',
+    phiso:'Nhất định: sắc pháp + 27 tâm Đáo đại + 40 tâm Siêu thế. Bất định: 41 tâm Dục giới khi không bắt 18 sắc thành tựu làm cảnh.'}
+  ]},
+ {ten:'Sinh hậu duyên', pali:'Pacchājātapaccaya',
+  dn:'Mãnh lực trợ giúp bằng cách <b>sinh ra sau</b> nhưng giúp pháp sinh trước được vững mạnh — như mưa đến sau giúp cây gieo trồng trước lớn mạnh. Là sự trợ giúp của <b>tâm</b> đối với <b>sắc pháp</b> sinh trước.',
+  nang:'117 tâm sinh sau (kể từ tâm hữu phần thứ 1 trở đi, trừ 4 tâm quả Vô sắc) và tâm sở hợp.',
+  so:'Sắc do 3 nhân sinh và 4 nhân sinh đang ở sát-na trụ (đồng sinh với tâm trước đó).',
+  phiso:'121 tâm + sắc tâm + sắc nghiệp tục sinh + sắc vật thực + sắc khí hậu + sắc nghiệp bình nhật (sát-na sinh) + sắc ngoại + sắc nghiệp Vô tưởng.'},
+ {ten:'Tập hành duyên', pali:'Āsevanapaccaya',
+  dn:'Trợ giúp, ủng hộ bằng cách <b>lập đi lập lại</b> làm thuần thục, tạo năng lực — như tụng bài kinh nhiều lần càng thuộc lòng. Chỉ có nơi các sát-na <b>đổng lực</b> (javana).',
+  nang:'47 tâm đổng lực hiệp thế, sát-na trước (trừ đổng lực cuối trong lộ trình tâm).',
+  so:'67 tâm đổng lực sinh nối tiếp (trừ đổng lực thứ nhất trong lộ trình tâm).',
+  phiso:'Đổng lực sát-na thứ 1, 2 tâm hướng môn, 52 tâm quả + sắc pháp.'},
+ {ten:'Nghiệp duyên', pali:'Kammapaccaya',
+  dn:'Trợ giúp bằng cách <b>tạo tác</b> — "Này chư tỳ khưu, Như Lai tuyên thuyết chính sự cố ý (cetanā) là nghiệp". Nghiệp chính là <b>tâm sở Tư</b>.',
+  subs:[
+   {ten:'Đồng sinh nghiệp duyên', pali:'Sahajātakammapaccaya',
+    dn:'Tâm sở Tư hành khiển, điều phối các pháp <b>đồng sinh</b> — ví như kỹ sư trưởng vừa điều hành vừa thực hiện công trình.',
+    nang:'Tâm sở Tư trong tất cả tâm.',
+    so:'Tâm + 51 tâm sở hợp (trừ tâm sở Tư) + sắc tâm + sắc nghiệp tục sinh.'},
+   {ten:'Vô gián nghiệp duyên', pali:'Anantarakammapaccaya',
+    dn:'Tâm sở Tư trong <b>tâm Đạo</b> trợ liền cho tâm quả Siêu thế sinh kế tục <b>không gián đoạn</b> trong lộ đắc đạo.',
+    nang:'Tâm sở Tư trong tâm Đạo.',
+    so:'Tâm quả Siêu thế + 36 tâm sở hợp, sinh kế tục tâm Đạo trong lộ đắc đạo.'},
+   {ten:'Dị thời nghiệp duyên', pali:'Nānakkhaṇikakammapaccaya',
+    dn:'Tâm sở Tư trợ giúp các pháp <b>cách xa thời gian</b> — nghiệp và quả của nghiệp không cùng thời; như lời di chúc được con cháu thực hiện về sau. Đây là "nghiệp báo nhân quả" thông thường.',
+    nang:'Tâm sở Tư hợp trong tâm thiện hay tâm bất thiện (quá khứ).',
+    so:'Sắc nghiệp + tâm quả và tâm sở hợp (trừ tâm sở Tư), trong hiện tại.',
+    phiso:'Tâm thiện, tâm bất thiện, tâm duy tác + sắc tâm, sắc ngoại, sắc vật thực, sắc khí hậu.'}
+  ]},
+ {ten:'Quả duyên', pali:'Vipākapaccaya',
+  dn:'Mãnh lực trợ giúp bằng <b>kết quả của nghiệp</b> (dị thục) — pháp quả trợ giúp bằng cách "thành tựu sự yên lặng", không cần nỗ lực, ví như trái cây nuôi hạt mầm.',
+  nang:'52 tâm quả + 38 tâm sở hợp.',
+  so:'52 tâm quả + 38 tâm sở hợp (khi không là năng duyên) + sắc nghiệp tục sinh + sắc tâm quả (trừ 2 sắc biểu tri).',
+  phiso:'Tâm thiện, tâm bất thiện, tâm duy tác + 52 tâm sở hợp + sắc nghiệp bình nhật, sắc nghiệp Vô tưởng, sắc ngoại, sắc khí hậu, sắc vật thực, sắc tâm của tâm phi quả.'},
+ {ten:'Vật thực duyên', pali:'Āhārapaccaya',
+  dn:'Mãnh lực trợ giúp, ủng hộ bằng cách <b>mang dưỡng tố (ojā) vào, nuôi dưỡng cho tồn tại vững mạnh</b>. Căn bản là Tứ thực: đoàn thực, xúc thực, tư niệm thực, thức thực.',
+  subs:[
+   {ten:'Sắc vật thực duyên', pali:'Rūpāhārapaccaya',
+    dn:'Dưỡng tố trong thực phẩm nuôi dưỡng sắc pháp.',
+    nang:'Tất cả sắc vật thực nội hay ngoại, đã ăn hay chưa ăn (dưỡng tố trong và ngoài cơ thể).',
+    so:'Sắc do vật thực tạo và các sắc đồng nhóm với sắc vật thực.',
+    phiso:'Tâm + tâm sở + sắc tâm + sắc ngoại + sắc nghiệp + sắc âm dương.'},
+   {ten:'Danh vật thực duyên', pali:'Nāmāhārapaccaya',
+    dn:'Ba danh thực "bám chặt lấy cảnh" trợ giúp các danh pháp đồng sinh thêm vững mạnh.',
+    nang:'3 danh vật thực: Xúc thực (tâm sở Xúc), Thức thực (tâm), Tư niệm thực (tâm sở Tư).',
+    so:'Tâm + tâm sở + sắc do tâm tạo + sắc nghiệp tục sinh.',
+    phiso:'Các sắc pháp ngoài ra + pháp vật thực đang làm năng duyên.'}
+  ]},
+ {ten:'Quyền duyên', pali:'Indriyapaccaya',
+  dn:'Mãnh lực trợ giúp, ủng hộ bằng cách <b>cai quản, kiểm soát, điều hành</b> trong lãnh vực riêng của mình. Năng duyên tổng quát là <b>20 quyền</b> (trừ Nữ quyền và Nam quyền, vì hai quyền này không có chức năng tạo ra – hỗ trợ – duy trì).',
+  subs:[
+   {ten:'Đồng sinh quyền duyên', pali:'Sahajātindriyapaccaya',
+    dn:'Các <b>danh quyền</b> huấn luyện và kiểm soát các pháp đồng sinh cùng thực hiện chức năng như mình.',
+    nang:'8 danh quyền: Tâm (ý quyền) + tâm sở Thọ (5 thọ quyền) + tâm sở Mạng quyền + Tín, Cần, Niệm, Nhất hành (định), Trí (5 quyền giác phần; Trí gồm cả Vị tri – Dĩ tri – Cụ tri quyền).',
+    so:'Tâm + 52 tâm sở hợp + sắc tục sinh + sắc do tâm tạo.'},
+   {ten:'Quyền sinh tiền duyên', pali:'Purejātindriyapaccaya',
+    dn:'5 <b>sắc thần kinh</b> sinh trước, đủ mạnh (sát-na quyền), cai quản tâm nương trú thực hiện đúng chức năng thấy, nghe, ngửi, nếm, đụng.',
+    nang:'5 sắc thần kinh ở sát-na thứ 26 (giai đoạn phát triển cao tột — "sát-na Quyền").',
+    so:'Ngũ song thức + 7 tâm sở hợp.'},
+   {ten:'Sắc mạng quyền duyên', pali:'Rūpajīvitindriyapaccaya',
+    dn:'Sắc Mạng quyền <b>cai quản tuổi thọ</b>, duy trì các sắc nghiệp đồng bọn tồn tại tròn đủ tuổi thọ.',
+    nang:'Tất cả sắc Mạng quyền.',
+    so:'Các nhóm (bọn) sắc nghiệp sinh chung với sắc Mạng quyền (9 bọn sắc nghiệp).'}
+  ]},
+ {ten:'Thiền duyên', pali:'Jhānapaccaya',
+  dn:'Mãnh lực trợ giúp bằng cách làm cảnh <b>"chói sáng"</b> (chăm chú vào đối tượng) hay <b>"thiêu đốt"</b> các pháp nghịch.',
+  nang:'5 chi thiền theo thực tính — Tầm, Tứ, Hỷ, Thọ (chi lạc, ưu, xả), Nhất hành (chi định) — tức 7 chi thiền, có trong 103 tâm (trừ 18 tâm vô nhân).',
+  so:'103 tâm + 52 tâm sở hợp (trừ chi thiền đang làm năng duyên) + sắc nghiệp tục sinh + sắc do tâm tạo.',
+  phiso:'Ngũ song thức + 7 tâm sở hợp + sắc nghiệp bình nhật + sắc ngoại + sắc vật thực + sắc âm dương + sắc nghiệp Vô tưởng.'},
+ {ten:'Đạo duyên', pali:'Maggapaccaya',
+  dn:'Mãnh lực trợ giúp bằng cách <b>như con đường</b> — dẫn đến khổ cảnh, lạc cảnh hoặc Níp-bàn.',
+  nang:'9 chi đạo trong những tâm hữu nhân: Trí (chánh kiến), Tầm (chánh/tà tư duy), 3 Giới phần (chánh ngữ, chánh nghiệp, chánh mạng), Cần (chánh/tà tinh tấn), Niệm (chánh niệm), Nhất hành (chánh/tà định), Tà kiến.',
+  so:'Tâm hữu nhân + 52 tâm sở hợp + sắc tâm hữu nhân + sắc nghiệp tục sinh với tâm hữu nhân.',
+  phiso:'18 tâm vô nhân + 12 tâm sở hợp + sắc ngoại, sắc âm dương, sắc vật thực, sắc nghiệp bình nhật, sắc nghiệp Vô tưởng, sắc tâm vô nhân, sắc nghiệp tục sinh với tâm vô nhân.'},
+ {ten:'Tương ưng duyên', pali:'Sampayuttapaccaya',
+  dn:'Mãnh lực trợ giúp theo cách <b>hòa hợp</b> — đồng sinh, đồng diệt, đồng biết một cảnh, đồng nương một vật — như nước hòa với sữa, không còn phân biệt được. Chỉ có giữa <b>danh với danh</b>.',
+  nang:'Tất cả tâm và tâm sở đồng sinh với nhau.',
+  so:'Tất cả tâm và tâm sở đồng sinh với nhau.',
+  phiso:'Sắc pháp + Níp-bàn + chế định.'},
+ {ten:'Bất tương ưng duyên', pali:'Vippayuttapaccaya',
+  dn:'Mãnh lực trợ giúp bằng cách <b>không hòa hợp</b> — như nước lăn trên lá sen. Là mối liên hệ giữa <b>danh và sắc</b>: danh trợ sắc, hoặc sắc trợ danh.',
+  subs:[
+   {ten:'Đồng sinh bất tương ưng duyên', pali:'Sahajātavippayuttapaccaya',
+    dn:'Danh trợ sắc cùng sinh lên nhưng không hòa hợp (tâm trợ sắc tâm; tâm tục sinh ↔ sắc nghiệp tục sinh cõi ngũ uẩn).',
+    nang:'107 tâm (trừ ngũ song thức + 4 tâm quả Vô sắc) cùng tâm sở hợp; sắc Ý vật tái tục.',
+    so:'Sắc do tâm tạo, sắc nghiệp tục sinh; tâm tái tục cõi ngũ uẩn.'},
+   {ten:'Sinh hậu bất tương ưng duyên', pali:'Pacchājātavippayuttapaccaya',
+    dn:'Danh sinh sau trợ sắc sinh trước — <b>chi pháp như Sinh hậu duyên</b>.'},
+   {ten:'Vật sinh tiền bất tương ưng duyên', pali:'Vatthupurejātavippayuttapaccaya',
+    dn:'Sắc vật sinh trước làm chỗ nương cho danh — <b>chi pháp như Vật sinh tiền (y) duyên</b>.'},
+   {ten:'Vật-cảnh sinh tiền bất tương ưng duyên', pali:'Vatthārammaṇapurejātavippayuttapaccaya',
+    dn:'Vật vừa là chỗ nương vừa là cảnh — <b>chi pháp như Vật-cảnh sinh tiền (y) duyên</b>.'}
+  ]},
+ {ten:'Hiện hữu duyên', pali:'Atthipaccaya',
+  dn:'Mãnh lực trợ giúp theo phương cách <b>"đang tồn tại"</b> — năng duyên và sở duyên cùng hiện hữu (7 trường hợp: 4 danh uẩn với nhau; tứ đại với nhau; danh–sắc lúc nhập thai; tâm với sắc tâm; tứ đại với sắc y sinh; 5 sắc thần kinh với 5 thức; sắc Ý vật với Ý giới – Ý thức giới).',
+  nang:'Tổng hợp năng duyên của 6 duyên thành phần bên dưới.',
+  so:'Tổng hợp sở duyên của 6 duyên thành phần bên dưới.',
+  subs:[
+   {ten:'Đồng sinh hiện hữu duyên', pali:'Sahajātatthipaccaya', dn:'<b>Tức Đồng sinh duyên</b>.'},
+   {ten:'Cảnh sinh tiền hiện hữu duyên', pali:'Ārammaṇapurejātatthipaccaya', dn:'<b>Tức Cảnh sinh tiền duyên</b>.'},
+   {ten:'Vật sinh tiền hiện hữu duyên', pali:'Vatthupurejātatthipaccaya', dn:'<b>Tức Vật sinh tiền y duyên</b>.'},
+   {ten:'Sinh hậu hiện hữu duyên', pali:'Pacchājātatthipaccaya', dn:'<b>Tức Sinh hậu duyên</b>.'},
+   {ten:'Vật thực hiện hữu duyên', pali:'Āhāratthipaccaya', dn:'<b>Tức Sắc vật thực duyên</b>.'},
+   {ten:'Quyền hiện hữu duyên', pali:'Indriyatthipaccaya', dn:'<b>Tức Sắc mạng quyền duyên</b>.'}
+  ]},
+ {ten:'Vô hữu duyên', pali:'Natthipaccaya',
+  dn:'Mãnh lực trợ giúp bằng cách <b>"vắng mặt"</b>: pháp vô sắc vừa diệt theo diễn tiến của mình, nhường chỗ trợ cho pháp vô sắc mới sinh lên. Chính là Vô gián duyên / Đẳng vô gián duyên nhìn theo khía cạnh "vắng mặt" — <b>trùng chi pháp với Vô gián duyên</b>.',
+  nang:'Tâm + tâm sở vừa diệt (trừ tâm Tử của vị Thánh Alahán).',
+  so:'Tâm + tâm sở sinh kế sau.',
+  phiso:'Sắc pháp.'},
+ {ten:'Ly duyên', pali:'Vigatapaccaya',
+  dn:'Mãnh lực trợ giúp bằng cách <b>"lìa nhau, diệt mất"</b> — cũng chính tâm và tâm sở trợ giúp bằng cách biến mất. <b>Chi pháp tương tự Vô hữu duyên</b>.',
+  nang:'Tâm + tâm sở vừa diệt, lìa đi (trừ tâm Tử của vị Thánh Alahán).',
+  so:'Tâm + tâm sở sinh kế sau.',
+  phiso:'Sắc pháp.'},
+ {ten:'Bất ly duyên', pali:'Avigatapaccaya',
+  dn:'Mãnh lực trợ giúp bằng cách <b>"không xa lìa"</b> — pháp đang còn, không diệt mất, ủng hộ pháp khác. <b>Chi pháp tương tự Hiện hữu duyên</b>.',
+  nang:'Như Hiện hữu duyên (tổng hợp 6 duyên thành phần).',
+  so:'Như Hiện hữu duyên.'}
+];
+
+function dhChiphapRows(d){
+  let h = '';
+  if(d.nang) h += `<div style="margin-bottom:6px"><b>Năng duyên:</b> ${d.nang}</div>`;
+  if(d.so) h += `<div style="margin-bottom:6px"><b>Sở duyên:</b> ${d.so}</div>`;
+  if(d.phiso) h += `<div style="margin-bottom:6px"><b>Phi sở duyên:</b> ${d.phiso}</div>`;
+  return h;
+}
+
+function renderDuyenHePage(){
+  const extra = document.getElementById('extra-content');
+  let circles = '';
+  DUYENHE_DATA.forEach((d,i)=>{
+    circles += `<div class="circle circle-plain" onclick="openDuyenHeSheet(${i})">
+      <div class="cp" style="font-weight:800">${i+1}</div>
+      <div class="cn">${d.ten.replace(' duyên','')}</div>
+      <div class="cp">${d.pali.replace('paccaya','').replace('paccayo','')}</div>
+    </div>`;
+  });
+  extra.innerHTML = `
+    <p class="info-note" style="margin-bottom:8px">24 duyên trong bộ Paṭṭhāna. Chạm 1 lần để chọn, chạm lần 2 để xem <b>định nghĩa tóm tắt</b> và <b>chi pháp năng duyên – sở duyên</b> (kèm phi sở duyên). Duyên nào phân rộng sẽ có chi pháp của từng duyên phụ.</p>
+    <div class="circle-grid">${circles}</div>
+    <p class="info-note" style="margin-top:10px"><b>5 đôi đặc trưng:</b> Vô gián – Đẳng vô gián (nghĩa lý đồng nhau) · Y – Cận y (âm thanh đồng nhau) · Sinh tiền – Sinh hậu (nghịch thời) · Tương ưng – Bất tương ưng (nghịch cách) · Nhân – Quả (nhân quả).<br>Nguồn: "Khái lược Duyên Hệ" — Tỳ khưu Chánh Minh.</p>
+  `;
+}
+
+function openDuyenHeSheet(i){
+  const d = DUYENHE_DATA[i];
+  let html = `
+    <div class="sheet-head"><h2>${i+1}. ${d.ten}</h2></div>
+    <p class="sheet-pali">${d.pali}</p>
+    <div class="sec"><div class="sec-label">Định nghĩa</div><div class="sec-body">${d.dn}</div></div>
+  `;
+  if(d.nang || d.so || d.phiso){
+    html += `<div class="sec" style="margin-top:12px"><div class="sec-label">Chi pháp</div><div class="sec-body">${dhChiphapRows(d)}</div></div>`;
+  }
+  if(d.subs){
+    html += `<div class="sec" style="margin-top:12px"><div class="sec-label">Phân rộng thành ${d.subs.length} duyên</div></div>`;
+    for(const s of d.subs){
+      html += `<div class="group-head" style="margin-top:10px">${s.ten} <i style="font-weight:400">(${s.pali})</i></div>
+        <div class="sec-body" style="margin-top:4px">${s.dn}</div>`;
+      if(s.nang || s.so || s.phiso){
+        html += `<div class="sec-body" style="margin-top:6px">${dhChiphapRows(s)}</div>`;
+      }
+    }
+  }
   document.getElementById('sheet-content').innerHTML = html;
   document.getElementById('sheet').classList.add('show');
   document.getElementById('sheet-backdrop').classList.add('show');
