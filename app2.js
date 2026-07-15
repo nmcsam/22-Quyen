@@ -8,7 +8,7 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['quyen22','22 Quyền'],['tamso','Tâm ↔ Tâm sở'],['phap','4 Pháp Thực Tính']];
+  const sections = [['quyen22','22 Quyền'],['tamso','Tâm ↔ Tâm sở'],['phap','4 Pháp Thực Tính'],['dactinh','Đặc tính · Chức năng']];
   document.getElementById('section-switch').innerHTML = sections.map(([k,label])=>
     `<button class="${k===currentSection?'active':''}" onclick="switchSection('${k}')">${label}</button>`
   ).join('');
@@ -43,6 +43,13 @@ function switchSection(s){
     legend.style.display='none';
     document.getElementById('nav').innerHTML = '';
     renderPhapPage();
+  } else if(s==='dactinh'){
+    document.getElementById('page-title').textContent = 'Đặc tính · Chức năng · Thể hiện · Nhân gần';
+    document.getElementById('page-subtitle').textContent = 'Chạm vào một pháp để xem 4 đặc tính (theo Aṭṭhasālinī)';
+    grid.style.display='none';
+    legend.style.display='none';
+    document.getElementById('nav').innerHTML = '';
+    renderDacTinhPage();
   }
   document.getElementById('main').scrollTop = 0;
 }
@@ -222,3 +229,91 @@ function renderPhapPage(){
 
 renderSectionSwitch();
 switchSection('quyen22');
+
+// ===== Phần "Đặc tính · Chức năng · Thể hiện · Nhân gần" (Aṭṭhasālinī) =====
+
+function plainCircleHTML(id, label, opener){
+  return `<div class="circle circle-plain" onclick="${opener}('${id}')"><div class="cn">${label}</div></div>`;
+}
+
+function renderDacTinhGroup(title, items){
+  let html = `<div class="group-head">${title} (${items.length})</div><div class="circle-grid">`;
+  html += items.join('');
+  html += `</div>`;
+  return html;
+}
+
+function renderDacTinhPage(){
+  const extra = document.getElementById('extra-content');
+
+  const batthienIds = ["si","votam","voquy","phongdat","tham","takien","man","hontram","thuymien","san","tat","lan","hoi","hoainghi"];
+  const totthaIds = ["xuc","tho","tuong","tu","nhattam","mangquyen","tacy","tam","tu2","thangiai","can","hy","duc"];
+  const tinhhaoIds = ["tin","niem","hiri","ottapa","votham","vosan","hanhxa","antinhthan","antinhtam","khinhthan","khinhtam","nhuthan","nhutam","thichthan","thichtam","thuanthan","thuantam","chanhthan","chanhtam","chanhngu","chanhnghiep","chanhmang","bi","tuyhy","tue"];
+
+  const batthienCircles = batthienIds.map(id=>{
+    const c = CETASIKA_DATA.find(x=>x.id===id);
+    return plainCircleHTML(id, c.ten, 'openDacTinhCetasika');
+  });
+  const totthaCircles = totthaIds.map(id=>{
+    const c = CETASIKA_DATA.find(x=>x.id===id);
+    return plainCircleHTML(id, c.ten, 'openDacTinhCetasika');
+  });
+  const tinhhaoCircles = tinhhaoIds.map(id=>{
+    const c = CETASIKA_DATA.find(x=>x.id===id);
+    return plainCircleHTML(id, c.ten, 'openDacTinhCetasika');
+  });
+  const rupaCircles = RUPA_DATA.map(r=> plainCircleHTML(r.id, r.ten, 'openDacTinhRupa'));
+  const vaitroCircles = VAITRO_TAM_DATA.map(v=> plainCircleHTML(v.id, v.ten, 'openDacTinhVaitro'));
+  const thoCircles = THO_CHITIET_DATA.map(t=> plainCircleHTML(t.id, t.ten, 'openDacTinhTho'));
+
+  extra.innerHTML = `
+    <p class="info-note" style="margin-bottom:12px">Dữ liệu trích từ Chú giải Bộ Pháp Tụ (Aṭṭhasālinī). Mỗi pháp có 4 đặc tính cố định: <b>Đặc tính (Lakkhaṇā)</b> — nét riêng để nhận diện; <b>Chức năng (Rasā)</b> — nhiệm vụ nó thực hiện; <b>Thể hiện (Paccupaṭṭhānā)</b> — cách nó hiện ra trước tâm hành giả; <b>Nhân gần (Padaṭṭhānā)</b> — điều kiện gần nhất làm nó sinh khởi.</p>
+
+    ${renderDacTinhGroup('14 Tâm sở Bất thiện', batthienCircles)}
+    ${renderDacTinhGroup('13 Tâm sở Tợ tha (Biến hành + Biệt cảnh)', totthaCircles)}
+    ${renderDacTinhGroup('25 Tâm sở Tịnh hảo', tinhhaoCircles)}
+    ${renderDacTinhGroup('28 Sắc pháp', rupaCircles)}
+    ${renderDacTinhGroup('14 Vai trò của Tâm (theo phận sự trong lộ trình)', vaitroCircles)}
+    ${renderDacTinhGroup('5 Thọ chi tiết (Lạc/Khổ/Hỷ/Ưu/Xả)', thoCircles)}
+    <p class="info-note">Tri giác (Saññā/Tưởng) đã có ở nhóm "13 Tâm sở Tợ tha" phía trên — Chú giải mô tả giống hệt nhau ở cả hai nơi (Bảng Thọ-Tưởng và Bảng Tợ tha).</p>
+  `;
+}
+
+function attrSheetHTML(headTitle, headSub, dt, cn, th, ng){
+  return `
+    <div class="sheet-head"><h2>${headTitle}</h2></div>
+    <p class="sheet-pali">${headSub}</p>
+    <div class="attr-block attr-dt"><div class="attr-label">Đặc tính (Lakkhaṇā)</div><div class="sec-body">${dt}</div></div>
+    <div class="attr-block attr-cn"><div class="attr-label">Chức năng (Rasā)</div><div class="sec-body">${cn}</div></div>
+    <div class="attr-block attr-th"><div class="attr-label">Thể hiện (Paccupaṭṭhānā)</div><div class="sec-body">${th}</div></div>
+    <div class="attr-block attr-ng"><div class="attr-label">Nhân gần (Padaṭṭhānā)</div><div class="sec-body">${ng}</div></div>
+  `;
+}
+
+function showAttrSheet(html){
+  document.getElementById('sheet-content').innerHTML = html;
+  document.getElementById('sheet').classList.add('show');
+  document.getElementById('sheet-backdrop').classList.add('show');
+}
+
+function openDacTinhCetasika(id){
+  const c = CETASIKA_DATA.find(x=>x.id===id);
+  const a = DACTINH_DATA[id];
+  showAttrSheet(attrSheetHTML(c.ten, c.pali, a.dt, a.cn, a.th, a.ng));
+}
+
+function openDacTinhRupa(id){
+  const r = RUPA_DATA.find(x=>x.id===id);
+  const a = DACTINH_DATA[id];
+  showAttrSheet(attrSheetHTML(r.ten, r.pali, a.dt, a.cn, a.th, a.ng));
+}
+
+function openDacTinhVaitro(id){
+  const v = VAITRO_TAM_DATA.find(x=>x.id===id);
+  showAttrSheet(attrSheetHTML(v.ten, v.pali, v.dt, v.cn, v.th, v.ng));
+}
+
+function openDacTinhTho(id){
+  const t = THO_CHITIET_DATA.find(x=>x.id===id);
+  showAttrSheet(attrSheetHTML(t.ten, t.pali, t.dt, t.cn, t.th, t.ng));
+}
