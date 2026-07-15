@@ -8,7 +8,7 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['quyen22','22 Quyền'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Đặc tính · Chức năng'],['canh','21 Cảnh']];
+  const sections = [['quyen22','22 Quyền'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Đặc tính · Chức năng'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi']];
   document.getElementById('section-switch').innerHTML = sections.map(([k,label])=>
     `<button class="${k===currentSection?'active':''}" onclick="switchSection('${k}')">${label}</button>`
   ).join('');
@@ -56,6 +56,13 @@ function switchSection(s){
     legend.style.display='none';
     document.getElementById('nav').innerHTML = '';
     renderCanhPage();
+  } else if(s==='duyenkhoi'){
+    document.getElementById('page-title').textContent = 'Duyên khởi — Paṭiccasamuppāda';
+    document.getElementById('page-subtitle').textContent = 'Chạm vào một chi để xem chi pháp';
+    grid.style.display='none';
+    legend.style.display='none';
+    document.getElementById('nav').innerHTML = '';
+    renderDuyenKhoiPage();
   }
   document.getElementById('main').scrollTop = 0;
 }
@@ -450,6 +457,102 @@ function openCanhSheet(id){
     ${c.biet ? `<div class="sec"><div class="sec-label">Tâm biết cảnh này</div><div class="sec-body">${c.biet}</div></div>` : ''}
     ${c.codinh ? `<div class="sec"><div class="sec-label">Tâm biết cảnh này cố định</div><div class="sec-body">${c.codinh}</div></div>` : ''}
     ${c.ghichu ? `<div class="info-note"><b>Ghi chú:</b> ${c.ghichu}</div>` : ''}
+  `;
+  document.getElementById('sheet-content').innerHTML = html;
+  document.getElementById('sheet').classList.add('show');
+  document.getElementById('sheet-backdrop').classList.add('show');
+}
+
+// ===== Trang "Duyên khởi" — bánh xe 12 chi Paṭiccasamuppāda =====
+// Chi pháp theo bảng "Chi pháp pháp duyên khởi" (Đường Vào Thắng Pháp — TK Chánh Minh)
+
+const DUYENKHOI_DATA = [
+ {ten:'Vô minh', pali:'Avijjā',
+  duyen:'Vô minh duyên Hành — Avijjāpaccayā saṅkhārā',
+  chiphap:'Tâm sở <b>Si</b> hợp trong <b>12 tâm bất thiện</b>.'},
+ {ten:'Hành', pali:'Saṅkhāra',
+  duyen:'Hành duyên Thức — Saṅkhārapaccayā viññāṇaṃ',
+  chiphap:'Tâm sở <b>Tư</b> hợp trong <b>12 tâm bất thiện</b> + <b>17 tâm thiện hiệp thế</b> (gom thành <b>29 Tư</b>).'},
+ {ten:'Thức', pali:'Viññāṇa',
+  duyen:'Thức duyên Danh sắc — Viññāṇapaccayā nāmarūpaṃ',
+  chiphap:'<b>32 tâm quả hiệp thế</b>.'},
+ {ten:'Danh sắc', pali:'Nāma-rūpa',
+  duyen:'Danh sắc duyên Lục nhập — Nāmarūpapaccayā saḷāyatanaṃ',
+  chiphap:'<b>Danh:</b> 35 tâm sở hợp trong 32 tâm quả hiệp thế.<br><b>Sắc:</b> sắc nghiệp tái tục, sắc nghiệp bình nhật, sắc tâm.'},
+ {ten:'Lục nhập', pali:'Saḷāyatana',
+  duyen:'Lục nhập duyên Xúc — Saḷāyatanapaccayā phasso',
+  chiphap:'<b>6 nội xứ:</b> 5 sắc thần kinh + 32 tâm quả hiệp thế (ý xứ).'},
+ {ten:'Xúc', pali:'Phassa',
+  duyen:'Xúc duyên Thọ — Phassapaccayā vedanā',
+  chiphap:'Tâm sở <b>Xúc</b> hợp trong <b>32 tâm quả hiệp thế</b>.'},
+ {ten:'Thọ', pali:'Vedanā',
+  duyen:'Thọ duyên Ái — Vedanāpaccayā taṇhā',
+  chiphap:'Tâm sở <b>Thọ</b> hợp trong <b>32 tâm quả hiệp thế</b>.'},
+ {ten:'Ái', pali:'Taṇhā',
+  duyen:'Ái duyên Thủ — Taṇhāpaccayā upādānaṃ',
+  chiphap:'Tâm sở <b>Tham</b> hợp trong <b>8 tâm tham</b> (<b>6 ái</b>).'},
+ {ten:'Thủ', pali:'Upādāna',
+  duyen:'Thủ duyên Hữu — Upādānapaccayā bhavo',
+  chiphap:'Tâm sở <b>Tham</b> + tâm sở <b>Tà kiến</b> hợp trong <b>8 tâm tham</b> (<b>4 thủ</b>).'},
+ {ten:'Hữu', pali:'Bhava',
+  duyen:'Hữu duyên Sanh — Bhavapaccayā jāti',
+  chiphap:'<b>Nghiệp hữu:</b> tâm sở Tư hợp trong 12 tâm bất thiện + 17 tâm thiện hiệp thế (gom thành 29 Tư).<br><b>Sanh hữu:</b> 32 tâm quả hiệp thế, 35 tâm sở hợp, 20 sắc nghiệp.'},
+ {ten:'Sanh', pali:'Jāti',
+  duyen:'Sanh duyên Già chết, sầu, bi, khổ, ưu, não — Jātipaccayā jarāmaraṇaṃ soka-parideva-dukkha-domanass-upāyāsā',
+  chiphap:'<b>Danh sanh (nāmajāti):</b> sự sanh lên của 32 tâm quả hiệp thế, 35 tâm sở hợp.<br><b>Sắc sanh (rūpajāti):</b> sự hiện khởi của 20 sắc nghiệp.'},
+ {ten:'Già chết', pali:'Jarā-maraṇa',
+  duyen:'Vòng luân hồi tiếp nối: sầu, bi, khổ, ưu, não nuôi dưỡng Vô minh',
+  chiphap:'<b>Già (jarā):</b> sự già của 32 tâm quả hiệp thế, 35 tâm sở hợp (sát-na trụ).<br><b>Chết (maraṇa):</b> sự diệt của 32 tâm quả hiệp thế, 35 tâm sở hợp (sát-na diệt).',
+  extra:[
+   ['Sầu','Soka','Ưu thọ đồng sanh trong 2 tâm sân (sanh lên từ 5 sự suy vong).'],
+   ['Bi','Parideva','Tâm bấn loạn, than vãn — âm thanh do tâm sinh (cittajavippallāsasadda).'],
+   ['Khổ','Dukkha','Khổ thân đồng sanh với tâm Thân thức thọ khổ.'],
+   ['Ưu','Domanassa','Tâm sở Thọ đồng sanh với 2 tâm sân (tâm sở khổ thọ).'],
+   ['Não','Upāyāsa','Tâm sở Sân đồng sanh với 2 tâm sân.']
+  ]}
+];
+
+function renderDuyenKhoiPage(){
+  const extra = document.getElementById('extra-content');
+  let nodes = '';
+  for(let i=0;i<12;i++){
+    const a = (-90 + i*30) * Math.PI/180; // bắt đầu 12 giờ, theo chiều kim đồng hồ
+    const x = 50 + 41*Math.cos(a);
+    const y = 50 + 41*Math.sin(a);
+    const d = DUYENKHOI_DATA[i];
+    nodes += `<div class="dk-node" style="left:${x.toFixed(2)}%;top:${y.toFixed(2)}%" onclick="openDuyenKhoiSheet(${i})">
+      <div class="n">${i+1}</div><div class="t">${d.ten}</div><div class="p">${d.pali}</div>
+    </div>`;
+  }
+  extra.innerHTML = `
+    <p class="info-note" style="margin-bottom:6px">Bánh xe 12 chi Duyên khởi, xoay theo chiều kim đồng hồ từ Vô minh (đỉnh). Chạm 1 lần để chọn, chạm lần 2 để xem chi pháp.</p>
+    <div class="dk-wrap">
+      <div class="dk-ring"></div>
+      <div class="dk-arrow">⟳</div>
+      <div class="dk-center">
+        <div style="font-weight:800;font-size:13px">12 Chi<br>Duyên khởi</div>
+        <div style="font-style:italic;font-size:11px;color:#8a6d1f">Paṭiccasamuppāda</div>
+      </div>
+      ${nodes}
+    </div>
+    <p class="info-note" style="margin-top:6px">Nguồn: bảng "Chi pháp pháp duyên khởi" — Đường Vào Thắng Pháp, Tỳ khưu Chánh Minh.</p>
+  `;
+}
+
+function openDuyenKhoiSheet(i){
+  const d = DUYENKHOI_DATA[i];
+  let extraHtml = '';
+  if(d.extra){
+    extraHtml = `<div class="sec" style="margin-top:14px"><div class="sec-label">Sanh duyên sầu · bi · khổ · ưu · não</div><div class="sec-body">` +
+      d.extra.map(([t,p,c])=>`<div style="margin-bottom:7px"><b>${t}</b> <i>(${p})</i>: ${c}</div>`).join('') +
+      `</div></div>`;
+  }
+  const html = `
+    <div class="sheet-head"><h2>${i+1}. ${d.ten}</h2></div>
+    <p class="sheet-pali">${d.pali}</p>
+    <div class="sec"><div class="sec-label">Chi pháp</div><div class="sec-body">${d.chiphap}</div></div>
+    <div class="info-note" style="margin-top:10px"><b>Duyên:</b> ${d.duyen}</div>
+    ${extraHtml}
   `;
   document.getElementById('sheet-content').innerHTML = html;
   document.getElementById('sheet').classList.add('show');

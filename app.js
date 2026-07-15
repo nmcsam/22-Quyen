@@ -100,7 +100,7 @@ function closeSheet(){
 // chạm LẦN 2 vào đúng ô đó → mới mở trang chi tiết. Chạm sang ô khác → chuyển chọn sang ô đó.
 // (Dùng capture-phase để chặn onclick mở trang ở lần chạm đầu tiên.)
 document.addEventListener('click', function(e){
-  const dot = e.target.closest('.pdot-sm,.pdot-ring-big,.circle');
+  const dot = e.target.closest('.pdot-sm,.pdot-ring-big,.circle,.dk-node');
   if(!dot) return;
   if(dot.classList.contains('pdot-selected')) return; // lần 2: cho onclick chạy, mở chi tiết
   e.stopPropagation();
