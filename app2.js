@@ -92,12 +92,15 @@ function renderTamSoPage(){
   const extra = document.getElementById('extra-content');
 
   const cittaChunks = [
-    {count:8, cols:4}, {count:2, cols:2}, {count:2, cols:2},
-    {count:7, cols:7}, {count:8, cols:8}, {count:3, cols:3},
-    {count:8, cols:8}, {count:8, cols:8}, {count:8, cols:8},
-    {count:5, cols:5}, {count:5, cols:5}, {count:5, cols:5},
-    {count:4, cols:4}, {count:4, cols:4}, {count:4, cols:4},
-    {count:20, cols:5}, {count:20, cols:5},
+    {count:8, cols:8},                          // Tham - 1 hàng
+    {count:2, cols:2}, {count:2, cols:2},        // Sân, Si
+    {count:7, cols:7}, {count:8, cols:8}, {count:3, cols:3},  // Vô nhân
+    {count:8, cols:8}, {count:8, cols:8}, {count:8, cols:8},  // Dục giới tịnh hảo
+    {count:5, cols:5, thanthong:true},           // Sắc giới Thiện (+Thần thông)
+    {count:5, cols:5},                           // Sắc giới Quả
+    {count:5, cols:5, thanthong:true},           // Sắc giới Duy Tác (+Thần thông)
+    {count:4, cols:4}, {count:4, cols:4}, {count:4, cols:4},  // Vô Sắc giới
+    {count:20, cols:5}, {count:20, cols:5},      // Siêu thế Đạo, Quả
   ];
   const cetaChunks = [
     {count:7, cols:7}, {count:6, cols:6}, {count:4, cols:4}, {count:3, cols:3},
@@ -110,9 +113,10 @@ function renderTamSoPage(){
   for(const chunk of cittaChunks){
     const items = CITTA_DATA.slice(ci, ci+chunk.count);
     ci += chunk.count;
+    const dashedDot = chunk.thanthong ? `<div class="pdot-sm pdot-dashed" onclick="openThanThongSheet()"></div>` : '';
     cittaHtml += `<div class="pblock">
-      <div class="prow" style="grid-template-columns:repeat(${chunk.cols},26px)">
-        ${items.map(c=>`<div class="pdot-sm" style="background:${VEDANA_COLOR[c.vedana]}" onclick="openCittaSheet(${c.id})"></div>`).join('')}
+      <div class="prow" style="grid-template-columns:repeat(${chunk.cols + (chunk.thanthong?1:0)},26px)">
+        ${items.map(c=>`<div class="pdot-sm" style="background:${VEDANA_COLOR[c.vedana]}" onclick="openCittaSheet(${c.id})"></div>`).join('')}${dashedDot}
       </div>
     </div>`;
   }
@@ -129,8 +133,41 @@ function renderTamSoPage(){
     </div>`;
   }
 
+  // ---- Sắc pháp (28) — 4 Đại hiển đặc biệt + 24 sắc còn lại ----
+  const rupaSpecialColor = {pathavi:'#a9784f', apo:'#3f9fd6', tejo:'#d4501e', vayo:'#6fa9c4'};
+  let rupaHtml = '';
+  const dai4 = RUPA_DATA.slice(0,4);
+  const rupaRest = RUPA_DATA.slice(4);
+  rupaHtml += `<div class="pblock"><div class="prow" style="grid-template-columns:repeat(4,26px)">
+    ${dai4.map(r=>`<div class="pdot-sm" style="background:${rupaSpecialColor[r.id]}" onclick="openDacTinhRupa('${r.id}')"></div>`).join('')}
+  </div></div>`;
+  const rupaRowSizes = [5,4,2,4,2,3,4];
+  let ri = 0;
+  for(const sz of rupaRowSizes){
+    const items = rupaRest.slice(ri, ri+sz);
+    ri += sz;
+    rupaHtml += `<div class="pblock"><div class="prow" style="grid-template-columns:repeat(${sz},26px)">
+      ${items.map(r=>`<div class="pdot-sm" style="background:#8b5fbf" onclick="openDacTinhRupa('${r.id}')"></div>`).join('')}
+    </div></div>`;
+  }
+
+  const nibbanaHtml = `<div class="pblock"><div class="prow" style="grid-template-columns:repeat(1,26px)">
+    <div class="pdot-sm pdot-ring" onclick="openNibbanaSheet()"></div>
+  </div></div>`;
+
+  const namaP = PANNATTI_DATA.filter(p=>p.nhom==='nama');
+  const atthaP = PANNATTI_DATA.filter(p=>p.nhom==='attha');
+  const pannattiHtml = `
+    <div class="pblock"><div class="prow" style="grid-template-columns:repeat(6,26px)">
+      ${namaP.map(p=>`<div class="pdot-sm" style="background:#4b3f8f" onclick="openPannattiSheet('${p.id}')"></div>`).join('')}
+    </div></div>
+    <div class="pblock"><div class="prow" style="grid-template-columns:repeat(7,26px)">
+      ${atthaP.map(p=>`<div class="pdot-sm" style="background:#4b3f8f" onclick="openPannattiSheet('${p.id}')"></div>`).join('')}
+    </div></div>
+  `;
+
   extra.innerHTML = `
-    <p class="info-note" style="margin-bottom:8px">Vị trí đúng Bảng NÊU. Màu = phạm vi Thọ mà pháp ấy có thể đồng sinh (Khổ=đen, Lạc=vàng, Ưu=nâu, Hỷ=đỏ, Xả=xanh lá — ô nhiều màu nghĩa là khởi được với nhiều loại Thọ khác nhau). Chụm 2 ngón tay để phóng to. Chạm vào 1 ô để xem số lượng phối hợp.</p>
+    <p class="info-note" style="margin-bottom:8px">Vị trí đúng Bảng NÊU. Màu = phạm vi Thọ mà pháp ấy có thể đồng sinh (Khổ=đen, Lạc=vàng, Ưu=nâu, Hỷ=đỏ, Xả=xanh lá — ô nhiều màu nghĩa là khởi được với nhiều loại Thọ khác nhau). Vòng nét đứt = có thể phát triển Thần thông. Chụm 2 ngón tay để phóng to. Chạm vào 1 ô để xem chi tiết.</p>
     <div class="poster-cols">
       <div class="poster-col">
         <div class="poster-col-title">TÂM (121)</div>
@@ -139,9 +176,50 @@ function renderTamSoPage(){
       <div class="poster-col">
         <div class="poster-col-title">TÂM SỞ (52)</div>
         ${cetaHtml}
+        <div class="poster-col-title" style="margin-top:12px">SẮC PHÁP (28)</div>
+        ${rupaHtml}
+        <div class="poster-col-title" style="margin-top:12px">NÍP-BÀN</div>
+        ${nibbanaHtml}
       </div>
     </div>
+    <div class="poster-col-title" style="margin-top:14px">PHÁP CHẾ ĐỊNH — 13</div>
+    <div style="margin-top:6px">${pannattiHtml}</div>
   `;
+}
+
+function openThanThongSheet(){
+  const html = `
+    <div class="sheet-head"><h2>Thần thông</h2></div>
+    <p class="sheet-pali">Abhiññā</p>
+    <div class="sec"><div class="sec-label">Giải thích</div><div class="sec-body">Năng lực thần thông (như thiên nhãn, thiên nhĩ, tha tâm thông...) chỉ có thể phát triển từ nền tảng Tâm <b>Thiện Sắc giới</b> và Tâm <b>Duy Tác Sắc giới</b> (của bậc đã ly dục nhiễm, đắc các tầng thiền) — không phát triển được từ Tâm Quả Sắc giới, vì Tâm Quả chỉ là kết quả thọ hưởng, không có khả năng chủ động vận dụng thần lực.</div></div>
+  `;
+  document.getElementById('sheet-content').innerHTML = html;
+  document.getElementById('sheet').classList.add('show');
+  document.getElementById('sheet-backdrop').classList.add('show');
+}
+
+function openNibbanaSheet(){
+  const n = NIBBANA_DATA;
+  const html = `
+    <div class="sheet-head"><h2>${n.ten}</h2></div>
+    <p class="sheet-pali">${n.pali}</p>
+    <div class="sec"><div class="sec-label">Giải thích</div><div class="sec-body">${n.mota}</div></div>
+  `;
+  document.getElementById('sheet-content').innerHTML = html;
+  document.getElementById('sheet').classList.add('show');
+  document.getElementById('sheet-backdrop').classList.add('show');
+}
+
+function openPannattiSheet(id){
+  const p = PANNATTI_DATA.find(x=>x.id===id);
+  const html = `
+    <div class="sheet-head"><h2>${p.ten}</h2></div>
+    <p class="sheet-pali">${p.pali} · ${p.nhom==='nama'?'Danh chế định':'Nghĩa chế định'}</p>
+    <div class="sec"><div class="sec-label">Giải thích</div><div class="sec-body">${p.mota}</div></div>
+  `;
+  document.getElementById('sheet-content').innerHTML = html;
+  document.getElementById('sheet').classList.add('show');
+  document.getElementById('sheet-backdrop').classList.add('show');
 }
 
 function openCittaSheet(id){
