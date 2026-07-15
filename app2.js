@@ -60,42 +60,49 @@ function switchSection(s){
   document.getElementById('main').scrollTop = 0;
 }
 
+const VEDANA_COLOR = {kho:'#232323', lac:'#eec22b', uu:'#7a3030', hy:'#d13b3b', xa:'#2f7d46'};
+const VEDANA_ORDER = ['kho','lac','uu','hy','xa'];
+
+// Trường hợp đặc biệt: các tâm sở bất định (chỉ khởi tùy hoàn cảnh) không nằm cố định
+// trong danh sách ceta của tâm, nên tính riêng phạm vi Thọ dựa trên tâm mà chúng có thể khởi cùng.
+const VEDANA_OVERRIDE = {
+  man: ['hy','xa'], tat: ['uu'], lan: ['uu'], hoi: ['uu'], bi: ['hy','xa'], tuyhy: ['hy','xa']
+};
+
+function vedanaSetOf(cetaId){
+  if(VEDANA_OVERRIDE[cetaId]) return VEDANA_OVERRIDE[cetaId];
+  const set = new Set();
+  for(const cit of CITTA_DATA){ if(cit.ceta.includes(cetaId)) set.add(cit.vedana); }
+  return VEDANA_ORDER.filter(v=>set.has(v));
+}
+
+function dotBackgroundStyle(colors){
+  if(colors.length<=1){
+    return `background:${VEDANA_COLOR[colors[0]]||'#999'}`;
+  }
+  if(colors.length===2){
+    return `background:linear-gradient(180deg, ${VEDANA_COLOR[colors[0]]} 50%, ${VEDANA_COLOR[colors[1]]} 50%)`;
+  }
+  const n = colors.length;
+  const stops = colors.map((c,i)=> `${VEDANA_COLOR[c]} ${Math.round(i/n*100)}% ${Math.round((i+1)/n*100)}%`).join(', ');
+  return `background:conic-gradient(${stops})`;
+}
+
 function renderTamSoPage(){
   const extra = document.getElementById('extra-content');
 
   const cittaChunks = [
-    {label:"8 Tham", count:8, cols:4},
-    {label:"2 Sân", count:2, cols:2},
-    {label:"2 Si", count:2, cols:2},
-    {label:"7 Quả B.Thiện", count:7, cols:7},
-    {label:"8 Quả Thiện", count:8, cols:8},
-    {label:"3 Duy Tác", count:3, cols:3},
-    {label:"8 Thiện DGTH", count:8, cols:8},
-    {label:"8 Quả DGTH", count:8, cols:8},
-    {label:"8 Duy Tác DGTH", count:8, cols:8},
-    {label:"5 Thiện Sắc giới", count:5, cols:5},
-    {label:"5 Quả Sắc giới", count:5, cols:5},
-    {label:"5 D.Tác Sắc giới", count:5, cols:5},
-    {label:"4 Thiện Vô Sắc", count:4, cols:4},
-    {label:"4 Quả Vô Sắc", count:4, cols:4},
-    {label:"4 D.Tác Vô Sắc", count:4, cols:4},
-    {label:"20 Đạo Siêu thế", count:20, cols:5},
-    {label:"20 Quả Siêu thế", count:20, cols:5},
+    {count:8, cols:4}, {count:2, cols:2}, {count:2, cols:2},
+    {count:7, cols:7}, {count:8, cols:8}, {count:3, cols:3},
+    {count:8, cols:8}, {count:8, cols:8}, {count:8, cols:8},
+    {count:5, cols:5}, {count:5, cols:5}, {count:5, cols:5},
+    {count:4, cols:4}, {count:4, cols:4}, {count:4, cols:4},
+    {count:20, cols:5}, {count:20, cols:5},
   ];
-
   const cetaChunks = [
-    {label:"7 Biến hành", count:7, cols:7, color:"gray"},
-    {label:"6 Biệt cảnh", count:6, cols:6, color:"amber"},
-    {label:"4 Si phần", count:4, cols:4, color:"coral"},
-    {label:"3 Tham phần", count:3, cols:3, color:"pink"},
-    {label:"4 Sân phần", count:4, cols:4, color:"purple"},
-    {label:"2 Hôn phần", count:2, cols:2, color:"blue"},
-    {label:"1 Hoài nghi", count:1, cols:1, color:"gray"},
-    {label:"7 Tịnh hảo BH", count:7, cols:7, color:"teal"},
-    {label:"12 Tịnh hảo cặp", count:12, cols:6, color:"teal"},
-    {label:"3 Giới phần", count:3, cols:3, color:"blue"},
-    {label:"2 Vô lượng", count:2, cols:2, color:"purple"},
-    {label:"1 Trí tuệ", count:1, cols:1, color:"green"},
+    {count:7, cols:7}, {count:6, cols:6}, {count:4, cols:4}, {count:3, cols:3},
+    {count:4, cols:4}, {count:2, cols:2}, {count:1, cols:1}, {count:7, cols:7},
+    {count:12, cols:6}, {count:3, cols:3}, {count:2, cols:2}, {count:1, cols:1},
   ];
 
   let ci = 0;
@@ -104,9 +111,8 @@ function renderTamSoPage(){
     const items = CITTA_DATA.slice(ci, ci+chunk.count);
     ci += chunk.count;
     cittaHtml += `<div class="pblock">
-      <div class="pblock-label">${chunk.label}</div>
-      <div class="prow" style="grid-template-columns:repeat(${chunk.cols},16px)">
-        ${items.map(c=>`<div class="pdot-sm v-${c.vedana}" onclick="openCittaSheet(${c.id})"></div>`).join('')}
+      <div class="prow" style="grid-template-columns:repeat(${chunk.cols},26px)">
+        ${items.map(c=>`<div class="pdot-sm" style="background:${VEDANA_COLOR[c.vedana]}" onclick="openCittaSheet(${c.id})"></div>`).join('')}
       </div>
     </div>`;
   }
@@ -117,15 +123,14 @@ function renderTamSoPage(){
     const items = CETASIKA_DATA.slice(ei, ei+chunk.count);
     ei += chunk.count;
     cetaHtml += `<div class="pblock">
-      <div class="pblock-label">${chunk.label}</div>
-      <div class="prow" style="grid-template-columns:repeat(${chunk.cols},16px)">
-        ${items.map(c=>`<div class="pdot-sm d-${chunk.color}" onclick="openCetasikaSheet('${c.id}')"></div>`).join('')}
+      <div class="prow" style="grid-template-columns:repeat(${chunk.cols},26px)">
+        ${items.map(c=>`<div class="pdot-sm" style="${dotBackgroundStyle(vedanaSetOf(c.id))}" onclick="openCetasikaSheet('${c.id}')"></div>`).join('')}
       </div>
     </div>`;
   }
 
   extra.innerHTML = `
-    <p class="info-note" style="margin-bottom:8px">Toàn bộ sơ đồ trong 1 màn hình, đúng vị trí & màu Bảng NÊU. Chụm 2 ngón tay để phóng to khi cần bấm chính xác. Chạm vào 1 ô để xem số lượng phối hợp.</p>
+    <p class="info-note" style="margin-bottom:8px">Vị trí đúng Bảng NÊU. Màu = phạm vi Thọ mà pháp ấy có thể đồng sinh (Khổ=đen, Lạc=vàng, Ưu=nâu, Hỷ=đỏ, Xả=xanh lá — ô nhiều màu nghĩa là khởi được với nhiều loại Thọ khác nhau). Chụm 2 ngón tay để phóng to. Chạm vào 1 ô để xem số lượng phối hợp.</p>
     <div class="poster-cols">
       <div class="poster-col">
         <div class="poster-col-title">TÂM (121)</div>

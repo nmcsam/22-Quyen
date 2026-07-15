@@ -70,11 +70,11 @@
   .sheet-handle{width:38px;height:4px;background:rgba(128,128,128,.35);border-radius:2px;margin:2px auto 12px}
   .sheet-head{display:flex;align-items:baseline;gap:8px;margin-bottom:2px}
   .sheet-head .num{font-size:13px;color:var(--ink-soft);font-weight:700}
-  .sheet-head h2{font-size:19px;margin:0;font-weight:700}
-  .sheet-pali{font-size:13.5px;font-style:italic;color:var(--ink-soft);margin:0 0 14px}
+  .sheet-head h2{font-size:23px;margin:0;font-weight:700}
+  .sheet-pali{font-size:16px;font-style:italic;color:var(--ink-soft);margin:0 0 14px}
   .sec{margin-bottom:14px}
-  .sec-label{font-size:11px;color:var(--ink-soft);font-weight:700;margin-bottom:4px}
-  .sec-body{font-size:calc(15.5px * var(--fontscale));line-height:1.55}
+  .sec-label{font-size:13.5px;color:var(--ink-soft);font-weight:700;margin-bottom:4px}
+  .sec-body{font-size:calc(17.5px * var(--fontscale));line-height:1.6}
   .pill-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
   .pill{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:20px}
   .close-x{position:absolute;top:12px;right:14px;font-size:20px;color:var(--ink-soft);background:none;border:none;padding:4px}
@@ -98,10 +98,10 @@
 
   .combo-list{display:flex;flex-direction:column;gap:8px;margin-top:6px}
   .combo-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:10px;background:rgba(128,128,128,.07)}
-  .combo-badge{flex:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
-  .combo-text{font-size:calc(14px * var(--fontscale));line-height:1.45}
+  .combo-badge{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700}
+  .combo-text{font-size:calc(16.5px * var(--fontscale));line-height:1.5}
   .combo-text .cname{font-weight:700}
-  .combo-text .cpali{font-style:italic;color:var(--ink-soft);font-size:calc(12.5px * var(--fontscale))}
+  .combo-text .cpali{font-style:italic;color:var(--ink-soft);font-size:calc(14.5px * var(--fontscale))}
 
   .article h3{font-size:15px;margin:20px 0 6px}
   .article p{font-size:14px;line-height:1.6;margin:6px 0}
@@ -128,26 +128,26 @@
   .d-green{background:#5a9e2f}
   .poster-section-title{font-size:15px;font-weight:700;margin:18px 2px 8px}
   .big-count{display:flex;align-items:baseline;gap:8px;background:rgba(201,118,46,.1);border-radius:12px;padding:12px 16px;margin:10px 0 14px}
-  .big-num{font-size:34px;font-weight:800;color:#c9762e;line-height:1}
-  .big-unit{font-size:13.5px;color:var(--ink-soft)}
+  .big-num{font-size:40px;font-weight:800;color:#c9762e;line-height:1}
+  .big-unit{font-size:15.5px;color:var(--ink-soft)}
 
-  .poster-cols{display:flex;gap:8px;align-items:flex-start}
+  .poster-cols{display:flex;gap:10px;align-items:flex-start}
   .poster-col{flex:1;min-width:0}
   .poster-col-title{font-size:12px;font-weight:800;text-align:center;margin-bottom:6px;padding:3px;border-radius:6px;background:rgba(128,128,128,.12)}
-  .pblock{margin-bottom:6px}
-  .pblock-label{font-size:6.5px;color:var(--ink-soft);line-height:1.1;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .prow{display:grid;gap:2px;margin-bottom:2px;justify-content:start}
-  .pdot-sm{width:16px;height:16px;border-radius:50%;cursor:pointer;border:0.5px solid rgba(0,0,0,.2)}
+  .pblock{margin-bottom:5px}
+  .prow{display:grid;gap:3px;margin-bottom:3px;justify-content:start}
+  .pdot-sm{width:26px;height:26px;border-radius:50%;cursor:pointer;border:1px solid rgba(0,0,0,.25);transition:transform .1s}
+  .pdot-sm:active{transform:scale(.88)}
 
   .circle-plain{background:var(--card);border-color:#2c2620 !important;color:var(--ink)}
   @media (prefers-color-scheme: dark){ .circle-plain{border-color:#e8ded0 !important} }
   .attr-block{margin-bottom:12px}
-  .attr-label{font-size:11px;letter-spacing:.02em;font-weight:700;margin-bottom:3px}
+  .attr-label{font-size:13.5px;letter-spacing:.02em;font-weight:700;margin-bottom:3px}
   .attr-dt .attr-label{color:#8a3b1a}
   .attr-cn .attr-label{color:#1c5b7a}
   .attr-th .attr-label{color:#5a7d2a}
   .attr-ng .attr-label{color:#72243e}
-  .attr-pali{font-size:calc(13px * var(--fontscale));font-style:italic;color:#1c5b9e;margin-top:2px;line-height:1.45}
+  .attr-pali{font-size:calc(15px * var(--fontscale));font-style:italic;color:#1c5b9e;margin-top:2px;line-height:1.5}
   @media (prefers-color-scheme: dark){ .attr-pali{color:#7ab3ea} }
 
   #fontctrl{display:flex;align-items:center;justify-content:center;gap:2px;margin-top:8px}
