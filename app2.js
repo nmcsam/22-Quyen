@@ -31,11 +31,11 @@ function switchSection(s){
     renderQuyenGrid();
   } else if(s==='tamso'){
     document.getElementById('page-title').textContent = 'Tâm ↔ Tâm sở';
-    document.getElementById('page-subtitle').textContent = 'Chạm vào một vòng tròn để xem phối hợp';
+    document.getElementById('page-subtitle').textContent = 'Chạm vào một ô để xem số lượng phối hợp';
     grid.style.display='none';
     legend.style.display='none';
-    renderTamSoNav();
-    renderTamSoGrid();
+    document.getElementById('nav').innerHTML = '';
+    renderTamSoPage();
   } else if(s==='dactinh'){
     document.getElementById('page-title').textContent = 'Đặc tính · Chức năng · Thể hiện · Nhân gần';
     document.getElementById('page-subtitle').textContent = 'Chạm vào một pháp để xem 4 đặc tính (theo Aṭṭhasālinī)';
@@ -54,57 +54,78 @@ function switchSection(s){
   document.getElementById('main').scrollTop = 0;
 }
 
-function renderTamSoNav(){
-  const nav = document.getElementById('nav');
-  nav.innerHTML = `
-    <button class="${tamsoMode==='tam2so'?'active':''}" onclick="switchTamSoMode('tam2so')"><span class="ico">◉</span>Tâm → Tâm sở</button>
-    <button class="${tamsoMode==='so2tam'?'active':''}" onclick="switchTamSoMode('so2tam')"><span class="ico">◎</span>Tâm sở → Tâm</button>
-  `;
-}
-
-function switchTamSoMode(m){
-  tamsoMode = m;
-  renderTamSoNav();
-  renderTamSoGrid();
-  document.getElementById('main').scrollTop = 0;
-}
-
-function renderTamSoGrid(){
+function renderTamSoPage(){
   const extra = document.getElementById('extra-content');
-  extra.innerHTML = tamsoMode==='tam2so' ? renderCittaGridHTML() : renderCetasikaGridHTML();
-}
 
-function renderCittaGridHTML(){
-  const groups = [];
-  for(const c of CITTA_DATA){ if(!groups.includes(c.group)) groups.push(c.group); }
-  let html = `<p class="info-note" style="margin-bottom:12px">121 tâm, chia theo 6 nhóm lớn. Chạm vào một tâm để xem các tâm sở phối hợp cùng.</p>`;
-  for(const g of groups){
-    const items = CITTA_DATA.filter(c=>c.group===g);
-    html += `<div class="group-head">${items[0].groupLabel} (${items.length})</div>`;
-    html += `<div class="circle-grid">`;
-    html += items.map(c=>{
-      const color = CITTA_GROUP_COLOR[g]||'gray';
-      return `<div class="circle cat-${color}" onclick="openCittaSheet(${c.id})"><div class="cn">${c.name}</div></div>`;
-    }).join('');
-    html += `</div>`;
-  }
-  return html;
-}
+  // ---- Cấu hình chia khối đúng theo Bảng NÊU (số ô mỗi hàng = số cột) ----
+  const cittaChunks = [
+    {label:"8 Tâm Tham", count:8, cols:4},
+    {label:"2 Tâm Sân", count:2, cols:2},
+    {label:"2 Tâm Si", count:2, cols:2},
+    {label:"7 Tâm Quả Bất Thiện (Vô nhân)", count:7, cols:7},
+    {label:"8 Tâm Quả Thiện (Vô nhân)", count:8, cols:8},
+    {label:"3 Tâm Duy Tác (Vô nhân)", count:3, cols:3},
+    {label:"8 Tâm Thiện — Dục giới tịnh hảo", count:8, cols:8},
+    {label:"8 Tâm Quả — Dục giới tịnh hảo", count:8, cols:8},
+    {label:"8 Tâm Duy Tác — Dục giới tịnh hảo", count:8, cols:8},
+    {label:"5 Tâm Thiện — Sắc giới", count:5, cols:5},
+    {label:"5 Tâm Quả — Sắc giới", count:5, cols:5},
+    {label:"5 Tâm Duy Tác — Sắc giới", count:5, cols:5},
+    {label:"4 Tâm Thiện — Vô Sắc giới", count:4, cols:4},
+    {label:"4 Tâm Quả — Vô Sắc giới", count:4, cols:4},
+    {label:"4 Tâm Duy Tác — Vô Sắc giới", count:4, cols:4},
+    {label:"20 Tâm Đạo — Siêu thế", count:20, cols:5},
+    {label:"20 Tâm Quả — Siêu thế", count:20, cols:5},
+  ];
 
-function renderCetasikaGridHTML(){
-  let html = `<p class="info-note" style="margin-bottom:12px">52 tâm sở, chia theo 8 nhóm chuẩn. Chạm vào một tâm sở để xem các tâm phối hợp cùng.</p>`;
-  for(const g of CETASIKA_GROUP_ORDER){
-    const items = CETASIKA_DATA.filter(c=>c.nhom===g);
-    if(!items.length) continue;
-    html += `<div class="group-head">${CETASIKA_GROUP_LABEL[g]}</div>`;
-    html += `<div class="circle-grid">`;
-    html += items.map(c=>{
-      const color = CETASIKA_GROUP_COLOR[g]||'gray';
-      return `<div class="circle cat-${color}" onclick="openCetasikaSheet('${c.id}')"><div class="cn">${c.ten}</div><div class="cp">${c.pali}</div></div>`;
-    }).join('');
-    html += `</div>`;
+  const cetaChunks = [
+    {label:"7 Sở hữu Biến hành", count:7, cols:7, color:"gray"},
+    {label:"6 Sở hữu Biệt cảnh (Tợ tha)", count:6, cols:6, color:"amber"},
+    {label:"4 Sở hữu Si phần", count:4, cols:4, color:"coral"},
+    {label:"3 Sở hữu Tham phần", count:3, cols:3, color:"pink"},
+    {label:"4 Sở hữu Sân phần", count:4, cols:4, color:"purple"},
+    {label:"2 Sở hữu Hôn phần", count:2, cols:2, color:"blue"},
+    {label:"1 Sở hữu Hoài nghi", count:1, cols:1, color:"gray"},
+    {label:"7 Sở hữu Tịnh hảo Biến hành", count:7, cols:7, color:"teal"},
+    {label:"12 Sở hữu Tịnh hảo (6 cặp Thân—Tâm)", count:12, cols:6, color:"teal"},
+    {label:"3 Sở hữu Giới phần (Tiết chế)", count:3, cols:3, color:"blue"},
+    {label:"2 Sở hữu Vô lượng phần", count:2, cols:2, color:"purple"},
+    {label:"1 Sở hữu Trí tuệ", count:1, cols:1, color:"green"},
+  ];
+
+  let ci = 0;
+  let cittaHtml = '';
+  for(const chunk of cittaChunks){
+    const items = CITTA_DATA.slice(ci, ci+chunk.count);
+    ci += chunk.count;
+    cittaHtml += `<div class="poster-block">
+      <div class="poster-label">${chunk.label}</div>
+      <div class="dot-row" style="grid-template-columns:repeat(${chunk.cols},1fr)">
+        ${items.map(c=>`<div class="pdot v-${c.vedana}" onclick="openCittaSheet(${c.id})"></div>`).join('')}
+      </div>
+    </div>`;
   }
-  return html;
+
+  let ei = 0;
+  let cetaHtml = '';
+  for(const chunk of cetaChunks){
+    const items = CETASIKA_DATA.slice(ei, ei+chunk.count);
+    ei += chunk.count;
+    cetaHtml += `<div class="poster-block">
+      <div class="poster-label">${chunk.label}</div>
+      <div class="dot-row" style="grid-template-columns:repeat(${chunk.cols},1fr)">
+        ${items.map(c=>`<div class="pdot d-${chunk.color}" onclick="openCetasikaSheet('${c.id}')"></div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  extra.innerHTML = `
+    <p class="info-note" style="margin-bottom:10px">Vị trí và số lượng ô đúng theo Bảng NÊU. Màu ô Tâm theo Thọ (Khổ=đen, Lạc=vàng, Ưu=nâu, Hỷ=đỏ, Xả=xanh lá). Chạm vào một ô để xem chi tiết phối hợp.</p>
+    <div class="poster-section-title">TÂM (Citta) — 121</div>
+    ${cittaHtml}
+    <div class="poster-section-title">TÂM SỞ (Cetasika) — 52</div>
+    ${cetaHtml}
+  `;
 }
 
 function openCittaSheet(id){
@@ -118,10 +139,7 @@ function openCittaSheet(id){
   const html = `
     <div class="sheet-head"><h2>${c.name}</h2></div>
     <p class="sheet-pali">${c.groupLabel} · Cảm thọ: ${c.vedanaLabel}</p>
-    <div class="sec">
-      <div class="sec-label">Tổng số tâm sở phối hợp</div>
-      <div class="sec-body"><b>${c.ceta.length} tâm sở</b> đồng sinh trong sát-na này.</div>
-    </div>
+    <div class="big-count"><span class="big-num">${c.ceta.length}</span><span class="big-unit">tâm sở phối hợp</span></div>
     ${c.note ? `<div class="info-note"><b>Trường hợp đặc biệt:</b> ${c.note}</div>` : ''}
     <div class="sec" style="margin-top:14px">
       <div class="sec-label">Danh sách Tâm sở phối hợp</div>
@@ -150,13 +168,14 @@ function openCetasikaSheet(id){
   const html = `
     <div class="sheet-head"><h2>${ces.ten}</h2></div>
     <p class="sheet-pali">${ces.pali}</p>
+    <div class="big-count"><span class="big-num">${matching.length}</span><span class="big-unit">tâm phối hợp</span></div>
     <div class="sec">
       <div class="sec-label">Giải thích / Vì sao phối hợp được, trường hợp đặc biệt</div>
       <div class="sec-body">${ces.giaithich}</div>
     </div>
-    ${ces.quyluat ? `<div class="info-note"><b>Công thức tính số tâm (${ces.socount||matching.length} tâm):</b> ${ces.quyluat}</div>` : ''}
+    ${ces.quyluat ? `<div class="info-note"><b>Công thức tính số tâm:</b> ${ces.quyluat}</div>` : ''}
     <div class="sec" style="margin-top:14px">
-      <div class="sec-label">Phối hợp với ${matching.length} tâm</div>
+      <div class="sec-label">Danh sách ${matching.length} tâm phối hợp</div>
       <div class="combo-list">${listHtml}</div>
     </div>
   `;
