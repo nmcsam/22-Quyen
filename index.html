@@ -131,12 +131,15 @@
   .big-num{font-size:40px;font-weight:800;color:#c9762e;line-height:1}
   .big-unit{font-size:15.5px;color:var(--ink-soft)}
 
-  .poster-cols{display:flex;gap:10px;align-items:flex-start}
+  .poster-cols{display:flex;gap:8px;align-items:flex-start;max-width:100%;overflow-x:auto}
   .poster-col{flex:1;min-width:0}
   .poster-col-title{font-size:12px;font-weight:800;text-align:center;margin-bottom:6px;padding:3px;border-radius:6px;background:rgba(128,128,128,.12)}
-  .pblock{margin-bottom:5px}
-  .prow{display:grid;gap:3px;margin-bottom:3px;justify-content:start}
-  .pdot-sm{width:26px;height:26px;border-radius:50%;cursor:pointer;border:1px solid rgba(0,0,0,.25);transition:transform .1s}
+  .pblock{margin-bottom:4px}
+  .pblock-gap{margin-top:13px}
+  .pblock-center{display:flex;justify-content:center}
+  .pblock-center .prow{justify-content:center}
+  .prow{display:grid;gap:2px;margin-bottom:2px;justify-content:start}
+  .pdot-sm{width:20px;height:20px;border-radius:50%;cursor:pointer;border:1px solid rgba(0,0,0,.25);transition:transform .1s}
   .pdot-sm:active{transform:scale(.88)}
   .pdot-dashed{background:none !important;border:2px dashed #4a9d5f}
   .pdot-ring{background:none !important;border:3px solid #e8c027;width:30px;height:30px}

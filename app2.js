@@ -91,21 +91,32 @@ function dotBackgroundStyle(colors){
 function renderTamSoPage(){
   const extra = document.getElementById('extra-content');
 
+  // center:true => hàng này được canh giữa dưới bề ngang 8 cột (theo đúng bản NÊU)
+  // groupGap:true => có khoảng cách lớn hơn phía trên (bắt đầu nhóm tâm mới)
   const cittaChunks = [
-    {count:8, cols:8},                          // Tham - 1 hàng
-    {count:2, cols:2}, {count:2, cols:2},        // Sân, Si
-    {count:7, cols:7}, {count:8, cols:8}, {count:3, cols:3},  // Vô nhân
-    {count:8, cols:8}, {count:8, cols:8}, {count:8, cols:8},  // Dục giới tịnh hảo
-    {count:5, cols:5, thanthong:true},           // Sắc giới Thiện (+Thần thông)
-    {count:5, cols:5},                           // Sắc giới Quả
-    {count:5, cols:5, thanthong:true},           // Sắc giới Duy Tác (+Thần thông)
-    {count:4, cols:4}, {count:4, cols:4}, {count:4, cols:4},  // Vô Sắc giới
-    {count:20, cols:5}, {count:20, cols:5},      // Siêu thế Đạo, Quả
+    {count:8, cols:8},                                          // Tham
+    {count:2, cols:2, center:true},                             // Sân
+    {count:2, cols:2, center:true},                             // Si
+    {count:7, cols:7, groupGap:true},                           // Vô nhân: Quả Bất Thiện
+    {count:8, cols:8},                                          // Vô nhân: Quả Thiện
+    {count:3, cols:3, center:true},                             // Vô nhân: Duy Tác
+    {count:8, cols:8, groupGap:true},                           // Dục giới tịnh hảo: Thiện
+    {count:8, cols:8},                                          // Dục giới tịnh hảo: Quả
+    {count:8, cols:8},                                          // Dục giới tịnh hảo: Duy Tác
+    {count:5, cols:5, thanthong:true, groupGap:true},           // Sắc giới: Thiện (+Thần thông)
+    {count:5, cols:5},                                          // Sắc giới: Quả
+    {count:5, cols:5, thanthong:true},                          // Sắc giới: Duy Tác (+Thần thông)
+    {count:4, cols:4, groupGap:true},                           // Vô Sắc giới: Thiện
+    {count:4, cols:4},                                          // Vô Sắc giới: Quả
+    {count:4, cols:4},                                          // Vô Sắc giới: Duy Tác
+    {count:20, cols:5, groupGap:true},                          // Siêu thế: Đạo
+    {count:20, cols:5},                                         // Siêu thế: Quả
   ];
   const cetaChunks = [
-    {count:7, cols:7}, {count:6, cols:6}, {count:4, cols:4}, {count:3, cols:3},
-    {count:4, cols:4}, {count:2, cols:2}, {count:1, cols:1}, {count:7, cols:7},
-    {count:12, cols:6}, {count:3, cols:3}, {count:2, cols:2}, {count:1, cols:1},
+    {count:7, cols:7}, {count:6, cols:6},
+    {count:4, cols:4, groupGap:true}, {count:3, cols:3}, {count:4, cols:4}, {count:2, cols:2}, {count:1, cols:1},
+    {count:7, cols:7, groupGap:true}, {count:12, cols:6},
+    {count:3, cols:3, groupGap:true}, {count:2, cols:2}, {count:1, cols:1},
   ];
 
   let ci = 0;
@@ -114,8 +125,9 @@ function renderTamSoPage(){
     const items = CITTA_DATA.slice(ci, ci+chunk.count);
     ci += chunk.count;
     const dashedDot = chunk.thanthong ? `<div class="pdot-sm pdot-dashed" onclick="openThanThongSheet()"></div>` : '';
-    cittaHtml += `<div class="pblock">
-      <div class="prow" style="grid-template-columns:repeat(${chunk.cols + (chunk.thanthong?1:0)},26px)">
+    const cls = 'pblock' + (chunk.groupGap?' pblock-gap':'') + (chunk.center?' pblock-center':'');
+    cittaHtml += `<div class="${cls}">
+      <div class="prow" style="grid-template-columns:repeat(${chunk.cols + (chunk.thanthong?1:0)},20px)">
         ${items.map(c=>`<div class="pdot-sm" style="background:${VEDANA_COLOR[c.vedana]}" onclick="openCittaSheet(${c.id})"></div>`).join('')}${dashedDot}
       </div>
     </div>`;
@@ -126,8 +138,9 @@ function renderTamSoPage(){
   for(const chunk of cetaChunks){
     const items = CETASIKA_DATA.slice(ei, ei+chunk.count);
     ei += chunk.count;
-    cetaHtml += `<div class="pblock">
-      <div class="prow" style="grid-template-columns:repeat(${chunk.cols},26px)">
+    const cls = 'pblock' + (chunk.groupGap?' pblock-gap':'');
+    cetaHtml += `<div class="${cls}">
+      <div class="prow" style="grid-template-columns:repeat(${chunk.cols},20px)">
         ${items.map(c=>`<div class="pdot-sm" style="${dotBackgroundStyle(vedanaSetOf(c.id))}" onclick="openCetasikaSheet('${c.id}')"></div>`).join('')}
       </div>
     </div>`;
@@ -135,10 +148,9 @@ function renderTamSoPage(){
 
   // ---- Sắc pháp (28) — 4 Đại hiển đặc biệt + 24 sắc còn lại ----
   const rupaSpecialColor = {pathavi:'#a9784f', apo:'#3f9fd6', tejo:'#d4501e', vayo:'#6fa9c4'};
-  let rupaHtml = '';
   const dai4 = RUPA_DATA.slice(0,4);
   const rupaRest = RUPA_DATA.slice(4);
-  rupaHtml += `<div class="pblock"><div class="prow" style="grid-template-columns:repeat(4,26px)">
+  let rupaHtml = `<div class="pblock"><div class="prow" style="grid-template-columns:repeat(4,20px)">
     ${dai4.map(r=>`<div class="pdot-sm" style="background:${rupaSpecialColor[r.id]}" onclick="openDacTinhRupa('${r.id}')"></div>`).join('')}
   </div></div>`;
   const rupaRowSizes = [5,4,2,4,2,3,4];
@@ -146,15 +158,12 @@ function renderTamSoPage(){
   for(const sz of rupaRowSizes){
     const items = rupaRest.slice(ri, ri+sz);
     ri += sz;
-    rupaHtml += `<div class="pblock"><div class="prow" style="grid-template-columns:repeat(${sz},26px)">
+    rupaHtml += `<div class="pblock"><div class="prow" style="grid-template-columns:repeat(${sz},20px)">
       ${items.map(r=>`<div class="pdot-sm" style="background:#8b5fbf" onclick="openDacTinhRupa('${r.id}')"></div>`).join('')}
     </div></div>`;
   }
 
-  const nibbanaHtml = `<div class="pblock" style="display:flex;justify-content:center;padding:8px 0">
-    <div class="pdot-ring-big" onclick="openNibbanaSheet()"></div>
-  </div>`;
-
+  // ---- 13 Pháp chế định: 6 Danh (dưới cột TÂM) + 7 Nghĩa (dưới cột TÂM SỞ) ----
   const namaColors = ['#4b3f8f','#5fa8d3','split-pb','split-bp','split-pb','split-bp'];
   const namaP = PANNATTI_DATA.filter(p=>p.nhom==='nama');
   const atthaP = PANNATTI_DATA.filter(p=>p.nhom==='attha');
@@ -163,31 +172,34 @@ function renderTamSoPage(){
     if(colorKey==='split-bp') return 'background:linear-gradient(180deg, #5fa8d3 50%, #4b3f8f 50%)';
     return `background:${colorKey}`;
   }
-  const pannattiHtml = `
-    <div class="pblock"><div class="prow" style="grid-template-columns:repeat(13,26px)">
-      ${namaP.map((p,i)=>`<div class="pdot-sm" style="${pannattiDotStyle(namaColors[i])}" onclick="openPannattiSheet('${p.id}')"></div>`).join('')}
-      ${atthaP.map(p=>`<div class="pdot-sm" style="background:#4b3f8f" onclick="openPannattiSheet('${p.id}')"></div>`).join('')}
-    </div></div>
-  `;
+  const namaHtml = `<div class="pblock pblock-gap"><div class="prow" style="grid-template-columns:repeat(6,20px)">
+    ${namaP.map((p,i)=>`<div class="pdot-sm" style="${pannattiDotStyle(namaColors[i])}" onclick="openPannattiSheet('${p.id}')"></div>`).join('')}
+  </div></div>`;
+  const atthaHtml = `<div class="pblock pblock-gap"><div class="prow" style="grid-template-columns:repeat(7,20px)">
+    ${atthaP.map(p=>`<div class="pdot-sm" style="background:#4b3f8f" onclick="openPannattiSheet('${p.id}')"></div>`).join('')}
+  </div></div>`;
 
   extra.innerHTML = `
-    <p class="info-note" style="margin-bottom:8px">Vị trí đúng Bảng NÊU. Màu = phạm vi Thọ mà pháp ấy có thể đồng sinh (Khổ=đen, Lạc=vàng, Ưu=nâu, Hỷ=đỏ, Xả=xanh lá — ô nhiều màu nghĩa là khởi được với nhiều loại Thọ khác nhau). Vòng nét đứt = có thể phát triển Thần thông. Chụm 2 ngón tay để phóng to. Chạm vào 1 ô để xem chi tiết.</p>
+    <p class="info-note" style="margin-bottom:8px">Vị trí đúng Bảng NÊU. Màu = phạm vi Thọ mà pháp ấy có thể đồng sinh (Khổ=đen, Lạc=vàng, Ưu=nâu, Hỷ=đỏ, Xả=xanh lá). Vòng nét đứt = có thể phát triển Thần thông. Chụm 2 ngón tay để phóng to. Chạm vào 1 ô để xem chi tiết.</p>
     <div class="poster-cols">
       <div class="poster-col">
         <div class="poster-col-title">TÂM (121)</div>
         ${cittaHtml}
+        <div class="poster-col-title" style="margin-top:14px">DANH CHẾ ĐỊNH (6)</div>
+        ${namaHtml}
       </div>
       <div class="poster-col">
         <div class="poster-col-title">TÂM SỞ (52)</div>
         ${cetaHtml}
-        <div class="poster-col-title" style="margin-top:12px">SẮC PHÁP (28)</div>
-        ${rupaHtml}
-        <div class="poster-col-title" style="margin-top:12px">NÍP-BÀN</div>
-        ${nibbanaHtml}
+        <div class="poster-col-title" style="margin-top:14px">SẮC PHÁP (28) &amp; NÍP-BÀN</div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div style="flex:1">${rupaHtml}</div>
+          <div class="pdot-ring-big" style="width:60px;height:60px;flex:none" onclick="openNibbanaSheet()"></div>
+        </div>
+        <div class="poster-col-title" style="margin-top:14px">NGHĨA CHẾ ĐỊNH (7)</div>
+        ${atthaHtml}
       </div>
     </div>
-    <div class="poster-col-title" style="margin-top:14px">PHÁP CHẾ ĐỊNH — 13</div>
-    <div style="margin-top:6px">${pannattiHtml}</div>
   `;
 }
 
