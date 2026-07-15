@@ -8,7 +8,7 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['quyen22','22 Quyền'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Đặc tính · Chức năng']];
+  const sections = [['quyen22','22 Quyền'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Đặc tính · Chức năng'],['canh','21 Cảnh']];
   document.getElementById('section-switch').innerHTML = sections.map(([k,label])=>
     `<button class="${k===currentSection?'active':''}" onclick="switchSection('${k}')">${label}</button>`
   ).join('');
@@ -43,6 +43,13 @@ function switchSection(s){
     legend.style.display='none';
     document.getElementById('nav').innerHTML = '';
     renderDacTinhPage();
+  } else if(s==='canh'){
+    document.getElementById('page-title').textContent = '21 Cảnh (Ārammaṇa)';
+    document.getElementById('page-subtitle').textContent = 'Chạm vào một cảnh để xem những tâm biết cảnh ấy';
+    grid.style.display='none';
+    legend.style.display='none';
+    document.getElementById('nav').innerHTML = '';
+    renderCanhPage();
   }
   document.getElementById('main').scrollTop = 0;
 }
@@ -163,8 +170,8 @@ switchSection('quyen22');
 
 // ===== Phần "Đặc tính · Chức năng · Thể hiện · Nhân gần" (Aṭṭhasālinī) =====
 
-function plainCircleHTML(id, label, opener){
-  return `<div class="circle circle-plain" onclick="${opener}('${id}')"><div class="cn">${label}</div></div>`;
+function plainCircleHTML(id, label, pali, opener){
+  return `<div class="circle circle-plain" onclick="${opener}('${id}')"><div class="cn">${label}</div>${pali?`<div class="cp">${pali}</div>`:''}</div>`;
 }
 
 function renderDacTinhGroup(title, items){
@@ -183,19 +190,19 @@ function renderDacTinhPage(){
 
   const batthienCircles = batthienIds.map(id=>{
     const c = CETASIKA_DATA.find(x=>x.id===id);
-    return plainCircleHTML(id, c.ten, 'openDacTinhCetasika');
+    return plainCircleHTML(id, c.ten, c.pali, 'openDacTinhCetasika');
   });
   const totthaCircles = totthaIds.map(id=>{
     const c = CETASIKA_DATA.find(x=>x.id===id);
-    return plainCircleHTML(id, c.ten, 'openDacTinhCetasika');
+    return plainCircleHTML(id, c.ten, c.pali, 'openDacTinhCetasika');
   });
   const tinhhaoCircles = tinhhaoIds.map(id=>{
     const c = CETASIKA_DATA.find(x=>x.id===id);
-    return plainCircleHTML(id, c.ten, 'openDacTinhCetasika');
+    return plainCircleHTML(id, c.ten, c.pali, 'openDacTinhCetasika');
   });
-  const rupaCircles = RUPA_DATA.map(r=> plainCircleHTML(r.id, r.ten, 'openDacTinhRupa'));
-  const vaitroCircles = VAITRO_TAM_DATA.map(v=> plainCircleHTML(v.id, v.ten, 'openDacTinhVaitro'));
-  const thoCircles = THO_CHITIET_DATA.map(t=> plainCircleHTML(t.id, t.ten, 'openDacTinhTho'));
+  const rupaCircles = RUPA_DATA.map(r=> plainCircleHTML(r.id, r.ten, r.pali, 'openDacTinhRupa'));
+  const vaitroCircles = VAITRO_TAM_DATA.map(v=> plainCircleHTML(v.id, v.ten, v.pali, 'openDacTinhVaitro'));
+  const thoCircles = THO_CHITIET_DATA.map(t=> plainCircleHTML(t.id, t.ten, t.pali, 'openDacTinhTho'));
 
   extra.innerHTML = `
     <p class="info-note" style="margin-bottom:12px">Dữ liệu trích từ Chú giải Bộ Pháp Tụ (Aṭṭhasālinī). Mỗi pháp có 4 đặc tính cố định: <b>Đặc tính (Lakkhaṇā)</b> — nét riêng để nhận diện; <b>Chức năng (Rasā)</b> — nhiệm vụ nó thực hiện; <b>Thể hiện (Paccupaṭṭhānā)</b> — cách nó hiện ra trước tâm hành giả; <b>Nhân gần (Padaṭṭhānā)</b> — điều kiện gần nhất làm nó sinh khởi.</p>
@@ -247,4 +254,30 @@ function openDacTinhVaitro(id){
 function openDacTinhTho(id){
   const t = THO_CHITIET_DATA.find(x=>x.id===id);
   showAttrSheet(attrSheetHTML(t.ten, t.pali, t));
+}
+
+// ===== Phần "21 Cảnh" (Ārammaṇa) =====
+
+function renderCanhPage(){
+  const extra = document.getElementById('extra-content');
+  const circles = CANH_DATA.map((c,i)=> plainCircleHTML(c.id, `${i+1}. ${c.ten}`, c.pali, 'openCanhSheet'));
+  extra.innerHTML = `
+    <p class="info-note" style="margin-bottom:12px">21 cách phân loại đối tượng (cảnh) mà Tâm có thể biết. Một số mục (7, 21) là cách gọi gộp chung các cảnh khác, không phải cảnh độc lập riêng biệt. Chạm vào từng cảnh để xem những tâm nào biết được nó, và những tâm nào biết cảnh ấy một cách "cố định" (không biết cảnh nào khác ngoài cảnh này).</p>
+    <div class="circle-grid">${circles.join('')}</div>
+    <p class="info-note" style="margin-top:14px">Nguồn: tổng hợp theo bài giảng Thắng Pháp Abhidhamma — chuaphapluan.com (Bài 69).</p>
+  `;
+}
+
+function openCanhSheet(id){
+  const c = CANH_DATA.find(x=>x.id===id);
+  const html = `
+    <div class="sheet-head"><h2>${c.ten}</h2></div>
+    <p class="sheet-pali">${c.pali}</p>
+    ${c.biet ? `<div class="sec"><div class="sec-label">Tâm biết cảnh này</div><div class="sec-body">${c.biet}</div></div>` : ''}
+    ${c.codinh ? `<div class="sec"><div class="sec-label">Tâm biết cảnh này cố định</div><div class="sec-body">${c.codinh}</div></div>` : ''}
+    ${c.ghichu ? `<div class="info-note"><b>Ghi chú:</b> ${c.ghichu}</div>` : ''}
+  `;
+  document.getElementById('sheet-content').innerHTML = html;
+  document.getElementById('sheet').classList.add('show');
+  document.getElementById('sheet-backdrop').classList.add('show');
 }
