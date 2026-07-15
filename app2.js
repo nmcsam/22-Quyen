@@ -22,7 +22,7 @@ function switchSection(s){
   const legend = document.getElementById('legend');
   const extra = document.getElementById('extra-content');
   const vp = document.getElementById('viewport-meta');
-  if(s==='tamso'){
+  if(s==='tamso'||s==='duyenkhoi'){
     vp.setAttribute('content','width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes');
   } else {
     vp.setAttribute('content','width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
@@ -512,31 +512,165 @@ const DUYENKHOI_DATA = [
   ]}
 ];
 
+function dkArc(r,a1,a2,sweep){
+  const c=360, rad=d=>d*Math.PI/180;
+  const x1=c+r*Math.cos(rad(a1)), y1=c+r*Math.sin(rad(a1));
+  const x2=c+r*Math.cos(rad(a2)), y2=c+r*Math.sin(rad(a2));
+  return `M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${r} ${r} 0 0 ${sweep} ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+}
+let dkPid = 0;
+function dkArcText(r,a1,a2,sweep,txt,{fill='#111',size=15,weight=600,click=null}={}){
+  const id = 'dkp'+(dkPid++);
+  const hit = click!==null ? `<path d="${dkArc(r,a1,a2,sweep)}" stroke="rgba(0,0,0,0)" stroke-width="34" fill="none"/>` : '';
+  const inner = `<path id="${id}" d="${dkArc(r,a1,a2,sweep)}" fill="none"/>${hit}
+    <text font-size="${size}" font-weight="${weight}" fill="${fill}"><textPath href="#${id}" startOffset="50%" text-anchor="middle">${txt}</textPath></text>`;
+  return click!==null ? `<g class="dkc" onclick="${click}">${inner}</g>` : inner;
+}
+function dkNode(a,r,label,idx,w){
+  const c=360, rad=a*Math.PI/180;
+  const x=c+r*Math.cos(rad), y=c+r*Math.sin(rad);
+  const rot = Math.sin(rad)>0 ? a-90 : a+90;
+  return `<g class="dkc" transform="translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${rot.toFixed(1)})" onclick="openDuyenKhoiSheet(${idx})">
+    <rect x="${-w/2}" y="-19" width="${w}" height="38" rx="19" fill="#fffdf2" stroke="#d21" stroke-width="3" class="dk-shape"/>
+    <rect x="${-w/2-4}" y="-23" width="${w+8}" height="46" rx="23" fill="none" stroke="#f0c419" stroke-width="2.5" opacity=".9"/>
+    <text text-anchor="middle" dominant-baseline="central" font-size="19" font-weight="800" fill="#111">${label}</text>
+  </g>`;
+}
+
 function renderDuyenKhoiPage(){
+  dkPid = 0;
   const extra = document.getElementById('extra-content');
-  let nodes = '';
-  for(let i=0;i<12;i++){
-    const a = (-90 + i*30) * Math.PI/180; // bắt đầu 12 giờ, theo chiều kim đồng hồ
-    const x = 50 + 41*Math.cos(a);
-    const y = 50 + 41*Math.sin(a);
-    const d = DUYENKHOI_DATA[i];
-    nodes += `<div class="dk-node" style="left:${x.toFixed(2)}%;top:${y.toFixed(2)}%" onclick="openDuyenKhoiSheet(${i})">
-      <div class="n">${i+1}</div><div class="t">${d.ten}</div><div class="p">${d.pali}</div>
-    </div>`;
+  const BROWN = '#96651f';
+  // 4 mũi tên đỏ góc ngoài (chiều kim đồng hồ)
+  let corner = '';
+  for(const ac of [-45,45,135,-135]){
+    corner += `<path d="${dkArc(348,ac-21,ac+21,1)}" stroke="#e01b1b" stroke-width="10" fill="none" marker-end="url(#dkarr)"/>`;
   }
+  // 4 mũi tên nhỏ băng qua căm (vòng xoay bên trong)
+  let cross = '';
+  for(const ax of [0,90,180,-90]){
+    cross += `<path d="${dkArc(152,ax-13,ax+13,1)}" stroke="#e01b1b" stroke-width="7" fill="none" marker-end="url(#dkarr)"/>`;
+  }
+  // Nhãn Tập đế / Khổ đế quanh tâm
+  const de =
+    dkArcText(107,-59,-31,1,'TẬP ĐẾ',{size:14,weight:800}) +
+    dkArcText(107,-149,-121,1,'KHỔ ĐẾ',{size:14,weight:800}) +
+    dkArcText(107,59,31,0,'KHỔ ĐẾ',{size:14,weight:800}) +
+    dkArcText(107,149,121,0,'TẬP ĐẾ',{size:14,weight:800});
+
+  // Chữ cung tròn theo 4 phần
+  const arcs =
+    // ---- Vành ngoài (chữ trắng/đỏ trên nền nâu) ----
+    dkArcText(300,-84,-30,1,'3 PHIỀN NÃO LUÂN',{fill:'#fff',size:17,weight:800}) +
+    dkArcText(300,-26,24,1,'2 NGHIỆP LUÂN',{fill:'#fff',size:17,weight:800}) +
+    dkArcText(300,-156,-102,1,'8 QUẢ LUÂN',{fill:'#fff',size:17,weight:800}) +
+    dkArcText(300,174,96,0,'THỌ DUYÊN ÁI LÀ CON ĐƯỜNG LUÂN HỒI',{fill:'#fff',size:13.5,weight:700}) +
+    dkArcText(300,84,6,0,'THỌ DIỆT, ÁI DIỆT LÀ ĐƯỜNG THOÁT KHỎI LUÂN HỒI',{fill:'#fff',size:12.5,weight:700}) +
+    // ---- Nhãn đỏ 4 phần (chạm xem tóm tắt phần) ----
+    dkArcText(248,-82,-8,1,'5 NHÂN QUÁ KHỨ TƯƠNG TỤC',{fill:'#d21',size:16,weight:800,click:'openDKQuarterSheet(1)'}) +
+    dkArcText(248,82,8,0,'5 QUẢ HIỆN TẠI TƯƠNG TỤC',{fill:'#d21',size:16,weight:800,click:'openDKQuarterSheet(2)'}) +
+    dkArcText(248,172,98,0,'5 NHÂN HIỆN TẠI TƯƠNG TỤC',{fill:'#d21',size:16,weight:800,click:'openDKQuarterSheet(3)'}) +
+    dkArcText(248,-172,-98,1,'5 QUẢ VỊ LAI TƯƠNG TỤC',{fill:'#d21',size:16,weight:800,click:'openDKQuarterSheet(4)'}) +
+    // ---- Danh sách chi (đen) ----
+    dkArcText(214,-80,-10,1,'Vô Minh, Hành, Ái, Thủ, Hữu',{size:15}) +
+    dkArcText(214,170,100,0,'Ái, Thủ, Hữu, Vô Minh, Hành',{size:15}) +
+    dkArcText(222,-170,-100,1,'Thức, Danh-Sắc, Lục Nhập, Xúc, Thọ',{size:13.5}) +
+    // Phần 2: 5 chi bấm được từng chi
+    dkArcText(214,84,69,0,'Thức',{size:16,weight:800,click:'openDuyenKhoiSheet(2)'}) +
+    dkArcText(214,68,49,0,'Danh-Sắc',{size:16,weight:800,click:'openDuyenKhoiSheet(3)'}) +
+    dkArcText(214,48,30,0,'Lục Nhập',{size:16,weight:800,click:'openDuyenKhoiSheet(4)'}) +
+    dkArcText(214,29,19,0,'Xúc',{size:16,weight:800,click:'openDuyenKhoiSheet(5)'}) +
+    dkArcText(214,18,6,0,'Thọ',{size:16,weight:800,click:'openDuyenKhoiSheet(6)'}) +
+    // Phần 4: Sanh / Lão-Tử bấm được
+    dkArcText(190,-172,-128,1,'SANH · SANH HỮU',{size:15.5,weight:800,click:'openDuyenKhoiSheet(10)'}) +
+    dkArcText(190,-124,-96,1,'LÃO - TỬ',{size:15.5,weight:800,click:'openDuyenKhoiSheet(11)'}) +
+    // ---- Thời & nhãn trong ----
+    dkArcText(148,-72,-18,1,'Thời Quá Khứ',{size:14}) +
+    dkArcText(126,-76,-14,1,'Nhân Quá Khứ Tương Tục',{size:11.5}) +
+    dkArcText(148,72,18,0,'Thời Hiện Tại',{size:14}) +
+    dkArcText(126,76,14,0,'Quả Hiện Tại Tương Tục',{size:11.5}) +
+    dkArcText(148,162,108,0,'Thời Hiện Tại',{size:14}) +
+    dkArcText(126,166,104,0,'Nhân Hiện Tại Tương Tục',{size:11.5}) +
+    dkArcText(148,-162,-108,1,'Thời Vị Lai',{size:14}) +
+    dkArcText(126,-166,-104,1,'Quả Vị Lai',{size:11.5});
+
+  // Nút chi (khung viền đỏ + vàng như bản gốc)
+  const nodes =
+    dkNode(-62,180,'VÔ MINH',0,104) +
+    dkNode(-27,180,'HÀNH',1,86) +
+    dkNode(111,180,'ÁI',7,72) +
+    dkNode(139,180,'THỦ',8,78) +
+    dkNode(167,180,'NGHIỆP HỮU',9,128);
+
   extra.innerHTML = `
-    <p class="info-note" style="margin-bottom:6px">Bánh xe 12 chi Duyên khởi, xoay theo chiều kim đồng hồ từ Vô minh (đỉnh). Chạm 1 lần để chọn, chạm lần 2 để xem chi pháp.</p>
-    <div class="dk-wrap">
-      <div class="dk-ring"></div>
-      <div class="dk-arrow">⟳</div>
-      <div class="dk-center">
-        <div style="font-weight:800;font-size:13px">12 Chi<br>Duyên khởi</div>
-        <div style="font-style:italic;font-size:11px;color:#8a6d1f">Paṭiccasamuppāda</div>
-      </div>
+    <p class="info-note" style="margin-bottom:6px">Biểu đồ Thập Nhị Nhân Duyên (truyền thống Mogok). Chạm 1 lần để chọn (ô/chữ chuyển xanh), chạm lần 2 để xem chi pháp. Chạm nhãn đỏ để xem tóm tắt từng phần, chạm tâm để xem các yếu tố chính. Chụm 2 ngón tay để phóng to.</p>
+    <svg viewBox="0 0 720 720" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="dkarr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#e01b1b"/>
+        </marker>
+      </defs>
+      ${corner}
+      <circle cx="360" cy="360" r="332" fill="${BROWN}"/>
+      <circle cx="360" cy="360" r="272" fill="#fffdf5"/>
+      <rect x="337" y="28" width="46" height="664" fill="${BROWN}"/>
+      <rect x="28" y="337" width="664" height="46" fill="${BROWN}"/>
+      <path d="M 360 14 L 360 118" stroke="#e01b1b" stroke-width="11" marker-end="url(#dkarr)"/>
+      <path d="M 360 604 L 360 708" stroke="#e01b1b" stroke-width="11" marker-end="url(#dkarr)"/>
+      ${cross}
+      ${arcs}
       ${nodes}
-    </div>
-    <p class="info-note" style="margin-top:6px">Nguồn: bảng "Chi pháp pháp duyên khởi" — Đường Vào Thắng Pháp, Tỳ khưu Chánh Minh.</p>
+      <g class="dkc" onclick="openDKCenterSheet()">
+        <circle cx="360" cy="360" r="95" fill="${BROWN}" stroke="#7a5218" stroke-width="3" class="dk-shape"/>
+        <text x="360" y="352" text-anchor="middle" font-size="30" font-weight="800" fill="#fff">VÔ MINH</text>
+        <text x="360" y="388" text-anchor="middle" font-size="28" font-weight="800" fill="#fff">ÁI</text>
+      </g>
+      ${de}
+      <text x="642" y="105" font-size="52" font-weight="800" fill="#e01b1b">1</text>
+      <text x="642" y="650" font-size="52" font-weight="800" fill="#e01b1b">2</text>
+      <text x="52" y="650" font-size="52" font-weight="800" fill="#e01b1b">3</text>
+      <text x="52" y="105" font-size="52" font-weight="800" fill="#e01b1b">4</text>
+    </svg>
+    <p class="info-note" style="margin-top:6px">Nguồn: Biểu đồ Thập Nhị Nhân Duyên — tài liệu truyền thống Mogok; chi pháp theo Đường Vào Thắng Pháp (TK Chánh Minh).</p>
   `;
+}
+
+const DK_QUARTER = {
+ 1:{ten:'Phần 1 — Nhân Quá Khứ Tương Tục',de:'Tập Đế · Thời Quá Khứ',
+    body:'<b>5 nhân quá khứ:</b> Vô Minh, Hành, Ái, Thủ, Nghiệp Hữu.<br><br>Trong đó: <b>3 Phiền Não Luân</b> (Vô Minh, Ái, Thủ) và <b>2 Nghiệp Luân</b> (Hành, Nghiệp Hữu).<br><br>5 nhân quá khứ làm duyên cho 5 quả hiện tại (mối nối Hành – Thức).'},
+ 2:{ten:'Phần 2 — Quả Hiện Tại Tương Tục',de:'Khổ Đế · Thời Hiện Tại',
+    body:'<b>5 quả hiện tại:</b> Thức, Danh-Sắc, Lục Nhập, Xúc, Thọ — thuộc <b>8 Quả Luân</b>.<br><br>Mối nối quan trọng nhất nằm ở cuối phần này: <b>Thọ duyên Ái</b> — nếu Thọ diệt, Ái diệt thì đó là <b>con đường thoát ra khỏi vòng luân hồi</b> (ghi ở vành ngoài).'},
+ 3:{ten:'Phần 3 — Nhân Hiện Tại Tương Tục',de:'Tập Đế · Thời Hiện Tại',
+    body:'<b>5 nhân hiện tại:</b> Ái, Thủ, Nghiệp Hữu, Vô Minh, Hành.<br><br><b>Thọ duyên Ái là con đường luân hồi</b>: từ quả hiện tại (Thọ) khởi lên Ái, Thủ, tạo Nghiệp Hữu mới — gieo nhân cho đời sau.<br><br>5 nhân hiện tại làm duyên cho 5 quả vị lai (mối nối Nghiệp Hữu – Sanh).'},
+ 4:{ten:'Phần 4 — Quả Vị Lai Tương Tục',de:'Khổ Đế · Thời Vị Lai',
+    body:'<b>5 quả vị lai:</b> Thức, Danh-Sắc, Lục Nhập, Xúc, Thọ — hiện khởi qua <b>Sanh / Sanh Hữu</b> và <b>Lão - Tử</b>, thuộc <b>8 Quả Luân</b>.<br><br>Sanh duyên Lão Tử, kéo theo Sầu, Bi, Khổ, Ưu, Não — rồi Vô minh lại làm duyên cho vòng xoay tiếp tục.'}
+};
+
+function openDKQuarterSheet(q){
+  const d = DK_QUARTER[q];
+  document.getElementById('sheet-content').innerHTML = `
+    <div class="sheet-head"><h2>${d.ten}</h2></div>
+    <p class="sheet-pali">${d.de}</p>
+    <div class="sec"><div class="sec-label">Nội dung</div><div class="sec-body">${d.body}</div></div>
+  `;
+  document.getElementById('sheet').classList.add('show');
+  document.getElementById('sheet-backdrop').classList.add('show');
+}
+
+function openDKCenterSheet(){
+  document.getElementById('sheet-content').innerHTML = `
+    <div class="sheet-head"><h2>Vô Minh – Ái: hai gốc rễ</h2></div>
+    <p class="sheet-pali">Avijjā · Taṇhā — Các yếu tố chính trong lược đồ</p>
+    <div class="sec"><div class="sec-label">1 · Hai gốc rễ</div><div class="sec-body"><b>Vô Minh</b> (Avijjā) — gốc rễ của quá khứ, và <b>Tham Ái</b> (Taṇhā) — gốc rễ của hiện tại.</div></div>
+    <div class="sec"><div class="sec-label">2 · Hai đế</div><div class="sec-body"><b>Tập Đế</b> (Samudaya Saccā): phần 1 và 3 (nhân). <b>Khổ Đế</b> (Dukkha Saccā): phần 2 và 4 (quả).</div></div>
+    <div class="sec"><div class="sec-label">3 · Bốn phần</div><div class="sec-body">Nhân Quá Khứ → Quả Hiện Tại; Nhân Hiện Tại → Quả Tương Lai.</div></div>
+    <div class="sec"><div class="sec-label">4 · Ba mối nối</div><div class="sec-body">Hành – Thức · Thọ – Ái · Nghiệp Hữu – Sanh.</div></div>
+    <div class="sec"><div class="sec-label">5 · Ba luân</div><div class="sec-body"><b>Phiền Não Luân</b> (Kilesavaṭṭa): Vô Minh, Lục Ái, Tứ Thủ.<br><b>Nghiệp Luân</b> (Kammavaṭṭa): Nghiệp Hữu và Hành.<br><b>Quả Luân</b> (Vipākavaṭṭa) — 8: Sanh Hữu, Thức, Danh-Sắc, Lục Nhập, Lục Xúc, Lục Thọ, Sanh, Già Chết.</div></div>
+    <div class="sec"><div class="sec-label">6 · Ba thời</div><div class="sec-body">Quá Khứ · Hiện Tại · Tương Lai.</div></div>
+    <div class="sec"><div class="sec-label">7 · Hai mươi yếu tố</div><div class="sec-body"><b>5 nhân quá khứ:</b> Vô Minh, Hành, Ái, Thủ, Nghiệp Hữu.<br><b>5 quả hiện tại:</b> Thức, Danh-Sắc, Lục Nhập, Xúc, Thọ.<br><b>5 nhân hiện tại:</b> Ái, Thủ, Nghiệp Hữu, Vô Minh, Hành.<br><b>5 quả tương lai:</b> Thức, Danh-Sắc, Lục Nhập, Xúc, Thọ.</div></div>
+  `;
+  document.getElementById('sheet').classList.add('show');
+  document.getElementById('sheet-backdrop').classList.add('show');
 }
 
 function openDuyenKhoiSheet(i){

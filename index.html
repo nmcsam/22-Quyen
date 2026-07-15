@@ -144,16 +144,10 @@
   .pdot-sm.pdot-selected{outline:3px solid #1a73e8;outline-offset:2px;transform:scale(1.25);position:relative;z-index:2}
   .pdot-ring-big.pdot-selected{outline:4px solid #1a73e8;outline-offset:3px;transform:scale(1.06)}
   .circle.pdot-selected{outline:3px solid #1a73e8;outline-offset:2px;transform:scale(1.06)}
-  .dk-wrap{position:relative;width:min(92vw,430px);aspect-ratio:1/1;margin:8px auto}
-  .dk-ring{position:absolute;inset:11%;border:3px solid #c9a227;border-radius:50%;opacity:.65}
-  .dk-arrow{position:absolute;left:50%;top:26%;transform:translate(-50%,-50%);font-size:26px;color:#c9a227;opacity:.8}
-  .dk-node{position:absolute;width:68px;height:68px;border-radius:50%;background:#fffdf5;border:2px solid #8a6d1f;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,.18);transition:transform .12s;padding:2px;box-sizing:border-box}
-  .dk-node .n{font-size:9px;font-weight:800;color:#b08d2f;line-height:1}
-  .dk-node .t{font-size:11px;font-weight:800;line-height:1.05;color:#222}
-  .dk-node .p{font-size:8px;font-style:italic;color:#777;line-height:1}
-  .dk-node:active{transform:translate(-50%,-50%) scale(.92)}
-  .dk-node.pdot-selected{outline:3px solid #1a73e8;outline-offset:2px;transform:translate(-50%,-50%) scale(1.14);z-index:3}
-  .dk-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;width:140px;color:#222}
+  .dkc{cursor:pointer}
+  .dkc.pdot-selected text{fill:#1a73e8}
+  .dkc.pdot-selected textPath{fill:#1a73e8}
+  .dkc.pdot-selected .dk-shape{stroke:#1a73e8;stroke-width:4.5;filter:drop-shadow(0 0 4px rgba(26,115,232,.8))}
   .pdot-dashed{background:none !important;border:2px dashed #4a9d5f}
   .pdot-ring{background:none !important;border:3px solid #e8c027;width:30px;height:30px}
   .pdot-ring-big{background:radial-gradient(circle, #fff8dc 0%, #fdf0b0 60%, #fdf0b0 100%);border:5px solid #e8c027;width:80px;height:80px;border-radius:50%;cursor:pointer;transition:transform .1s;flex:none}
