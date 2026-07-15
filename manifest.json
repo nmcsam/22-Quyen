@@ -1,7 +1,7 @@
 {
-  "name": "22 Quyền — Bāvīsatindriya",
-  "short_name": "22 Quyền",
-  "description": "Tra cứu chi tiết 22 quyền (Bāvīsatindriya) trong Vi Diệu Pháp: chi pháp, thực tính pháp, địa vực, và quyền duyên.",
+  "name": "Thắng Pháp — Abhidhamma",
+  "short_name": "Thắng Pháp",
+  "description": "Tra cứu Thắng Pháp (Abhidhamma): 22 quyền, tâm – tâm sở, đặc tính, 21 cảnh, duyên khởi và 24 duyên hệ.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
