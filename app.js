@@ -27,7 +27,7 @@ function renderQuyenGrid(){
     const cat = v.colors[v.key(d)] || 'gray';
     return `<div class="card cat-${cat}" onclick="openQuyenSheet(${d.id})">
       <div class="n">${d.id}</div>
-      <div class="v">${d.ten.replace(' quyền','')}</div>
+      <div class="v">${d.ten}</div>
       <div class="p">${d.pali.split(' ')[0]}</div>
     </div>`;
   }).join('');
@@ -100,3 +100,19 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').catch(()=>{});
   });
 }
+
+// ===== Điều chỉnh cỡ chữ (lưu lại giữa các lần mở app) =====
+let fontScale = parseFloat(localStorage.getItem('quyen22-fontscale')) || 1;
+
+function applyFontScale(){
+  document.documentElement.style.setProperty('--fontscale', fontScale.toFixed(2));
+  document.getElementById('fontscale-pct').textContent = Math.round(fontScale*100) + '%';
+  localStorage.setItem('quyen22-fontscale', fontScale.toFixed(2));
+}
+
+function adjustFontScale(delta){
+  fontScale = Math.min(1.6, Math.max(0.8, fontScale + delta));
+  applyFontScale();
+}
+
+applyFontScale();

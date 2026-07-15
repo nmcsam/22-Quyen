@@ -8,7 +8,7 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['quyen22','22 Quyền'],['tamso','Tâm ↔ Tâm sở'],['phap','4 Pháp Thực Tính'],['dactinh','Đặc tính · Chức năng']];
+  const sections = [['quyen22','22 Quyền'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Đặc tính · Chức năng']];
   document.getElementById('section-switch').innerHTML = sections.map(([k,label])=>
     `<button class="${k===currentSection?'active':''}" onclick="switchSection('${k}')">${label}</button>`
   ).join('');
@@ -36,13 +36,6 @@ function switchSection(s){
     legend.style.display='none';
     renderTamSoNav();
     renderTamSoGrid();
-  } else if(s==='phap'){
-    document.getElementById('page-title').textContent = '4 Pháp Thực Tính (Paramattha)';
-    document.getElementById('page-subtitle').textContent = 'Nền tảng phân loại mọi thực tại';
-    grid.style.display='none';
-    legend.style.display='none';
-    document.getElementById('nav').innerHTML = '';
-    renderPhapPage();
   } else if(s==='dactinh'){
     document.getElementById('page-title').textContent = 'Đặc tính · Chức năng · Thể hiện · Nhân gần';
     document.getElementById('page-subtitle').textContent = 'Chạm vào một pháp để xem 4 đặc tính (theo Aṭṭhasālinī)';
@@ -165,68 +158,6 @@ function openCetasikaSheet(id){
   document.getElementById('sheet-backdrop').classList.add('show');
 }
 
-const RUPA_GROUP_COLOR = {daihien:'coral', pasada:'purple', canhgioi:'blue', tinhchat:'pink', dacbiet:'amber', bieutri:'teal', vikara:'green', tuong:'gray'};
-const RUPA_GROUP_LABEL = {daihien:'4 Đại hiển (Mahābhūta)', pasada:'5 Thần kinh (Pasāda)', canhgioi:'4 Cảnh giới (Gocara)', tinhchat:'2 Tính chất (Bhāva)', dacbiet:'3 Sắc đặc biệt (Ý vật / Mạng quyền / Vật thực)', bieutri:'2 Biểu tri (Viññatti)', vikara:'3 Sắc đổi (Vikāra)', tuong:'4 Sắc tướng (Lakkhaṇa)'};
-const RUPA_GROUP_ORDER = ['daihien','pasada','canhgioi','tinhchat','dacbiet','bieutri','vikara','tuong'];
-
-function renderRupaGridHTML(){
-  let html = '';
-  for(const g of RUPA_GROUP_ORDER){
-    const items = RUPA_DATA.filter(r=>r.nhom===g);
-    if(!items.length) continue;
-    html += `<div class="group-head">${RUPA_GROUP_LABEL[g]}</div>`;
-    html += `<div class="circle-grid">`;
-    html += items.map(r=>{
-      const color = RUPA_GROUP_COLOR[g]||'gray';
-      return `<div class="circle cat-${color}" onclick="openRupaSheet('${r.id}')"><div class="cn">${r.ten}</div></div>`;
-    }).join('');
-    html += `</div>`;
-  }
-  return html;
-}
-
-function openRupaSheet(id){
-  const r = RUPA_DATA.find(x=>x.id===id);
-  const html = `
-    <div class="sheet-head"><h2>${r.ten}</h2></div>
-    <p class="sheet-pali">${r.pali} · ${RUPA_GROUP_LABEL[r.nhom]}</p>
-    <div class="sec">
-      <div class="sec-label">Giải thích</div>
-      <div class="sec-body">${r.giaithich}</div>
-    </div>
-  `;
-  document.getElementById('sheet-content').innerHTML = html;
-  document.getElementById('sheet').classList.add('show');
-  document.getElementById('sheet-backdrop').classList.add('show');
-}
-
-function renderPhapPage(){
-  const extra = document.getElementById('extra-content');
-  extra.innerHTML = `
-    <div class="article">
-      <p>Toàn bộ thực tại theo Vi Diệu Pháp được quy về <b>4 Pháp Thực Tính (Paramattha Dhamma)</b> — những gì có thật theo nghĩa chân đế, khác với khái niệm chế định (paññatti) như "người", "cái bàn"...</p>
-
-      <div class="box4 cat-purple"><h3 style="margin-top:0">1. Tâm (Citta)</h3><p>Sự nhận biết đối tượng cảnh — có 89 hoặc 121 tâm tùy cách phân loại. Trong 22 Quyền, Tâm chính là <b>Ý quyền</b>. Xem chi tiết từng tâm ở mục "Tâm ↔ Tâm sở".</p></div>
-
-      <div class="box4 cat-amber"><h3 style="margin-top:0">2. Tâm sở (Cetasika) — 52 pháp</h3><p>Pháp đồng sinh, đồng diệt, đồng cảnh, đồng căn cứ với Tâm — như Thọ, Tưởng, Tư, Tín, Tham, Sân...</p></div>
-
-      <div class="box4 cat-teal"><h3 style="margin-top:0">3. Sắc pháp (Rūpa) — 28 pháp</h3><p>Vật chất do nghiệp, tâm, thời tiết (utu), vật thực (āhāra) tạo ra.</p></div>
-
-      <div class="box4 cat-gray"><h3 style="margin-top:0">4. Níp-bàn (Nibbāna)</h3><p>Thực tại duy nhất không do duyên sinh — không sinh, không diệt, không đồng sinh với pháp nào khác. Không được liệt kê thành nhiều "loại" như 3 pháp trên vì bản chất Níp-bàn chỉ có một duy nhất.</p></div>
-
-      <div class="info-note">Cộng riêng <b>Tâm sở (52) + Sắc pháp (28) = 80 pháp thực tính</b> — đây là các thành phần cụ thể, đa dạng cấu tạo nên danh-sắc của một chúng sinh (không tính Tâm vì bản chất Tâm chỉ là "biết cảnh", không chia nhỏ thêm; không tính Níp-bàn vì không phải pháp hữu vi cấu tạo nên chúng sinh).</div>
-
-      <h3 style="margin-top:22px">52 Tâm sở (Cetasika)</h3>
-      <p style="font-size:13px;color:var(--ink-soft);margin-top:-4px">Xem phối hợp với Tâm ở mục "Tâm ↔ Tâm sở → Tâm sở → Tâm". Danh sách đầy đủ:</p>
-      ${renderCetasikaGridHTML()}
-
-      <h3 style="margin-top:22px">28 Sắc pháp (Rūpa)</h3>
-      <p style="font-size:13px;color:var(--ink-soft);margin-top:-4px">Chạm vào từng sắc pháp để xem giải thích:</p>
-      ${renderRupaGridHTML()}
-    </div>
-  `;
-}
-
 renderSectionSwitch();
 switchSection('quyen22');
 
@@ -279,14 +210,14 @@ function renderDacTinhPage(){
   `;
 }
 
-function attrSheetHTML(headTitle, headSub, dt, cn, th, ng){
+function attrSheetHTML(headTitle, headSub, item){
   return `
     <div class="sheet-head"><h2>${headTitle}</h2></div>
     <p class="sheet-pali">${headSub}</p>
-    <div class="attr-block attr-dt"><div class="attr-label">Đặc tính (Lakkhaṇā)</div><div class="sec-body">${dt}</div></div>
-    <div class="attr-block attr-cn"><div class="attr-label">Chức năng (Rasā)</div><div class="sec-body">${cn}</div></div>
-    <div class="attr-block attr-th"><div class="attr-label">Thể hiện (Paccupaṭṭhānā)</div><div class="sec-body">${th}</div></div>
-    <div class="attr-block attr-ng"><div class="attr-label">Nhân gần (Padaṭṭhānā)</div><div class="sec-body">${ng}</div></div>
+    <div class="attr-block attr-dt"><div class="attr-label">Đặc tính (Lakkhaṇā)</div><div class="sec-body">${item.dt}</div><div class="attr-pali">${item.dtp||''}</div></div>
+    <div class="attr-block attr-cn"><div class="attr-label">Chức năng (Rasā)</div><div class="sec-body">${item.cn}</div><div class="attr-pali">${item.cnp||''}</div></div>
+    <div class="attr-block attr-th"><div class="attr-label">Thể hiện (Paccupaṭṭhānā)</div><div class="sec-body">${item.th}</div><div class="attr-pali">${item.thp||''}</div></div>
+    <div class="attr-block attr-ng"><div class="attr-label">Nhân gần (Padaṭṭhānā)</div><div class="sec-body">${item.ng}</div><div class="attr-pali">${item.ngp||''}</div></div>
   `;
 }
 
@@ -299,21 +230,21 @@ function showAttrSheet(html){
 function openDacTinhCetasika(id){
   const c = CETASIKA_DATA.find(x=>x.id===id);
   const a = DACTINH_DATA[id];
-  showAttrSheet(attrSheetHTML(c.ten, c.pali, a.dt, a.cn, a.th, a.ng));
+  showAttrSheet(attrSheetHTML(c.ten, c.pali, a));
 }
 
 function openDacTinhRupa(id){
   const r = RUPA_DATA.find(x=>x.id===id);
   const a = DACTINH_DATA[id];
-  showAttrSheet(attrSheetHTML(r.ten, r.pali, a.dt, a.cn, a.th, a.ng));
+  showAttrSheet(attrSheetHTML(r.ten, r.pali, a));
 }
 
 function openDacTinhVaitro(id){
   const v = VAITRO_TAM_DATA.find(x=>x.id===id);
-  showAttrSheet(attrSheetHTML(v.ten, v.pali, v.dt, v.cn, v.th, v.ng));
+  showAttrSheet(attrSheetHTML(v.ten, v.pali, v));
 }
 
 function openDacTinhTho(id){
   const t = THO_CHITIET_DATA.find(x=>x.id===id);
-  showAttrSheet(attrSheetHTML(t.ten, t.pali, t.dt, t.cn, t.th, t.ng));
+  showAttrSheet(attrSheetHTML(t.ten, t.pali, t));
 }

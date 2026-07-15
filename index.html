@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
   :root{
-    --bg:#f7f3ec; --card:#ffffff; --ink:#2c2620; --ink-soft:#6b6053;
+    --bg:#f7f3ec; --card:#ffffff; --ink:#2c2620; --ink-soft:#6b6053; --fontscale:1;
     --purple-50:#EEEDFE;--purple-200:#AFA9EC;--purple-800:#3C3489;
     --teal-50:#E1F5EE;--teal-200:#5DCAA5;--teal-800:#085041;
     --coral-50:#FAECE7;--coral-200:#F0997B;--coral-800:#712B13;
@@ -39,13 +39,13 @@
   header h1{font-size:17px;margin:0 0 2px;font-weight:700}
   header p{font-size:11.5px;color:var(--ink-soft);margin:0}
   main{flex:1;overflow-y:auto;padding:8px 10px 90px}
-  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
-  .card{border-radius:12px;padding:8px 4px;text-align:center;border:1px solid transparent;cursor:pointer;user-select:none;transition:transform .1s}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;overflow-x:hidden}
+  .card{border-radius:12px;padding:8px 4px;text-align:center;border:1px solid transparent;cursor:pointer;user-select:none;transition:transform .1s;min-width:0;overflow-wrap:break-word}
   .card:active{transform:scale(0.94)}
-  .card .n{font-size:10px;font-weight:700;opacity:.7}
-  .card .v{font-size:12px;font-weight:700;margin-top:2px;line-height:1.2}
-  .card .p{font-size:9.5px;font-style:italic;margin-top:2px;opacity:.85;line-height:1.1}
-  .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:14px 2px 4px;font-size:11.5px;color:var(--ink-soft)}
+  .card .n{font-size:calc(11px * var(--fontscale));font-weight:700;opacity:.7}
+  .card .v{font-size:calc(14px * var(--fontscale));font-weight:700;margin-top:2px;line-height:1.25}
+  .card .p{font-size:calc(11px * var(--fontscale));font-style:italic;margin-top:2px;opacity:.85;line-height:1.15}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:14px 2px 4px;font-size:calc(12.5px * var(--fontscale));color:var(--ink-soft)}
   .legend-item{display:flex;align-items:center;gap:5px}
   .dot{width:11px;height:11px;border-radius:3px;flex:none}
   nav{flex:none;display:flex;border-top:1px solid rgba(128,128,128,.25);background:var(--card);padding-bottom:env(safe-area-inset-bottom)}
@@ -73,8 +73,8 @@
   .sheet-head h2{font-size:19px;margin:0;font-weight:700}
   .sheet-pali{font-size:13.5px;font-style:italic;color:var(--ink-soft);margin:0 0 14px}
   .sec{margin-bottom:14px}
-  .sec-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);font-weight:700;margin-bottom:4px}
-  .sec-body{font-size:14.5px;line-height:1.5}
+  .sec-label{font-size:11px;color:var(--ink-soft);font-weight:700;margin-bottom:4px}
+  .sec-body{font-size:calc(15.5px * var(--fontscale));line-height:1.55}
   .pill-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
   .pill{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:20px}
   .close-x{position:absolute;top:12px;right:14px;font-size:20px;color:var(--ink-soft);background:none;border:none;padding:4px}
@@ -87,21 +87,21 @@
   .subnav button{flex:1;min-width:100px;font-size:11.5px;padding:7px 6px;border-radius:10px;border:1px solid rgba(128,128,128,.25);background:var(--card);color:var(--ink-soft);font-family:inherit;font-weight:600}
   .subnav button.active{border-color:#c9762e;color:#c9762e;background:rgba(201,118,46,.08)}
 
-  .group-head{font-size:12px;font-weight:700;color:var(--ink-soft);margin:14px 2px 6px;letter-spacing:.02em}
+  .group-head{font-size:calc(13px * var(--fontscale));font-weight:700;color:var(--ink-soft);margin:14px 2px 6px;letter-spacing:.02em}
   .group-head:first-child{margin-top:2px}
 
   .circle-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;margin-bottom:4px}
   .circle{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;cursor:pointer;border-width:1.5px;border-style:solid;padding:4px;user-select:none;transition:transform .1s}
   .circle:active{transform:scale(.92)}
-  .circle .cn{font-size:9.5px;font-weight:700;line-height:1.15;overflow:hidden}
-  .circle .cp{font-size:7.5px;font-style:italic;opacity:.8;margin-top:1px;overflow:hidden}
+  .circle .cn{font-size:calc(12px * var(--fontscale));font-weight:700;line-height:1.2;overflow:hidden}
+  .circle .cp{font-size:calc(9.5px * var(--fontscale));font-style:italic;opacity:.8;margin-top:1px;overflow:hidden}
 
   .combo-list{display:flex;flex-direction:column;gap:8px;margin-top:6px}
   .combo-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:10px;background:rgba(128,128,128,.07)}
   .combo-badge{flex:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
-  .combo-text{font-size:13px;line-height:1.4}
+  .combo-text{font-size:calc(14px * var(--fontscale));line-height:1.45}
   .combo-text .cname{font-weight:700}
-  .combo-text .cpali{font-style:italic;color:var(--ink-soft);font-size:11.5px}
+  .combo-text .cpali{font-style:italic;color:var(--ink-soft);font-size:calc(12.5px * var(--fontscale))}
 
   .article h3{font-size:15px;margin:20px 0 6px}
   .article p{font-size:14px;line-height:1.6;margin:6px 0}
@@ -111,11 +111,18 @@
   .circle-plain{background:var(--card);border-color:#2c2620 !important;color:var(--ink)}
   @media (prefers-color-scheme: dark){ .circle-plain{border-color:#e8ded0 !important} }
   .attr-block{margin-bottom:12px}
-  .attr-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:3px}
+  .attr-label{font-size:11px;letter-spacing:.02em;font-weight:700;margin-bottom:3px}
   .attr-dt .attr-label{color:#8a3b1a}
   .attr-cn .attr-label{color:#1c5b7a}
   .attr-th .attr-label{color:#5a7d2a}
   .attr-ng .attr-label{color:#72243e}
+  .attr-pali{font-size:calc(13px * var(--fontscale));font-style:italic;color:#1c5b9e;margin-top:2px;line-height:1.45}
+  @media (prefers-color-scheme: dark){ .attr-pali{color:#7ab3ea} }
+
+  #fontctrl{display:flex;align-items:center;justify-content:center;gap:2px;margin-top:8px}
+  #fontctrl button{width:30px;height:30px;border-radius:8px;border:1px solid rgba(128,128,128,.3);background:var(--card);color:var(--ink);font-size:15px;font-weight:700;font-family:inherit;display:flex;align-items:center;justify-content:center}
+  #fontctrl button:active{background:rgba(201,118,46,.15)}
+  #fontctrl .pct{font-size:11.5px;color:var(--ink-soft);min-width:38px;text-align:center}
 </style>
 </head>
 <body>
@@ -124,6 +131,11 @@
     <h1 id="page-title">22 Quyền — Bāvīsatindriya</h1>
     <p id="page-subtitle">Chạm vào một quyền để xem chi tiết</p>
     <div id="section-switch"></div>
+    <div id="fontctrl">
+      <button onclick="adjustFontScale(-0.1)" aria-label="Chữ nhỏ hơn">A−</button>
+      <span class="pct" id="fontscale-pct">100%</span>
+      <button onclick="adjustFontScale(0.1)" aria-label="Chữ lớn hơn">A+</button>
+    </div>
   </header>
   <main id="main">
     <div class="grid" id="grid"></div>
