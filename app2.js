@@ -158,24 +158,64 @@ function openCetasikaSheet(id){
   document.getElementById('sheet-backdrop').classList.add('show');
 }
 
+const RUPA_GROUP_COLOR = {daihien:'coral', pasada:'purple', canhgioi:'blue', tinhchat:'pink', dacbiet:'amber', bieutri:'teal', vikara:'green', tuong:'gray'};
+const RUPA_GROUP_LABEL = {daihien:'4 Đại hiển (Mahābhūta)', pasada:'5 Thần kinh (Pasāda)', canhgioi:'4 Cảnh giới (Gocara)', tinhchat:'2 Tính chất (Bhāva)', dacbiet:'3 Sắc đặc biệt (Ý vật / Mạng quyền / Vật thực)', bieutri:'2 Biểu tri (Viññatti)', vikara:'3 Sắc đổi (Vikāra)', tuong:'4 Sắc tướng (Lakkhaṇa)'};
+const RUPA_GROUP_ORDER = ['daihien','pasada','canhgioi','tinhchat','dacbiet','bieutri','vikara','tuong'];
+
+function renderRupaGridHTML(){
+  let html = '';
+  for(const g of RUPA_GROUP_ORDER){
+    const items = RUPA_DATA.filter(r=>r.nhom===g);
+    if(!items.length) continue;
+    html += `<div class="group-head">${RUPA_GROUP_LABEL[g]}</div>`;
+    html += `<div class="circle-grid">`;
+    html += items.map(r=>{
+      const color = RUPA_GROUP_COLOR[g]||'gray';
+      return `<div class="circle cat-${color}" onclick="openRupaSheet('${r.id}')"><div class="cn">${r.ten}</div></div>`;
+    }).join('');
+    html += `</div>`;
+  }
+  return html;
+}
+
+function openRupaSheet(id){
+  const r = RUPA_DATA.find(x=>x.id===id);
+  const html = `
+    <div class="sheet-head"><h2>${r.ten}</h2></div>
+    <p class="sheet-pali">${r.pali} · ${RUPA_GROUP_LABEL[r.nhom]}</p>
+    <div class="sec">
+      <div class="sec-label">Giải thích</div>
+      <div class="sec-body">${r.giaithich}</div>
+    </div>
+  `;
+  document.getElementById('sheet-content').innerHTML = html;
+  document.getElementById('sheet').classList.add('show');
+  document.getElementById('sheet-backdrop').classList.add('show');
+}
+
 function renderPhapPage(){
   const extra = document.getElementById('extra-content');
   extra.innerHTML = `
     <div class="article">
       <p>Toàn bộ thực tại theo Vi Diệu Pháp được quy về <b>4 Pháp Thực Tính (Paramattha Dhamma)</b> — những gì có thật theo nghĩa chân đế, khác với khái niệm chế định (paññatti) như "người", "cái bàn"...</p>
 
-      <div class="box4 cat-purple"><h3 style="margin-top:0">1. Tâm (Citta)</h3><p>Sự nhận biết đối tượng cảnh — có 89 hoặc 121 tâm tùy cách phân loại (mở rộng theo 5 tầng thiền). Trong 22 Quyền, Tâm chính là <b>Ý quyền (Manindriya)</b> — quyền duy nhất có chi pháp là Tâm. Đây cũng là đối tượng của mục "Tâm → Tâm sở" bạn vừa khám phá.</p></div>
+      <div class="box4 cat-purple"><h3 style="margin-top:0">1. Tâm (Citta)</h3><p>Sự nhận biết đối tượng cảnh — có 89 hoặc 121 tâm tùy cách phân loại. Trong 22 Quyền, Tâm chính là <b>Ý quyền</b>. Xem chi tiết từng tâm ở mục "Tâm ↔ Tâm sở".</p></div>
 
-      <div class="box4 cat-amber"><h3 style="margin-top:0">2. Tâm sở (Cetasika)</h3><p>52 pháp đồng sinh, đồng diệt, đồng cảnh, đồng căn cứ với Tâm — như Thọ, Tưởng, Tư, Tín, Tham, Sân... Phần lớn trong 14 Danh quyền có chi pháp là Tâm sở — ví dụ Tín quyền = Sở hữu tín, Tuệ quyền = Sở hữu trí tuệ.</p></div>
+      <div class="box4 cat-amber"><h3 style="margin-top:0">2. Tâm sở (Cetasika) — 52 pháp</h3><p>Pháp đồng sinh, đồng diệt, đồng cảnh, đồng căn cứ với Tâm — như Thọ, Tưởng, Tư, Tín, Tham, Sân...</p></div>
 
-      <div class="box4 cat-teal"><h3 style="margin-top:0">3. Sắc pháp (Rūpa)</h3><p>28 loại sắc — vật chất do nghiệp, tâm, thời tiết (utu), vật thực (āhāra) tạo ra. Trong 22 Quyền, 7 Sắc quyền (Nhãn, Nhĩ, Tỷ, Thiệt, Thân, Nữ, Nam) và phần Sắc mạng quyền của Mạng quyền đều thuộc nhóm này.</p></div>
+      <div class="box4 cat-teal"><h3 style="margin-top:0">3. Sắc pháp (Rūpa) — 28 pháp</h3><p>Vật chất do nghiệp, tâm, thời tiết (utu), vật thực (āhāra) tạo ra.</p></div>
 
-      <div class="box4 cat-gray"><h3 style="margin-top:0">4. Níp-bàn (Nibbāna)</h3><p>Thực tại duy nhất không do duyên sinh (vô vi, asaṅkhata) — không sinh, không diệt, không đồng sinh với bất kỳ pháp nào khác. Là đối tượng của Tâm và Tâm sở Siêu thế (Đạo, Quả), nhưng tự nó không phải là Tâm hay Tâm sở. <b>Không quyền nào trong 22 Quyền mang chi pháp là Níp-bàn</b> — vì Níp-bàn không phải một "năng lực cai quản" (indriya) mà là mục tiêu được 3 quyền Siêu thế (Tri vị tri, Tri dĩ tri, Tri cụ tri) hướng đến.</p></div>
+      <div class="box4 cat-gray"><h3 style="margin-top:0">4. Níp-bàn (Nibbāna)</h3><p>Thực tại duy nhất không do duyên sinh — không sinh, không diệt, không đồng sinh với pháp nào khác. Không được liệt kê thành nhiều "loại" như 3 pháp trên vì bản chất Níp-bàn chỉ có một duy nhất.</p></div>
 
-      <h3>Vì sao Tâm và Tâm sở luôn phối hợp với nhau?</h3>
-      <p>Tâm và Tâm sở là 2 trong 4 Pháp Thực Tính, và theo định nghĩa, Tâm sở (Cetasika) <b>bắt buộc</b> phải hội đủ 4 đặc tính đồng sinh (ekuppāda), đồng diệt (ekanirodha), đồng cảnh (ekārammaṇa), đồng căn cứ (ekavatthuka) với Tâm mà nó phối hợp — đây chính là lý do gốc rễ giải thích mọi trường hợp phối hợp bạn đã xem ở mục "Tâm ↔ Tâm sở". Sắc pháp và Níp-bàn thì không bị ràng buộc theo cách này: Sắc pháp có thể tồn tại độc lập không cần Tâm (như ở cõi Vô tưởng), còn Níp-bàn hoàn toàn không đồng sinh với gì cả — chỉ được làm đối tượng để Tâm nhận biết.</p>
+      <div class="info-note">Cộng riêng <b>Tâm sở (52) + Sắc pháp (28) = 80 pháp thực tính</b> — đây là các thành phần cụ thể, đa dạng cấu tạo nên danh-sắc của một chúng sinh (không tính Tâm vì bản chất Tâm chỉ là "biết cảnh", không chia nhỏ thêm; không tính Níp-bàn vì không phải pháp hữu vi cấu tạo nên chúng sinh).</div>
 
-      <div class="info-note">Mẹo nhớ: Tâm + Tâm sở luôn đi cùng nhau như bóng với hình trong một sát-na — Sắc pháp có thể có mặt độc lập — Níp-bàn thì đứng ngoài mọi sự sinh diệt, chỉ được biết đến chứ không tham gia phối hợp.</div>
+      <h3 style="margin-top:22px">52 Tâm sở (Cetasika)</h3>
+      <p style="font-size:13px;color:var(--ink-soft);margin-top:-4px">Xem phối hợp với Tâm ở mục "Tâm ↔ Tâm sở → Tâm sở → Tâm". Danh sách đầy đủ:</p>
+      ${renderCetasikaGridHTML()}
+
+      <h3 style="margin-top:22px">28 Sắc pháp (Rūpa)</h3>
+      <p style="font-size:13px;color:var(--ink-soft);margin-top:-4px">Chạm vào từng sắc pháp để xem giải thích:</p>
+      ${renderRupaGridHTML()}
     </div>
   `;
 }
