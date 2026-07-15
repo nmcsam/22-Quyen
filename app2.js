@@ -151,17 +151,21 @@ function renderTamSoPage(){
     </div></div>`;
   }
 
-  const nibbanaHtml = `<div class="pblock"><div class="prow" style="grid-template-columns:repeat(1,26px)">
-    <div class="pdot-sm pdot-ring" onclick="openNibbanaSheet()"></div>
-  </div></div>`;
+  const nibbanaHtml = `<div class="pblock" style="display:flex;justify-content:center;padding:8px 0">
+    <div class="pdot-ring-big" onclick="openNibbanaSheet()"></div>
+  </div>`;
 
+  const namaColors = ['#4b3f8f','#5fa8d3','split-pb','split-bp','split-pb','split-bp'];
   const namaP = PANNATTI_DATA.filter(p=>p.nhom==='nama');
   const atthaP = PANNATTI_DATA.filter(p=>p.nhom==='attha');
+  function pannattiDotStyle(colorKey){
+    if(colorKey==='split-pb') return 'background:linear-gradient(180deg, #4b3f8f 50%, #5fa8d3 50%)';
+    if(colorKey==='split-bp') return 'background:linear-gradient(180deg, #5fa8d3 50%, #4b3f8f 50%)';
+    return `background:${colorKey}`;
+  }
   const pannattiHtml = `
-    <div class="pblock"><div class="prow" style="grid-template-columns:repeat(6,26px)">
-      ${namaP.map(p=>`<div class="pdot-sm" style="background:#4b3f8f" onclick="openPannattiSheet('${p.id}')"></div>`).join('')}
-    </div></div>
-    <div class="pblock"><div class="prow" style="grid-template-columns:repeat(7,26px)">
+    <div class="pblock"><div class="prow" style="grid-template-columns:repeat(13,26px)">
+      ${namaP.map((p,i)=>`<div class="pdot-sm" style="${pannattiDotStyle(namaColors[i])}" onclick="openPannattiSheet('${p.id}')"></div>`).join('')}
       ${atthaP.map(p=>`<div class="pdot-sm" style="background:#4b3f8f" onclick="openPannattiSheet('${p.id}')"></div>`).join('')}
     </div></div>
   `;
