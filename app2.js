@@ -106,9 +106,9 @@ function renderTamSoPage(){
     {count:5, cols:5, thanthong:true, groupGap:true},           // Sắc giới: Thiện (+Thần thông)
     {count:5, cols:5},                                          // Sắc giới: Quả
     {count:5, cols:5, thanthong:true},                          // Sắc giới: Duy Tác (+Thần thông)
-    {count:4, cols:4, groupGap:true, indent:66},                // Vô Sắc giới: Thiện (thụt vào)
-    {count:4, cols:4, indent:66},                               // Vô Sắc giới: Quả
-    {count:4, cols:4, indent:66},                               // Vô Sắc giới: Duy Tác
+    {count:4, cols:4, groupGap:true, indent:110},              // Vô Sắc giới: Thiện (thụt vào — cột 6→9)
+    {count:4, cols:4, indent:110},                              // Vô Sắc giới: Quả
+    {count:4, cols:4, indent:110},                              // Vô Sắc giới: Duy Tác
     {count:20, cols:5, groupGap:true},                          // Siêu thế: Đạo
     {count:20, cols:5},                                         // Siêu thế: Quả
   ];
@@ -177,12 +177,12 @@ function renderTamSoPage(){
     if(colorKey==='split-bp') return 'background:linear-gradient(180deg, #5fa8d3 50%, #4b3f8f 50%)';
     return `background:${colorKey}`;
   }
-  const pannattiHtml = `<div class="pblock" style="display:flex;gap:10px;justify-content:center">
-    <div class="prow" style="grid-template-columns:repeat(6,20px)">
-      ${namaP.map((p,i)=>`<div class="pdot-sm" style="${pannattiDotStyle(namaColors[i])}" onclick="openPannattiSheet('${p.id}')"></div>`).join('')}
-    </div>
+  const pannattiHtml = `<div class="pblock" style="display:flex;justify-content:space-between;width:100%">
     <div class="prow" style="grid-template-columns:repeat(7,20px)">
       ${atthaP.map(p=>`<div class="pdot-sm" style="background:#4b3f8f" onclick="openPannattiSheet('${p.id}')"></div>`).join('')}
+    </div>
+    <div class="prow" style="grid-template-columns:repeat(6,20px)">
+      ${namaP.map((p,i)=>`<div class="pdot-sm" style="${pannattiDotStyle(namaColors[i])}" onclick="openPannattiSheet('${p.id}')"></div>`).join('')}
     </div>
   </div>`;
 
@@ -199,11 +199,11 @@ function renderTamSoPage(){
         <div class="poster-col-title" style="margin-top:14px">SẮC PHÁP (28) &amp; NÍP-BÀN</div>
         <div style="display:flex;gap:10px;align-items:flex-end">
           <div style="flex:1">${rupaHtml}</div>
-          <div class="pdot-ring-big" onclick="openNibbanaSheet()"></div>
+          <div class="pdot-ring-big" style="margin-right:66px" onclick="openNibbanaSheet()"></div>
         </div>
       </div>
     </div>
-    <div class="poster-col-title" style="margin-top:14px">PHÁP CHẾ ĐỊNH (13) — 6 Danh + 7 Nghĩa</div>
+    <div class="poster-col-title" style="margin-top:14px">PHÁP CHẾ ĐỊNH (13) — 7 Nghĩa (trái) · 6 Danh (phải)</div>
     ${pannattiHtml}
   `;
 }
@@ -266,33 +266,73 @@ function openCittaSheet(id){
   document.getElementById('sheet-backdrop').classList.add('show');
 }
 
-function openCetasikaSheet(id){
-  const ces = CETASIKA_DATA.find(x=>x.id===id);
-  const matching = CITTA_DATA.filter(c=>c.ceta.includes(id));
+// Tâm sở BẤT ĐỊNH (aniyatayogī): không nằm cố định trong danh sách tâm sở của tâm nào,
+// nhưng CÓ THỂ khởi cùng một số tâm nhất định khi có dịp. Danh sách "tâm có thể phối hợp"
+// được khai báo riêng ở đây (dữ liệu ceta của tâm chỉ chứa các tâm sở nhất định — niyata).
+const APPAMANNA_CITTAS = [31,32,33,34,35,36,37,38, 47,48,49,50,51,52,53,54, 55,56,57,58, 60,61,62,63, 65,66,67,68];
+const ANIYATA_INFO = {
+  man:   {cittas:[3,4,7,8],  note:'Mạn là tâm sở <b>bất định</b> (aniyatayogī): chỉ có thể khởi cùng 4 tâm Tham <b>ly tà kiến</b>, và cũng chỉ khởi khi có dịp so sánh hơn–kém–bằng, không phải lúc nào cũng có mặt.'},
+  tat:   {cittas:[9,10],     note:'Tật là tâm sở <b>bất định</b> (aniyatayogī): chỉ có thể khởi cùng 2 tâm Sân (khi ganh tỵ, tâm luôn kèm thọ Ưu và sự chống đối). Khởi <b>riêng lẻ</b> — trong một sát-na không đồng sinh cùng Lận hay Hối, vì mỗi pháp bắt một loại cảnh khác nhau.'},
+  lan:   {cittas:[9,10],     note:'Lận là tâm sở <b>bất định</b> (aniyatayogī): chỉ có thể khởi cùng 2 tâm Sân. Khởi <b>riêng lẻ</b> — không đồng sinh cùng Tật hay Hối trong cùng một sát-na.'},
+  hoi:   {cittas:[9,10],     note:'Hối là tâm sở <b>bất định</b> (aniyatayogī): chỉ có thể khởi cùng 2 tâm Sân. Khởi <b>riêng lẻ</b> — không đồng sinh cùng Tật hay Lận trong cùng một sát-na.'},
+  bi:    {cittas:APPAMANNA_CITTAS, note:'Bi là tâm sở <b>bất định</b>: chỉ khởi khi lấy chúng sinh đang khổ làm cảnh — trong 16 tâm Đại thiện + Đại duy tác và 12 tâm Sắc giới từ Sơ thiền đến Tứ thiền (không có ở Ngũ thiền vì tầng này thuần Xả vi tế). Không đồng sinh cùng Tùy hỷ trong cùng sát-na.'},
+  tuyhy: {cittas:APPAMANNA_CITTAS, note:'Tùy hỷ là tâm sở <b>bất định</b>: chỉ khởi khi lấy chúng sinh đang hạnh phúc/thành công làm cảnh — trong 16 tâm Đại thiện + Đại duy tác và 12 tâm Sắc giới từ Sơ thiền đến Tứ thiền. Không đồng sinh cùng Bi trong cùng sát-na.'},
+  chanhngu:    {cittas:[31,32,33,34,35,36,37,38], note:'Ngoài 40 tâm Siêu thế (phối hợp <b>cố định</b>, cả 3 Tiết chế cùng khởi một lượt), Chánh ngữ còn khởi <b>bất định, riêng lẻ</b> trong 8 tâm Đại thiện — khi có dịp thực sự tránh xa ác ngữ.'},
+  chanhnghiep: {cittas:[31,32,33,34,35,36,37,38], note:'Ngoài 40 tâm Siêu thế (phối hợp <b>cố định</b>), Chánh nghiệp còn khởi <b>bất định, riêng lẻ</b> trong 8 tâm Đại thiện — khi có dịp thực sự tránh xa thân ác hạnh.'},
+  chanhmang:   {cittas:[31,32,33,34,35,36,37,38], note:'Ngoài 40 tâm Siêu thế (phối hợp <b>cố định</b>), Chánh mạng còn khởi <b>bất định, riêng lẻ</b> trong 8 tâm Đại thiện — khi có dịp thực sự tránh xa nuôi mạng sai trái.'}
+};
+
+function buildCittaGroupList(list, badgeSuffix){
   const groupsPresent = [];
-  for(const m of matching){ if(!groupsPresent.includes(m.group)) groupsPresent.push(m.group); }
-  let listHtml = '';
+  for(const m of list){ if(!groupsPresent.includes(m.group)) groupsPresent.push(m.group); }
+  let html = '';
   for(const g of groupsPresent){
-    const sub = matching.filter(m=>m.group===g);
+    const sub = list.filter(m=>m.group===g);
     const color = CITTA_GROUP_COLOR[g]||'gray';
-    listHtml += `<div class="group-head" style="margin-top:10px">${sub[0].groupLabel} (${sub.length})</div>`;
-    listHtml += sub.map(m=>
+    html += `<div class="group-head" style="margin-top:10px">${sub[0].groupLabel} (${sub.length})${badgeSuffix||''}</div>`;
+    html += sub.map(m=>
       `<div class="combo-item"><div class="combo-badge cat-${color}">●</div><div class="combo-text"><span class="cname">${m.name}</span></div></div>`
     ).join('');
   }
+  return html;
+}
+
+function openCetasikaSheet(id){
+  const ces = CETASIKA_DATA.find(x=>x.id===id);
+  const matching = CITTA_DATA.filter(c=>c.ceta.includes(id));
+  const ani = ANIYATA_INFO[id];
+  const aniCittas = ani ? ani.cittas.map(cid=>CITTA_DATA.find(c=>c.id===cid)).filter(Boolean) : [];
+
+  let bigNum, bigUnit;
+  if(ani && matching.length>0){ bigNum = `${matching.length} + ${aniCittas.length}`; bigUnit = 'tâm cố định + tâm bất định'; }
+  else if(ani){ bigNum = aniCittas.length; bigUnit = 'tâm có thể phối hợp (bất định)'; }
+  else { bigNum = matching.length; bigUnit = 'tâm phối hợp'; }
+
+  let listHtml = '';
+  if(matching.length>0){
+    listHtml += `<div class="sec" style="margin-top:14px">
+      <div class="sec-label">Danh sách ${matching.length} tâm phối hợp${ani?' cố định (niyata)':''}</div>
+      <div class="combo-list">${buildCittaGroupList(matching)}</div>
+    </div>`;
+  }
+  if(aniCittas.length>0){
+    listHtml += `<div class="sec" style="margin-top:14px">
+      <div class="sec-label">${aniCittas.length} tâm có thể phối hợp — bất định (aniyata), chỉ khởi khi có dịp</div>
+      <div class="combo-list">${buildCittaGroupList(aniCittas)}</div>
+    </div>`;
+  }
+
   const html = `
     <div class="sheet-head"><h2>${ces.ten}</h2></div>
     <p class="sheet-pali">${ces.pali}</p>
-    <div class="big-count"><span class="big-num">${matching.length}</span><span class="big-unit">tâm phối hợp</span></div>
+    <div class="big-count"><span class="big-num">${bigNum}</span><span class="big-unit">${bigUnit}</span></div>
     <div class="sec">
       <div class="sec-label">Giải thích / Vì sao phối hợp được, trường hợp đặc biệt</div>
       <div class="sec-body">${ces.giaithich}</div>
     </div>
+    ${ani ? `<div class="info-note">${ani.note}</div>` : ''}
     ${ces.quyluat ? `<div class="info-note"><b>Công thức tính số tâm:</b> ${ces.quyluat}</div>` : ''}
-    <div class="sec" style="margin-top:14px">
-      <div class="sec-label">Danh sách ${matching.length} tâm phối hợp</div>
-      <div class="combo-list">${listHtml}</div>
-    </div>
+    ${listHtml}
   `;
   document.getElementById('sheet-content').innerHTML = html;
   document.getElementById('sheet').classList.add('show');

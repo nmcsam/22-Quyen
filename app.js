@@ -93,7 +93,17 @@ function openQuyenSheet(id){
 function closeSheet(){
   document.getElementById('sheet').classList.remove('show');
   document.getElementById('sheet-backdrop').classList.remove('show');
+  document.querySelectorAll('.pdot-selected').forEach(x=>x.classList.remove('pdot-selected'));
 }
+
+// Biểu hiện "đang chọn": chấm/ô tròn nào được chạm sẽ có viền xanh nổi bật
+// cho tới khi đóng bảng chi tiết hoặc chạm ô khác.
+document.addEventListener('click', function(e){
+  const dot = e.target.closest('.pdot-sm,.pdot-ring-big,.circle');
+  if(!dot) return;
+  document.querySelectorAll('.pdot-selected').forEach(x=>x.classList.remove('pdot-selected'));
+  dot.classList.add('pdot-selected');
+});
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{

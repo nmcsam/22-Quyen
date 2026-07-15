@@ -141,6 +141,9 @@
   .prow{display:grid;gap:2px;margin-bottom:2px;justify-content:start}
   .pdot-sm{width:20px;height:20px;border-radius:50%;cursor:pointer;border:1px solid rgba(0,0,0,.25);transition:transform .1s}
   .pdot-sm:active{transform:scale(.88)}
+  .pdot-sm.pdot-selected{outline:3px solid #1a73e8;outline-offset:2px;transform:scale(1.18);position:relative;z-index:2}
+  .pdot-ring-big.pdot-selected{outline:4px solid #1a73e8;outline-offset:3px}
+  .circle.pdot-selected{outline:3px solid #1a73e8;outline-offset:2px}
   .pdot-dashed{background:none !important;border:2px dashed #4a9d5f}
   .pdot-ring{background:none !important;border:3px solid #e8c027;width:30px;height:30px}
   .pdot-ring-big{background:radial-gradient(circle, #fff8dc 0%, #fdf0b0 60%, #fdf0b0 100%);border:5px solid #e8c027;width:80px;height:80px;border-radius:50%;cursor:pointer;transition:transform .1s;flex:none}
