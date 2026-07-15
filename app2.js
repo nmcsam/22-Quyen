@@ -21,6 +21,12 @@ function switchSection(s){
   const grid = document.getElementById('grid');
   const legend = document.getElementById('legend');
   const extra = document.getElementById('extra-content');
+  const vp = document.getElementById('viewport-meta');
+  if(s==='tamso'){
+    vp.setAttribute('content','width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes');
+  } else {
+    vp.setAttribute('content','width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
+  }
   if(s==='quyen22'){
     document.getElementById('page-title').textContent = '22 Quyền — Bāvīsatindriya';
     document.getElementById('page-subtitle').textContent = 'Chạm vào một quyền để xem chi tiết';
@@ -57,40 +63,39 @@ function switchSection(s){
 function renderTamSoPage(){
   const extra = document.getElementById('extra-content');
 
-  // ---- Cấu hình chia khối đúng theo Bảng NÊU (số ô mỗi hàng = số cột) ----
   const cittaChunks = [
-    {label:"8 Tâm Tham", count:8, cols:4},
-    {label:"2 Tâm Sân", count:2, cols:2},
-    {label:"2 Tâm Si", count:2, cols:2},
-    {label:"7 Tâm Quả Bất Thiện (Vô nhân)", count:7, cols:7},
-    {label:"8 Tâm Quả Thiện (Vô nhân)", count:8, cols:8},
-    {label:"3 Tâm Duy Tác (Vô nhân)", count:3, cols:3},
-    {label:"8 Tâm Thiện — Dục giới tịnh hảo", count:8, cols:8},
-    {label:"8 Tâm Quả — Dục giới tịnh hảo", count:8, cols:8},
-    {label:"8 Tâm Duy Tác — Dục giới tịnh hảo", count:8, cols:8},
-    {label:"5 Tâm Thiện — Sắc giới", count:5, cols:5},
-    {label:"5 Tâm Quả — Sắc giới", count:5, cols:5},
-    {label:"5 Tâm Duy Tác — Sắc giới", count:5, cols:5},
-    {label:"4 Tâm Thiện — Vô Sắc giới", count:4, cols:4},
-    {label:"4 Tâm Quả — Vô Sắc giới", count:4, cols:4},
-    {label:"4 Tâm Duy Tác — Vô Sắc giới", count:4, cols:4},
-    {label:"20 Tâm Đạo — Siêu thế", count:20, cols:5},
-    {label:"20 Tâm Quả — Siêu thế", count:20, cols:5},
+    {label:"8 Tham", count:8, cols:4},
+    {label:"2 Sân", count:2, cols:2},
+    {label:"2 Si", count:2, cols:2},
+    {label:"7 Quả B.Thiện", count:7, cols:7},
+    {label:"8 Quả Thiện", count:8, cols:8},
+    {label:"3 Duy Tác", count:3, cols:3},
+    {label:"8 Thiện DGTH", count:8, cols:8},
+    {label:"8 Quả DGTH", count:8, cols:8},
+    {label:"8 Duy Tác DGTH", count:8, cols:8},
+    {label:"5 Thiện Sắc giới", count:5, cols:5},
+    {label:"5 Quả Sắc giới", count:5, cols:5},
+    {label:"5 D.Tác Sắc giới", count:5, cols:5},
+    {label:"4 Thiện Vô Sắc", count:4, cols:4},
+    {label:"4 Quả Vô Sắc", count:4, cols:4},
+    {label:"4 D.Tác Vô Sắc", count:4, cols:4},
+    {label:"20 Đạo Siêu thế", count:20, cols:5},
+    {label:"20 Quả Siêu thế", count:20, cols:5},
   ];
 
   const cetaChunks = [
-    {label:"7 Sở hữu Biến hành", count:7, cols:7, color:"gray"},
-    {label:"6 Sở hữu Biệt cảnh (Tợ tha)", count:6, cols:6, color:"amber"},
-    {label:"4 Sở hữu Si phần", count:4, cols:4, color:"coral"},
-    {label:"3 Sở hữu Tham phần", count:3, cols:3, color:"pink"},
-    {label:"4 Sở hữu Sân phần", count:4, cols:4, color:"purple"},
-    {label:"2 Sở hữu Hôn phần", count:2, cols:2, color:"blue"},
-    {label:"1 Sở hữu Hoài nghi", count:1, cols:1, color:"gray"},
-    {label:"7 Sở hữu Tịnh hảo Biến hành", count:7, cols:7, color:"teal"},
-    {label:"12 Sở hữu Tịnh hảo (6 cặp Thân—Tâm)", count:12, cols:6, color:"teal"},
-    {label:"3 Sở hữu Giới phần (Tiết chế)", count:3, cols:3, color:"blue"},
-    {label:"2 Sở hữu Vô lượng phần", count:2, cols:2, color:"purple"},
-    {label:"1 Sở hữu Trí tuệ", count:1, cols:1, color:"green"},
+    {label:"7 Biến hành", count:7, cols:7, color:"gray"},
+    {label:"6 Biệt cảnh", count:6, cols:6, color:"amber"},
+    {label:"4 Si phần", count:4, cols:4, color:"coral"},
+    {label:"3 Tham phần", count:3, cols:3, color:"pink"},
+    {label:"4 Sân phần", count:4, cols:4, color:"purple"},
+    {label:"2 Hôn phần", count:2, cols:2, color:"blue"},
+    {label:"1 Hoài nghi", count:1, cols:1, color:"gray"},
+    {label:"7 Tịnh hảo BH", count:7, cols:7, color:"teal"},
+    {label:"12 Tịnh hảo cặp", count:12, cols:6, color:"teal"},
+    {label:"3 Giới phần", count:3, cols:3, color:"blue"},
+    {label:"2 Vô lượng", count:2, cols:2, color:"purple"},
+    {label:"1 Trí tuệ", count:1, cols:1, color:"green"},
   ];
 
   let ci = 0;
@@ -98,10 +103,10 @@ function renderTamSoPage(){
   for(const chunk of cittaChunks){
     const items = CITTA_DATA.slice(ci, ci+chunk.count);
     ci += chunk.count;
-    cittaHtml += `<div class="poster-block">
-      <div class="poster-label">${chunk.label}</div>
-      <div class="dot-row" style="grid-template-columns:repeat(${chunk.cols},1fr)">
-        ${items.map(c=>`<div class="pdot v-${c.vedana}" onclick="openCittaSheet(${c.id})"></div>`).join('')}
+    cittaHtml += `<div class="pblock">
+      <div class="pblock-label">${chunk.label}</div>
+      <div class="prow" style="grid-template-columns:repeat(${chunk.cols},16px)">
+        ${items.map(c=>`<div class="pdot-sm v-${c.vedana}" onclick="openCittaSheet(${c.id})"></div>`).join('')}
       </div>
     </div>`;
   }
@@ -111,20 +116,26 @@ function renderTamSoPage(){
   for(const chunk of cetaChunks){
     const items = CETASIKA_DATA.slice(ei, ei+chunk.count);
     ei += chunk.count;
-    cetaHtml += `<div class="poster-block">
-      <div class="poster-label">${chunk.label}</div>
-      <div class="dot-row" style="grid-template-columns:repeat(${chunk.cols},1fr)">
-        ${items.map(c=>`<div class="pdot d-${chunk.color}" onclick="openCetasikaSheet('${c.id}')"></div>`).join('')}
+    cetaHtml += `<div class="pblock">
+      <div class="pblock-label">${chunk.label}</div>
+      <div class="prow" style="grid-template-columns:repeat(${chunk.cols},16px)">
+        ${items.map(c=>`<div class="pdot-sm d-${chunk.color}" onclick="openCetasikaSheet('${c.id}')"></div>`).join('')}
       </div>
     </div>`;
   }
 
   extra.innerHTML = `
-    <p class="info-note" style="margin-bottom:10px">Vị trí và số lượng ô đúng theo Bảng NÊU. Màu ô Tâm theo Thọ (Khổ=đen, Lạc=vàng, Ưu=nâu, Hỷ=đỏ, Xả=xanh lá). Chạm vào một ô để xem chi tiết phối hợp.</p>
-    <div class="poster-section-title">TÂM (Citta) — 121</div>
-    ${cittaHtml}
-    <div class="poster-section-title">TÂM SỞ (Cetasika) — 52</div>
-    ${cetaHtml}
+    <p class="info-note" style="margin-bottom:8px">Toàn bộ sơ đồ trong 1 màn hình, đúng vị trí & màu Bảng NÊU. Chụm 2 ngón tay để phóng to khi cần bấm chính xác. Chạm vào 1 ô để xem số lượng phối hợp.</p>
+    <div class="poster-cols">
+      <div class="poster-col">
+        <div class="poster-col-title">TÂM (121)</div>
+        ${cittaHtml}
+      </div>
+      <div class="poster-col">
+        <div class="poster-col-title">TÂM SỞ (52)</div>
+        ${cetaHtml}
+      </div>
+    </div>
   `;
 }
 
