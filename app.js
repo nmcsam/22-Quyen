@@ -96,14 +96,18 @@ function closeSheet(){
   document.querySelectorAll('.pdot-selected').forEach(x=>x.classList.remove('pdot-selected'));
 }
 
-// Biểu hiện "đang chọn": chấm/ô tròn nào được chạm sẽ có viền xanh nổi bật
-// cho tới khi đóng bảng chi tiết hoặc chạm ô khác.
+// Chạm 2 bước: chạm LẦN 1 vào ô tròn → ô phóng to + viền xanh (xác nhận đã chọn đúng ô);
+// chạm LẦN 2 vào đúng ô đó → mới mở trang chi tiết. Chạm sang ô khác → chuyển chọn sang ô đó.
+// (Dùng capture-phase để chặn onclick mở trang ở lần chạm đầu tiên.)
 document.addEventListener('click', function(e){
   const dot = e.target.closest('.pdot-sm,.pdot-ring-big,.circle');
   if(!dot) return;
+  if(dot.classList.contains('pdot-selected')) return; // lần 2: cho onclick chạy, mở chi tiết
+  e.stopPropagation();
+  e.preventDefault();
   document.querySelectorAll('.pdot-selected').forEach(x=>x.classList.remove('pdot-selected'));
   dot.classList.add('pdot-selected');
-});
+}, true);
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
