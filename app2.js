@@ -665,7 +665,7 @@ function renderDuyenKhoiPage(){
   // Tên hiển thị (tối đa 2 dòng)
   const NAMES = [['Vô minh'],['Hành'],['Thức'],['Danh','sắc'],['Lục','nhập'],['Xúc'],['Thọ'],['Ái'],['Thủ'],['Hữu'],['Sanh'],['Già','chết']];
 
-  const C=360, R=268, NR=58;
+  const C=360, R=284, NR=49;
   let nodes='', arrows='';
   for(let i=0;i<12;i++){
     const a=(-90+i*30)*Math.PI/180;
@@ -673,24 +673,24 @@ function renderDuyenKhoiPage(){
     const p=phanOf(i);
     const lines=NAMES[i];
     const texts = lines.length===1
-      ? `<text x="0" y="8" text-anchor="middle" font-size="23" font-weight="800" fill="${p.ink}">${lines[0]}</text>`
-      : `<text x="0" y="0" text-anchor="middle" font-size="22" font-weight="800" fill="${p.ink}">${lines[0]}</text>
-         <text x="0" y="24" text-anchor="middle" font-size="22" font-weight="800" fill="${p.ink}">${lines[1]}</text>`;
+      ? `<text x="0" y="8" text-anchor="middle" font-size="21" font-weight="800" fill="${p.ink}">${lines[0]}</text>`
+      : `<text x="0" y="-2" text-anchor="middle" font-size="20" font-weight="800" fill="${p.ink}">${lines[0]}</text>
+         <text x="0" y="20" text-anchor="middle" font-size="20" font-weight="800" fill="${p.ink}">${lines[1]}</text>`;
     nodes += `<g class="dkc" transform="translate(${x.toFixed(1)},${y.toFixed(1)})" onclick="openDuyenKhoiSheet(${i})">
       <circle r="${NR}" fill="${p.fill}" stroke="${p.stroke}" stroke-width="3.5" class="dk-shape"/>
-      <text x="0" y="-30" text-anchor="middle" font-size="16" font-weight="700" fill="${p.stroke}">${i+1}</text>
+      <text x="0" y="-26" text-anchor="middle" font-size="15" font-weight="700" fill="${p.stroke}">${i+1}</text>
       ${texts}
     </g>`;
     // mũi tên nối chi i -> i+1 (cung ngắn giữa 2 nút)
-    const a1=-90+i*30+13.5, a2=-90+i*30+17.5;
-    arrows += `<path d="${dkArc(R,a1,a2,1)}" stroke="#c8471f" stroke-width="7" fill="none" marker-end="url(#dkarr)"/>`;
+    const a1=-90+i*30+11.5, a2=-90+i*30+18;
+    arrows += `<path d="${dkArc(R,a1,a2,1)}" stroke="#c8471f" stroke-width="8" fill="none" marker-end="url(#dkarr)"/>`;
   }
 
   extra.innerHTML = `
     <p class="info-note" style="margin-bottom:6px">Vòng Thập Nhị Nhân Duyên — chạm 1 lần để chọn, chạm lần 2 để xem chi pháp và giảng giải. Chạm <b>tâm vòng tròn</b> để xem các yếu tố chính (2 gốc rễ, 2 đế, 3 mối nối, 3 luân, 20 yếu tố...).</p>
     <svg viewBox="0 0 720 720" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <marker id="dkarr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+        <marker id="dkarr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.6" markerHeight="4.6" orient="auto-start-reverse">
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#c8471f"/>
         </marker>
       </defs>
