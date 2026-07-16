@@ -1,4 +1,4 @@
-const CACHE_NAME = "quyen22-cache-v29";
+const CACHE_NAME = "quyen22-cache-v30";
 const ASSETS = [
   "./",
   "./index.html",

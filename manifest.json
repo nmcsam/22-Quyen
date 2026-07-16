@@ -1,6 +1,6 @@
 {
-  "name": "Thắng Pháp — Abhidhamma",
-  "short_name": "Thắng Pháp",
+  "name": "Abhidhamma",
+  "short_name": "Abhidhamma",
   "description": "Tra cứu Thắng Pháp (Abhidhamma): 22 quyền, tâm – tâm sở, đặc tính, 21 cảnh, duyên khởi và 24 duyên hệ.",
   "start_url": "./index.html",
   "scope": "./",
@@ -9,7 +9,17 @@
   "theme_color": "#4a3120",
   "orientation": "portrait",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }
