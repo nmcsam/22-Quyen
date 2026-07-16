@@ -8,7 +8,7 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['quyen22','22 Quyền'],['tamso','Tâm ↔ Tâm sở'],['dactinh','80 Pháp thực tính'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi'],['duyenhe','24 Duyên hệ'],['xugioi','12 Xứ · 18 Giới']];
+  const sections = [['tamso','Tâm ↔ Tâm sở'],['quyen22','22 Quyền'],['dactinh','80 Pháp thực tính'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi'],['duyenhe','24 Duyên hệ'],['xugioi','12 Xứ · 18 Giới']];
   document.getElementById('section-switch').innerHTML = sections.map(([k,label])=>
     `<button class="${k===currentSection?'active':''}" onclick="switchSection('${k}')">${label}</button>`
   ).join('');
@@ -25,6 +25,7 @@ const PAGE_ACTIONS = {
 
 function switchSection(s){
   currentSection = s;
+  try{ localStorage.setItem('quyen22-section', s); }catch(e){}
   if(typeof applyFontScale==='function') applyFontScale();
   const pa = document.getElementById('page-actions');
   if(pa) pa.innerHTML = PAGE_ACTIONS[s] || '';
@@ -377,8 +378,7 @@ function openCetasikaSheet(id){
   document.getElementById('sheet-backdrop').classList.add('show');
 }
 
-renderSectionSwitch();
-switchSection('quyen22');
+// (khởi tạo chuyển xuống cuối file — sau khi mọi dữ liệu đã khai báo)
 
 // ===== Phần "Đặc tính · Chức năng · Thể hiện · Nhân gần" (Aṭṭhasālinī) =====
 
@@ -688,7 +688,8 @@ function renderDuyenKhoiPage(){
 
   extra.innerHTML = `
     <p class="info-note" style="margin-bottom:6px">Vòng Thập Nhị Nhân Duyên — chạm 1 lần để chọn, chạm lần 2 để xem chi pháp và giảng giải. Chạm <b>tâm vòng tròn</b> để xem các yếu tố chính (2 gốc rễ, 2 đế, 3 mối nối, 3 luân, 20 yếu tố...).</p>
-    <svg viewBox="0 0 720 720" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg">
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+    <svg viewBox="0 0 720 720" style="width:calc(100% * var(--fontscale,1));min-width:calc(100% * var(--fontscale,1));height:auto;display:block;margin:0 auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="dkarr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.6" markerHeight="4.6" orient="auto-start-reverse">
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#c8471f"/>
@@ -705,6 +706,7 @@ function renderDuyenKhoiPage(){
         <text x="${C}" y="${C+62}" text-anchor="middle" font-size="13.5" fill="#e8d1a5">(chạm để xem các yếu tố chính)</text>
       </g>
     </svg>
+    </div>
     <div class="qbtn-row" style="justify-content:center">
       <button class="qbtn" style="border-color:#b34a32;color:#8a2f18" onclick="openDKQuarterSheet(1)">P1 · 5 nhân quá khứ</button>
       <button class="qbtn" style="border-color:#4c7a3a;color:#33591f" onclick="openDKQuarterSheet(2)">P2 · 5 quả hiện tại</button>
@@ -715,12 +717,33 @@ function renderDuyenKhoiPage(){
   `;
 }
 
+const DK_QUARTER = {
+ 1:{ten:'Phần 1 · 5 Nhân quá khứ tương tục', de:'Thuộc Tập Đế (Samudayasaccā) · thời quá khứ',
+    chis:[0,1],
+    body:'Năm nhân trong kiếp quá khứ đã tạo nên kiếp sống hiện tại: <b>Vô Minh, Hành, Ái, Thủ, Nghiệp Hữu</b>.<br><br>Trên vòng tròn chỉ vẽ 2 chi <b>Vô Minh</b> và <b>Hành</b>, nhưng kể đủ phải gồm cả <b>Ái, Thủ, Nghiệp Hữu</b> — vì hễ tạo nghiệp (Hành) thì luôn có Vô Minh dẫn đầu và Ái – Thủ nuôi dưỡng: 5 pháp này đồng đẳng, cùng là "3 phiền não luân + 2 nghiệp luân" của quá khứ.<br><br>5 nhân quá khứ → sinh ra 5 quả hiện tại (Phần 2).'},
+ 2:{ten:'Phần 2 · 5 Quả hiện tại tương tục', de:'Thuộc Khổ Đế (Dukkhasaccā) · thời hiện tại',
+    chis:[2,3,4,5,6],
+    body:'Năm quả dị thục đang diễn ra trong kiếp hiện tại, do 5 nhân quá khứ tạo nên: <b>Thức, Danh-Sắc, Lục Nhập, Xúc, Thọ</b>.<br><br>Đây chính là thân – tâm này: thức tái sanh, danh sắc, 6 căn, sự xúc chạm và cảm thọ. Tất cả thuộc <b>Quả luân</b> (vipākavaṭṭa) — quả thì không thiện không bất thiện, chỉ là sự chín muồi của nghiệp cũ.<br><br>Mối nối quan trọng: <b>Thọ → Ái</b> (chuyển từ Phần 2 sang Phần 3) — "Thọ duyên Ái là con đường luân hồi; Thọ diệt, Ái diệt là đường thoát khỏi luân hồi". Chính tại đây thiền quán cảm thọ (vedanānupassanā) cắt đứt vòng xoay.'},
+ 3:{ten:'Phần 3 · 5 Nhân hiện tại tương tục', de:'Thuộc Tập Đế (Samudayasaccā) · thời hiện tại',
+    chis:[7,8,9],
+    body:'Năm nhân đang được tạo trong kiếp hiện tại, sẽ cho quả vị lai: <b>Ái, Thủ, Nghiệp Hữu, Vô Minh, Hành</b>.<br><br>Trên vòng tròn chỉ vẽ 3 chi <b>Ái, Thủ, Hữu</b> (nghiệp hữu), nhưng kể đủ gồm cả <b>Vô Minh và Hành</b> ngầm đi theo — hưởng thọ rồi ái, ái rồi thủ, thủ rồi tạo nghiệp: đó là cách chúng sinh đang gieo nhân mới ngay bây giờ.<br><br>5 nhân hiện tại → sinh ra 5 quả vị lai (Phần 4).'},
+ 4:{ten:'Phần 4 · 5 Quả vị lai tương tục', de:'Thuộc Khổ Đế (Dukkhasaccā) · thời vị lai',
+    chis:[10,11],
+    body:'Năm quả sẽ sinh trong kiếp tương lai nếu nhân hiện tại không được đoạn tận: <b>Thức, Danh-Sắc, Lục Nhập, Xúc, Thọ</b> (của kiếp sau).<br><br>Trên vòng tròn vẽ 2 chi <b>Sanh (Sanh hữu)</b> và <b>Già chết</b>: "Sanh" chính là sự sinh khởi của 5 quả ấy, "Già chết" là sự già – diệt của chúng, kéo theo sầu, bi, khổ, ưu, não.<br><br>Toàn bộ 4 phần = <b>20 yếu tố</b> (5 nhân quá khứ + 5 quả hiện tại + 5 nhân hiện tại + 5 quả vị lai), 3 mối nối, 3 luân, 3 thời — vòng tròn khép kín không điểm khởi đầu.'}
+};
+
 function openDKQuarterSheet(q){
   const d = DK_QUARTER[q];
+  const chiBtns = d.chis.map(i=>{
+    const c = DUYENKHOI_DATA[i];
+    return `<button class="qbtn" onclick="openDuyenKhoiSheet(${i})">${i+1}. ${c.ten}</button>`;
+  }).join(' ');
   document.getElementById('sheet-content').innerHTML = `
     <div class="sheet-head"><h2>${d.ten}</h2></div>
     <p class="sheet-pali">${d.de}</p>
     <div class="sec"><div class="sec-label">Nội dung</div><div class="sec-body">${d.body}</div></div>
+    <div class="sec" style="margin-top:12px"><div class="sec-label">Xem chi pháp từng chi trong phần này</div>
+      <div class="qbtn-row" style="margin-top:8px">${chiBtns}</div></div>
   `;
   document.getElementById('sheet').classList.add('show');
   document.getElementById('sheet-backdrop').classList.add('show');
@@ -1178,3 +1201,78 @@ function openXGTomTat(){
     <p class="info-note">Cả hai hệ thống đều bao quát toàn bộ thực tại: 28 sắc pháp (12 sắc thô + 16 sắc tế) + 89 tâm + 52 tâm sở + Níp-bàn — chỉ khác cách nhóm.</p>
   `);
 }
+
+
+// ===== Cài đặt: ngôn ngữ hiển thị + xuất dữ liệu =====
+function getLangMode(){ try{ return localStorage.getItem('quyen22-lang') || 'both'; }catch(e){ return 'both'; } }
+function applyLangMode(){
+  const m = getLangMode();
+  document.body.classList.toggle('lang-vi', m==='vi');
+  document.body.classList.toggle('lang-pali', m==='pali');
+}
+function setLangMode(m){
+  try{ localStorage.setItem('quyen22-lang', m); }catch(e){}
+  applyLangMode();
+  openSettingsSheet(); // vẽ lại để cập nhật nút đang chọn
+}
+
+function openSettingsSheet(){
+  const m = getLangMode();
+  const btn = (val,label)=>`<button class="qbtn ${m===val?'on':''}" onclick="setLangMode('${val}')">${label}</button>`;
+  document.getElementById('sheet-content').innerHTML = `
+    <div class="sheet-head"><h2>Cài đặt</h2></div>
+    <p class="sheet-pali">Thắng Pháp — Abhidhamma</p>
+    <div class="sec"><div class="sec-label">Ngôn ngữ hiển thị (tên trên các ô)</div>
+      <div class="setopt">
+        ${btn('vi','Tiếng Việt')}
+        ${btn('both','Việt – Pāli')}
+        ${btn('pali','Pāli')}
+      </div>
+      <div class="sec-body" style="margin-top:8px;font-size:calc(14px * var(--fontscale));color:var(--ink-soft)">Áp dụng cho các ô tròn/thẻ trên các trang. Trong bảng chi tiết luôn hiển thị đầy đủ cả Việt lẫn Pāli.</div>
+    </div>
+    <div class="sec" style="margin-top:14px"><div class="sec-label">Dữ liệu</div>
+      <div class="setopt"><button class="qbtn" onclick="exportAppData()">⬇ Xuất toàn bộ dữ liệu (JSON)</button></div>
+      <div class="sec-body" style="margin-top:8px;font-size:calc(14px * var(--fontscale));color:var(--ink-soft)">Tải về một tệp JSON gồm toàn bộ dữ liệu của app: 22 Quyền, Tâm – Tâm sở, 80 Pháp thực tính, 21 Cảnh, Duyên khởi, 24 Duyên hệ, 12 Xứ – 18 Giới.</div>
+    </div>
+  `;
+  document.getElementById('sheet').classList.add('show');
+  document.getElementById('sheet-backdrop').classList.add('show');
+}
+
+function exportAppData(){
+  const pick = name => (typeof window[name] !== 'undefined') ? window[name] : undefined;
+  const data = {
+    app: 'Thắng Pháp — Abhidhamma',
+    xuat_ngay: new Date().toISOString(),
+    quyen22: typeof QUYEN_DATA!=='undefined'?QUYEN_DATA:undefined,
+    citta: typeof CITTA_DATA!=='undefined'?CITTA_DATA:undefined,
+    cetasika: typeof CETASIKA_DATA!=='undefined'?CETASIKA_DATA:undefined,
+    dactinh_4khiacanh: typeof DACTINH_DATA!=='undefined'?DACTINH_DATA:undefined,
+    sacphap: typeof RUPA_DATA!=='undefined'?RUPA_DATA:undefined,
+    tho_chitiet: typeof THO_CHITIET_DATA!=='undefined'?THO_CHITIET_DATA:undefined,
+    vaitro_tam: typeof VAITRO_TAM_DATA!=='undefined'?VAITRO_TAM_DATA:undefined,
+    nipban: typeof NIPBAN_DT!=='undefined'?NIPBAN_DT:undefined,
+    canh21: typeof CANH_DATA!=='undefined'?CANH_DATA:undefined,
+    phapchedinh: typeof PANNATTI_DATA!=='undefined'?PANNATTI_DATA:undefined,
+    duyenkhoi: typeof DUYENKHOI_DATA!=='undefined'?DUYENKHOI_DATA:undefined,
+    duyenkhoi_4phan: typeof DK_QUARTER!=='undefined'?DK_QUARTER:undefined,
+    duyenhe24: typeof DUYENHE_DATA!=='undefined'?DUYENHE_DATA:undefined,
+    xu12: typeof XU_DATA!=='undefined'?XU_DATA:undefined,
+    gioi18: typeof GIOI_DATA!=='undefined'?GIOI_DATA:undefined,
+    aniyata: typeof ANIYATA_INFO!=='undefined'?ANIYATA_INFO:undefined
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'thang-phap-abhidhamma-data.json';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 500);
+}
+
+
+// ===== Khởi tạo app (đặt cuối file để mọi const dữ liệu đã sẵn sàng) =====
+renderSectionSwitch();
+applyLangMode();
+switchSection((function(){ try{ return localStorage.getItem('quyen22-section') || 'tamso'; }catch(e){ return 'tamso'; } })());

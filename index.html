@@ -157,6 +157,14 @@
   .qbtn-row{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px;justify-content:center}
   .qbtn{padding:6px 11px;border-radius:16px;border:1.5px solid #b06a28;background:var(--card);color:var(--ink);font-weight:700;font-family:inherit;font-size:12.5px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
   .qbtn:active{background:#f3cba4}
+  /* Chế độ ngôn ngữ: lang-vi = chỉ Việt, lang-pali = chỉ Pāli (mặc định: cả hai) */
+  body.lang-vi .circle .cn ~ .cp{display:none}
+  body.lang-vi .card .p{display:none}
+  body.lang-pali .circle .cn{display:none}
+  body.lang-pali .card .v{display:none}
+  body.lang-pali .card .p{font-size:12px;font-weight:700;color:var(--ink)}
+  .setopt{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .setopt .qbtn.on{background:#b06a28;color:#fff;border-color:#b06a28}
   .dkc{cursor:pointer}
   .dkc.pdot-selected text{fill:#1a73e8}
   .dkc.pdot-selected textPath{fill:#1a73e8}
@@ -216,6 +224,7 @@
         <button onclick="adjustFontScale(-0.1)" aria-label="Chữ nhỏ hơn">A−</button>
         <span class="pct" id="fontscale-pct">100%</span>
         <button onclick="adjustFontScale(0.1)" aria-label="Chữ lớn hơn">A+</button>
+        <button onclick="openSettingsSheet()" aria-label="Cài đặt" style="margin-left:4px">⚙</button>
       </div>
     </div>
   </header>
