@@ -284,7 +284,7 @@ function openCittaSheet(id){
   // theo đúng thứ tự Bảng Nêu (thứ tự trong CETASIKA_DATA)
   const names = CETASIKA_DATA.filter(x=>c.ceta.includes(x.id)).map(x=>x.ten.replace(/ \(sở hữu\)/,''));
   const html = `
-    <div class="sheet-head"><h2>${c.name}</h2></div>
+    <div class="sheet-head"><h2>${cittaFullName(c)} <span style="font-weight:600;font-size:.62em;color:var(--ink-soft)">(${glossCitta(c)})</span></h2></div>
     <p class="sheet-pali">${c.groupLabel} · Cảm thọ: ${c.vedanaLabel}</p>
     <div class="big-count"><span class="big-num">${c.ceta.length}</span><span class="big-unit">tâm sở phối hợp</span></div>
     ${c.note ? `<div class="info-note"><b>Trường hợp đặc biệt:</b> ${c.note}</div>` : ''}
@@ -326,7 +326,7 @@ function buildCittaGroupList(list){
     const total = CITTA_DATA.filter(m=>m.group===g).length;
     parts.push(`${sub.length} ${sub[0].groupLabel}`);
     if(sub.length < total){
-      partials.push(`<b>${sub.length} ${sub[0].groupLabel}</b> (trong ${total}): ${sub.map(m=>m.name).join('; ')}`);
+      partials.push(`<b>${sub.length} ${sub[0].groupLabel}</b> (trong ${total}): ${sub.map(m=>'Tâm '+m.name).join('; ')}`);
     }
   }
   let html = `<div class="sec-body"><b>${list.length}</b> = ${parts.join(' + ')}</div>`;
@@ -361,8 +361,10 @@ function openCetasikaSheet(id){
     </div>`;
   }
 
+  const dn4 = (typeof DACTINH_DATA!=='undefined' && DACTINH_DATA[id]) ? DACTINH_DATA[id].dt : '';
+  const tenDay = 'Tâm sở ' + ces.ten.replace(/ \(sở hữu\)/,'');
   const html = `
-    <div class="sheet-head"><h2>${ces.ten}</h2></div>
+    <div class="sheet-head"><h2>${tenDay}${dn4?` <span style="font-weight:600;font-size:.62em;color:var(--ink-soft)">(${dn4.charAt(0).toLowerCase()+dn4.slice(1)})</span>`:''}</h2></div>
     <p class="sheet-pali">${ces.pali}</p>
     <div class="big-count"><span class="big-num">${bigNum}</span><span class="big-unit">${bigUnit}</span></div>
     <div class="sec">
@@ -395,10 +397,10 @@ function renderDacTinhGroup(title, items){
 
 // Níp-bàn (pháp thực tính thứ 80) — theo Vi Diệu Pháp Sơ Cấp (Sư Giác Giới)
 const NIPBAN_DT = {
-  dt:'Vắng lặng', dtp:'santilakkhaṇaṃ',
-  cn:'Bất tử, không chuyển động', cnp:'accutarasaṃ, acalarasaṃ',
-  th:'Không có hiện tướng', thp:'animittapaccupaṭṭhānaṃ',
-  ng:'Không có nhân cần thiết — Níp-bàn không bị tạo tác nên không có nhân sanh; Níp-bàn chỉ làm cảnh, làm năng duyên cho tâm.', ngp:''
+  dt:'Sự vắng lặng tuyệt đối', dtp:'Santi',
+  cn:'Bất động, bất tử', cnp:'Acalaṃ, Accuta',
+  th:'Sự lìa khỏi hoàn toàn mọi hiện hữu', thp:'Nissarana',
+  ng:'Không có — Níp-bàn là pháp vô vi, không bị tạo tác nên không có nhân cần thiết.', ngp:''
 };
 
 // 6 cặp tâm sở Tịnh hảo "thân – tâm" (kể chung 1 pháp thực tính mỗi cặp)
@@ -459,7 +461,7 @@ function renderDacTinhPage(){
   const nbCircle = circ('nipban', 'Níp-bàn', 'Nibbāna', 'openDacTinhNipban', 'circle-tho');
 
   extra.innerHTML = `
-    <p class="info-note" style="margin-bottom:12px"><b>Pháp thực tính (Sabhāvadhamma)</b> là pháp có bản thể thật: mỗi pháp có <b>Trạng thái / Đặc tính (Lakkhaṇā)</b> riêng, <b>Phận sự / Chức năng (Rasā)</b> riêng, có <b>Sự hiện bày / Thể hiện (Paccupaṭṭhānā)</b> và <b>Nhân cần thiết / Nhân gần (Padaṭṭhānā)</b>.<br>
+    <p class="info-note" style="margin-bottom:12px"><b>Pháp thực tính (Sabhāvadhamma)</b> là pháp có bản thể thật: mỗi pháp có <b>Trạng thái / Đặc tính (Lakkhaṇā)</b> riêng, <b>Phận sự / Chức năng (Rasā)</b> riêng, có <b>Sự hiện bày / Sự thể hiện (Paccupaṭṭhānā)</b> và <b>Nhân cần thiết / Nhân gần (Padaṭṭhānā)</b>.<br>
     Pháp thực tính có <b>80 pháp</b> = 1 Tâm + 50 tâm sở + 28 sắc pháp + 1 Níp-bàn. (Tâm 121 thứ kể là 1; tâm sở 52 thứ kể 50 pháp vì Thọ tách thành 5 loại còn 6 cặp "thân – tâm" mỗi cặp kể chung 1 pháp.)</p>
     ${renderDacTinhGroup('1. Tâm (Citta)', [tamCircle])}
     ${renderDacTinhGroup('2–18 · Tâm sở Tợ tha (17)', [toithaHtml])}
@@ -468,7 +470,7 @@ function renderDacTinhPage(){
     ${renderDacTinhGroup('52–79 · Sắc pháp (28)', [rupaHtml])}
     ${renderDacTinhGroup('80. Níp-bàn (Nibbāna)', [nbCircle])}
     ${renderDacTinhGroup('Phụ lục · 14 vai trò của Tâm theo phận sự', [VAITRO_TAM_DATA.filter(v=>v.id!=='vt_vinnana').map(v=> plainCircleHTML(v.id, v.ten, v.pali, 'openDacTinhVaitro', 'circle-vt')).join('')])}
-    <p class="info-note">Nguồn: Vi Diệu Pháp Sơ Cấp (mục "Tám mươi pháp thực tính") — Sư Giác Giới; chi tiết 4 khía cạnh đối chiếu Chú giải Bộ Pháp Tụ (Aṭṭhasālinī).</p>
+    <p class="info-note">Nguồn 4 khía cạnh: bảng "Bốn khía cạnh thực tính của các pháp chân đế" theo Milindapañhā, Visuddhimagga và Aṭṭhasālinī (Toát Yếu Vô Tỷ Pháp — Mehm Tin Mon); cách kể 80 pháp theo Vi Diệu Pháp Sơ Cấp (Sư Giác Giới).</p>
   `;
 }
 
@@ -495,7 +497,7 @@ function attrBlocksOnly(item){
   return `
     <div class="attr-block attr-dt"><div class="attr-label">Đặc tính (Lakkhaṇā)</div><div class="sec-body">${item.dt}</div><div class="attr-pali">${item.dtp||''}</div></div>
     <div class="attr-block attr-cn"><div class="attr-label">Chức năng (Rasā)</div><div class="sec-body">${item.cn}</div><div class="attr-pali">${item.cnp||''}</div></div>
-    <div class="attr-block attr-th"><div class="attr-label">Thể hiện (Paccupaṭṭhānā)</div><div class="sec-body">${item.th}</div><div class="attr-pali">${item.thp||''}</div></div>
+    <div class="attr-block attr-th"><div class="attr-label">Sự thể hiện (Paccupaṭṭhānā)</div><div class="sec-body">${item.th}</div><div class="attr-pali">${item.thp||''}</div></div>
     <div class="attr-block attr-ng"><div class="attr-label">Nhân gần (Padaṭṭhānā)</div><div class="sec-body">${item.ng}</div><div class="attr-pali">${item.ngp||''}</div></div>
   `;
 }
@@ -506,7 +508,7 @@ function attrSheetHTML(headTitle, headSub, item){
     <p class="sheet-pali">${headSub}</p>
     <div class="attr-block attr-dt"><div class="attr-label">Đặc tính (Lakkhaṇā)</div><div class="sec-body">${item.dt}</div><div class="attr-pali">${item.dtp||''}</div></div>
     <div class="attr-block attr-cn"><div class="attr-label">Chức năng (Rasā)</div><div class="sec-body">${item.cn}</div><div class="attr-pali">${item.cnp||''}</div></div>
-    <div class="attr-block attr-th"><div class="attr-label">Thể hiện (Paccupaṭṭhānā)</div><div class="sec-body">${item.th}</div><div class="attr-pali">${item.thp||''}</div></div>
+    <div class="attr-block attr-th"><div class="attr-label">Sự thể hiện (Paccupaṭṭhānā)</div><div class="sec-body">${item.th}</div><div class="attr-pali">${item.thp||''}</div></div>
     <div class="attr-block attr-ng"><div class="attr-label">Nhân gần (Padaṭṭhānā)</div><div class="sec-body">${item.ng}</div><div class="attr-pali">${item.ngp||''}</div></div>
   `;
 }
@@ -689,7 +691,7 @@ function renderDuyenKhoiPage(){
   extra.innerHTML = `
     <p class="info-note" style="margin-bottom:6px">Vòng Thập Nhị Nhân Duyên — chạm 1 lần để chọn, chạm lần 2 để xem chi pháp và giảng giải. Chạm <b>tâm vòng tròn</b> để xem các yếu tố chính (2 gốc rễ, 2 đế, 3 mối nối, 3 luân, 20 yếu tố...).</p>
     <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-    <svg viewBox="0 0 720 720" style="width:calc(100% * var(--fontscale,1));min-width:calc(100% * var(--fontscale,1));height:auto;display:block;margin:0 auto" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 720 720" style="width:calc(min(100%, 560px) * var(--fontscale,1));height:auto;display:block;margin:0 auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="dkarr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.6" markerHeight="4.6" orient="auto-start-reverse">
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#c8471f"/>
@@ -1276,3 +1278,38 @@ function exportAppData(){
 renderSectionSwitch();
 applyLangMode();
 switchSection((function(){ try{ return localStorage.getItem('quyen22-section') || 'tamso'; }catch(e){ return 'tamso'; } })());
+
+
+// ===== Tên đầy đủ + định nghĩa ngắn cho Tâm =====
+function cittaFullName(c){
+  return 'Tâm ' + c.name;
+}
+function glossCitta(c){
+  const n = c.name, g = c.groupLabel || '';
+  if(g.startsWith('Bất thiện')){
+    const goc = n.startsWith('Tham') ? 'gốc Tham' : n.startsWith('Sân') ? 'gốc Sân' : 'gốc Si';
+    return 'tâm bất thiện ' + goc + ', tạo nghiệp xấu';
+  }
+  if(g.startsWith('Vô nhân')){
+    if(n.includes('quả')) return 'tâm quả vô nhân — kết quả của nghiệp, không có nhân tương ưng';
+    return 'tâm duy tác vô nhân — chỉ làm phận sự, không tạo nghiệp';
+  }
+  if(g.startsWith('Dục giới Tịnh hảo')){
+    if(n.startsWith('Thiện')) return 'tâm đại thiện dục giới, tạo nghiệp lành';
+    if(n.startsWith('Quả')) return 'tâm đại quả dục giới — quả của đại thiện';
+    return 'tâm đại duy tác dục giới — tâm của bậc Alahán';
+  }
+  if(g.startsWith('Sắc giới')){
+    const loai = n.startsWith('Thiện') ? 'thiện' : n.startsWith('Quả') ? 'quả' : 'duy tác';
+    return 'tâm thiền Sắc giới (' + loai + '), chứng đắc bằng thiền định';
+  }
+  if(g.startsWith('Vô Sắc giới')){
+    const loai = n.startsWith('Thiện') ? 'thiện' : n.startsWith('Quả') ? 'quả' : 'duy tác';
+    return 'tâm thiền Vô sắc giới (' + loai + '), lấy cảnh vô sắc';
+  }
+  if(g.startsWith('Siêu thế')){
+    return n.includes('Đạo') ? 'tâm Đạo siêu thế — sát-na đoạn trừ phiền não, lấy Níp-bàn làm cảnh'
+                             : 'tâm Quả siêu thế — hưởng quả giải thoát, lấy Níp-bàn làm cảnh';
+  }
+  return 'tâm';
+}
