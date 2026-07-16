@@ -130,9 +130,9 @@ function renderTamSoPage(){
     {count:5, cols:5, thanthong:true, groupGap:true},           // Sắc giới: Thiện (+Thần thông)
     {count:5, cols:5},                                          // Sắc giới: Quả
     {count:5, cols:5, thanthong:true},                          // Sắc giới: Duy Tác (+Thần thông)
-    {count:4, cols:4, groupGap:true, indent:110},              // Vô Sắc giới: Thiện (thụt vào — cột 6→9)
-    {count:4, cols:4, indent:110},                              // Vô Sắc giới: Quả
-    {count:4, cols:4, indent:110},                              // Vô Sắc giới: Duy Tác
+    {count:4, cols:4, groupGap:true, indent:4},                 // Vô Sắc giới: Thiện (thụt vào — cột 5→8)
+    {count:4, cols:4, indent:4},                                // Vô Sắc giới: Quả
+    {count:4, cols:4, indent:4},                                // Vô Sắc giới: Duy Tác
     {count:20, cols:5, groupGap:true},                          // Siêu thế: Đạo
     {count:20, cols:5},                                         // Siêu thế: Quả
   ];
@@ -145,18 +145,18 @@ function renderTamSoPage(){
 
   let ci = 0;
   let cittaHtml = '';
-  const REFW = 8*20 + 7*2; // 174px = bề ngang chuẩn 8 cột, dùng làm khung quy chiếu để canh giữa
+  const REFW = `calc(8 * var(--dot) + 14px)`; // bề ngang chuẩn 8 cột (ô + 7 khe 2px), khung quy chiếu để canh giữa
   for(const chunk of cittaChunks){
     const items = CITTA_DATA.slice(ci, ci+chunk.count);
     ci += chunk.count;
     const dashedDot = chunk.thanthong ? `<div class="pdot-sm pdot-dashed" onclick="openThanThongSheet()"></div>` : '';
     const cols2 = chunk.cols + (chunk.thanthong?1:0);
-    const rowW = cols2*20 + (cols2-1)*2;
-    let rowStyle = `width:${rowW}px`;
+    const rowW = `calc(${cols2} * var(--dot) + ${(cols2-1)*2}px)`;
+    let rowStyle = `width:${rowW}`;
     if(chunk.center) rowStyle += ';margin:0 auto';
-    else if(chunk.indent) rowStyle += `;margin-left:${chunk.indent}px`;
-    cittaHtml += `<div class="pblock${chunk.groupGap?' pblock-gap':''}" style="width:${REFW}px">
-      <div class="prow" style="grid-template-columns:repeat(${cols2},20px);${rowStyle}">
+    else if(chunk.indent) rowStyle += `;margin-left:calc(${chunk.indent} * (var(--dot) + 2px))`;
+    cittaHtml += `<div class="pblock${chunk.groupGap?' pblock-gap':''}" style="width:${REFW}">
+      <div class="prow" style="grid-template-columns:repeat(${cols2},var(--dot));${rowStyle}">
         ${items.map(c=>`<div class="pdot-sm" data-k="ci-${c.id}" style="background:${VEDANA_COLOR[c.vedana]}" onclick="openCittaSheet(${c.id})"></div>`).join('')}${dashedDot}
       </div>
     </div>`;
@@ -169,7 +169,7 @@ function renderTamSoPage(){
     ei += chunk.count;
     const cls = 'pblock' + (chunk.groupGap?' pblock-gap':'');
     cetaHtml += `<div class="${cls}">
-      <div class="prow" style="grid-template-columns:repeat(${chunk.cols},20px)">
+      <div class="prow" style="grid-template-columns:repeat(${chunk.cols},var(--dot))">
         ${items.map(c=>`<div class="pdot-sm" data-k="ce-${c.id}" style="${dotBackgroundStyle(vedanaSetOf(c.id))}" onclick="openCetasikaSheet('${c.id}')"></div>`).join('')}
       </div>
     </div>`;
@@ -179,7 +179,7 @@ function renderTamSoPage(){
   const rupaSpecialColor = {pathavi:'#a9784f', apo:'#3f9fd6', tejo:'#d4501e', vayo:'#6fa9c4'};
   const dai4 = RUPA_DATA.slice(0,4);
   const rupaRest = RUPA_DATA.slice(4);
-  let rupaHtml = `<div class="pblock"><div class="prow" style="grid-template-columns:repeat(4,20px)">
+  let rupaHtml = `<div class="pblock"><div class="prow" style="grid-template-columns:repeat(4,var(--dot))">
     ${dai4.map(r=>`<div class="pdot-sm" style="background:${rupaSpecialColor[r.id]}" onclick="openDacTinhRupa('${r.id}')"></div>`).join('')}
   </div></div>`;
   const rupaRowSizes = [5,4,2,4,2,3,4];
@@ -187,7 +187,7 @@ function renderTamSoPage(){
   for(const sz of rupaRowSizes){
     const items = rupaRest.slice(ri, ri+sz);
     ri += sz;
-    rupaHtml += `<div class="pblock"><div class="prow" style="grid-template-columns:repeat(${sz},20px)">
+    rupaHtml += `<div class="pblock"><div class="prow" style="grid-template-columns:repeat(${sz},var(--dot))">
       ${items.map(r=>`<div class="pdot-sm" style="background:#8b5fbf" onclick="openDacTinhRupa('${r.id}')"></div>`).join('')}
     </div></div>`;
   }
@@ -202,10 +202,10 @@ function renderTamSoPage(){
     return `background:${colorKey}`;
   }
   const pannattiHtml = `<div class="pblock" style="display:flex;justify-content:space-between;width:100%">
-    <div class="prow" style="grid-template-columns:repeat(7,20px)">
+    <div class="prow" style="grid-template-columns:repeat(7,var(--dot))">
       ${atthaP.map(p=>`<div class="pdot-sm" style="background:#4b3f8f" onclick="openPannattiSheet('${p.id}')"></div>`).join('')}
     </div>
-    <div class="prow" style="grid-template-columns:repeat(6,20px)">
+    <div class="prow" style="grid-template-columns:repeat(6,var(--dot))">
       ${namaP.map((p,i)=>`<div class="pdot-sm" style="${pannattiDotStyle(namaColors[i])}" onclick="openPannattiSheet('${p.id}')"></div>`).join('')}
     </div>
   </div>`;

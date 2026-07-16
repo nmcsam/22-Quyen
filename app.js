@@ -162,7 +162,7 @@ function applyFontScale(){
 
 function adjustFontScale(delta){
   const sc = fontScales[currentSection] || 1;
-  fontScales[currentSection] = Math.min(1.6, Math.max(0.8, sc + delta));
+  fontScales[currentSection] = Math.min(1.6, Math.max(0.5, sc + delta));
   applyFontScale();
 }
 
