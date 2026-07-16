@@ -8,15 +8,26 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['quyen22','22 Quyền'],['tamso','Tâm ↔ Tâm sở'],['dactinh','80 Pháp thực tính'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi'],['duyenhe','24 Duyên hệ']];
+  const sections = [['quyen22','22 Quyền'],['tamso','Tâm ↔ Tâm sở'],['dactinh','80 Pháp thực tính'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi'],['duyenhe','24 Duyên hệ'],['xugioi','12 Xứ · 18 Giới']];
   document.getElementById('section-switch').innerHTML = sections.map(([k,label])=>
     `<button class="${k===currentSection?'active':''}" onclick="switchSection('${k}')">${label}</button>`
   ).join('');
 }
 
+const PAGE_ACTIONS = {
+  quyen22: `<button class="qbtn" onclick="openQuyenDanhSac()">Danh · Sắc quyền</button>
+    <button class="qbtn" onclick="openQuyenCoi()">Địa vức (Cõi)</button>
+    <button class="qbtn" onclick="openQuyenChiPhap16()">16 chi pháp chân đế</button>
+    <button class="qbtn" onclick="openQuyenDuyenTQ()">Quyền duyên</button>`,
+  xugioi: `<button class="qbtn" onclick="openXGDoiChieu()">Đối chiếu Xứ ↔ Giới</button>
+    <button class="qbtn" onclick="openXGTomTat()">Tóm tắt số pháp</button>`
+};
+
 function switchSection(s){
   currentSection = s;
   if(typeof applyFontScale==='function') applyFontScale();
+  const pa = document.getElementById('page-actions');
+  if(pa) pa.innerHTML = PAGE_ACTIONS[s] || '';
   renderSectionSwitch();
   closeSheet();
   const grid = document.getElementById('grid');
@@ -33,13 +44,6 @@ function switchSection(s){
     document.getElementById('nav').innerHTML = '';
     currentView = 'sacdanh';
     renderQuyenGrid();
-    document.getElementById('extra-content').innerHTML = `
-      <div class="qbtn-row">
-        <button class="qbtn" onclick="openQuyenDanhSac()">Danh quyền · Sắc quyền</button>
-        <button class="qbtn" onclick="openQuyenCoi()">Địa vức (Cõi)</button>
-        <button class="qbtn" onclick="openQuyenChiPhap16()">16 chi pháp chân đế</button>
-        <button class="qbtn" onclick="openQuyenDuyenTQ()">Quyền duyên</button>
-      </div>`;
   } else if(s==='tamso'){
     document.getElementById('page-subtitle').textContent = 'Tâm ↔ Tâm sở · chạm vào một ô để xem phối hợp';
     grid.style.display='none';
@@ -70,6 +74,12 @@ function switchSection(s){
     legend.style.display='none';
     document.getElementById('nav').innerHTML = '';
     renderDuyenHePage();
+  } else if(s==='xugioi'){
+    document.getElementById('page-subtitle').textContent = '12 Xứ (Āyatana) · 18 Giới (Dhātu) — chạm để xem chi pháp';
+    grid.style.display='none';
+    legend.style.display='none';
+    document.getElementById('nav').innerHTML = '';
+    renderXuGioiPage();
   }
   document.getElementById('main').scrollTop = 0;
 }
@@ -201,7 +211,6 @@ function renderTamSoPage(){
   </div>`;
 
   extra.innerHTML = `
-    <p class="info-note" style="margin-bottom:8px">Vị trí đúng Bảng NÊU. Màu = phạm vi Thọ mà pháp ấy có thể đồng sinh (Khổ=đen, Lạc=vàng, Ưu=nâu, Hỷ=đỏ, Xả=xanh lá). Vòng nét đứt = có thể phát triển Thần thông. Chụm 2 ngón tay để phóng to. Chạm vào 1 ô để xem chi tiết.</p>
     <div class="poster-cols">
       <div class="poster-col">
         <div class="poster-col-title">TÂM (121)</div>
@@ -271,8 +280,8 @@ function openCittaSheet(id){
   const NHOM_LABEL = {bienhanh:'Biến hành', toitha:'Biệt cảnh', batthien_bh:'Bất thiện biến hành', batthien_rieng:'Bất thiện', tinhhao_bh:'Tịnh hảo biến hành', tietche:'Tiết chế', voluong:'Vô lượng phần', tuequyen:'Trí tuệ'};
   const groupFormula = groupOrder.map(g=>`${byGroup[g].length} ${NHOM_LABEL[g]||g}`).join(' + ');
   // Công thức đầy đủ: "36 tâm sở = (An tịnh tâm + An tịnh thân + Cần + ...)" — xếp theo vần
-  const names = c.ceta.map(cid=>{const x=CETASIKA_DATA.find(y=>y.id===cid);return x?x.ten.replace(/ \(sở hữu\)/,''):null;}).filter(Boolean)
-    .sort((a,b)=>a.localeCompare(b,'vi'));
+  // theo đúng thứ tự Bảng Nêu (thứ tự trong CETASIKA_DATA)
+  const names = CETASIKA_DATA.filter(x=>c.ceta.includes(x.id)).map(x=>x.ten.replace(/ \(sở hữu\)/,''));
   const html = `
     <div class="sheet-head"><h2>${c.name}</h2></div>
     <p class="sheet-pali">${c.groupLabel} · Cảm thọ: ${c.vedanaLabel}</p>
@@ -645,111 +654,66 @@ function dkNode(a,r,label,idx,w){
 function renderDuyenKhoiPage(){
   dkPid = 0;
   const extra = document.getElementById('extra-content');
-  const BROWN = '#96651f';
-  // 4 mũi tên đỏ góc ngoài (chiều kim đồng hồ)
-  let corner = '';
-  for(const ac of [-45,45,135,-135]){
-    corner += `<path d="${dkArc(348,ac-21,ac+21,1)}" stroke="#e01b1b" stroke-width="10" fill="none" marker-end="url(#dkarr)"/>`;
-  }
-  // 4 mũi tên nhỏ băng qua căm (vòng xoay bên trong)
-  let cross = '';
-  for(const ax of [0,90,180,-90]){
-    cross += `<path d="${dkArc(152,ax-13,ax+13,1)}" stroke="#e01b1b" stroke-width="7" fill="none" marker-end="url(#dkarr)"/>`;
-  }
-  // Nhãn Tập đế / Khổ đế quanh tâm
-  const de =
-    dkArcText(107,-59,-31,1,'TẬP ĐẾ',{size:14,weight:800}) +
-    dkArcText(107,-149,-121,1,'KHỔ ĐẾ',{size:14,weight:800}) +
-    dkArcText(107,59,31,0,'KHỔ ĐẾ',{size:14,weight:800}) +
-    dkArcText(107,149,121,0,'TẬP ĐẾ',{size:14,weight:800});
+  // 4 phần theo truyền thống Mogok: màu nền từng chi
+  const PHAN = [
+    {chis:[0,1],       fill:'#fbe3dc', stroke:'#b34a32', ink:'#6d2413', label:'Nhân quá khứ'},
+    {chis:[2,3,4,5,6], fill:'#e2f2da', stroke:'#4c7a3a', ink:'#274617', label:'Quả hiện tại'},
+    {chis:[7,8,9],     fill:'#fdecca', stroke:'#b07a1f', ink:'#5f3e08', label:'Nhân hiện tại'},
+    {chis:[10,11],     fill:'#e5dcf5', stroke:'#6b4fa0', ink:'#392564', label:'Quả vị lai'}
+  ];
+  const phanOf = i => PHAN.find(p=>p.chis.includes(i));
+  // Tên hiển thị (tối đa 2 dòng)
+  const NAMES = [['Vô minh'],['Hành'],['Thức'],['Danh','sắc'],['Lục','nhập'],['Xúc'],['Thọ'],['Ái'],['Thủ'],['Hữu'],['Sanh'],['Già','chết']];
 
-  // Chữ cung tròn theo 4 phần
-  const arcs =
-    // ---- Vành ngoài (chữ trắng/đỏ trên nền nâu) ----
-    dkArcText(300,-84,-30,1,'3 PHIỀN NÃO LUÂN',{fill:'#fff',size:17,weight:800}) +
-    dkArcText(300,-26,24,1,'2 NGHIỆP LUÂN',{fill:'#fff',size:17,weight:800}) +
-    dkArcText(300,-156,-102,1,'8 QUẢ LUÂN',{fill:'#fff',size:17,weight:800}) +
-    dkArcText(300,174,96,0,'THỌ DUYÊN ÁI LÀ CON ĐƯỜNG LUÂN HỒI',{fill:'#fff',size:13.5,weight:700}) +
-    dkArcText(300,84,6,0,'THỌ DIỆT, ÁI DIỆT LÀ ĐƯỜNG THOÁT KHỎI LUÂN HỒI',{fill:'#fff',size:12.5,weight:700}) +
-    // ---- Nhãn đỏ 4 phần (chạm xem tóm tắt phần) ----
-    dkArcText(248,-82,-8,1,'5 NHÂN QUÁ KHỨ TƯƠNG TỤC',{fill:'#d21',size:17.5,weight:800,click:'openDKQuarterSheet(1)'}) +
-    dkArcText(248,82,8,0,'5 QUẢ HIỆN TẠI TƯƠNG TỤC',{fill:'#d21',size:17.5,weight:800,click:'openDKQuarterSheet(2)'}) +
-    dkArcText(248,172,98,0,'5 NHÂN HIỆN TẠI TƯƠNG TỤC',{fill:'#d21',size:17.5,weight:800,click:'openDKQuarterSheet(3)'}) +
-    dkArcText(248,-172,-98,1,'5 QUẢ VỊ LAI TƯƠNG TỤC',{fill:'#d21',size:17.5,weight:800,click:'openDKQuarterSheet(4)'}) +
-    // ---- Danh sách chi (đen) ----
-    dkArcText(214,-80,-10,1,'Vô Minh, Hành, Ái, Thủ, Hữu',{size:16}) +
-    dkArcText(214,170,100,0,'Ái, Thủ, Hữu, Vô Minh, Hành',{size:16}) +
-    dkArcText(220,-168,-98,1,'Thức, Danh-Sắc, Lục Nhập, Xúc, Thọ',{size:14.5}) +
-    // Phần 2: 5 chi bấm được từng chi (so le 2 bán kính cho dễ đọc, dễ chạm)
-    dkArcText(222,86,64,0,'Thức',{size:20,weight:800,click:'openDuyenKhoiSheet(2)'}) +
-    dkArcText(192,72,42,0,'Danh-Sắc',{size:20,weight:800,click:'openDuyenKhoiSheet(3)'}) +
-    dkArcText(222,52,26,0,'Lục Nhập',{size:20,weight:800,click:'openDuyenKhoiSheet(4)'}) +
-    dkArcText(192,32,14,0,'Xúc',{size:20,weight:800,click:'openDuyenKhoiSheet(5)'}) +
-    dkArcText(222,18,2,0,'Thọ',{size:20,weight:800,click:'openDuyenKhoiSheet(6)'}) +
-    // Phần 4: Sanh / Lão-Tử bấm được
-    dkArcText(190,-176,-126,1,'SANH · SANH HỮU',{size:19,weight:800,click:'openDuyenKhoiSheet(10)'}) +
-    dkArcText(190,-122,-92,1,'LÃO - TỬ',{size:19,weight:800,click:'openDuyenKhoiSheet(11)'}) +
-    // ---- Thời & nhãn trong ----
-    dkArcText(148,-72,-18,1,'Thời Quá Khứ',{size:14}) +
-    dkArcText(126,-76,-14,1,'Nhân Quá Khứ Tương Tục',{size:11.5}) +
-    dkArcText(148,72,18,0,'Thời Hiện Tại',{size:14}) +
-    dkArcText(126,76,14,0,'Quả Hiện Tại Tương Tục',{size:11.5}) +
-    dkArcText(148,162,108,0,'Thời Hiện Tại',{size:14}) +
-    dkArcText(126,166,104,0,'Nhân Hiện Tại Tương Tục',{size:11.5}) +
-    dkArcText(148,-162,-108,1,'Thời Vị Lai',{size:14}) +
-    dkArcText(126,-166,-104,1,'Quả Vị Lai',{size:11.5});
-
-  // Nút chi (khung viền đỏ + vàng như bản gốc)
-  const nodes =
-    dkNode(-62,180,'VÔ MINH',0,116) +
-    dkNode(-27,180,'HÀNH',1,94) +
-    dkNode(111,180,'ÁI',7,78) +
-    dkNode(139,180,'THỦ',8,84) +
-    dkNode(167,180,'NGHIỆP HỮU',9,142);
+  const C=360, R=268, NR=58;
+  let nodes='', arrows='';
+  for(let i=0;i<12;i++){
+    const a=(-90+i*30)*Math.PI/180;
+    const x=C+R*Math.cos(a), y=C+R*Math.sin(a);
+    const p=phanOf(i);
+    const lines=NAMES[i];
+    const texts = lines.length===1
+      ? `<text x="0" y="8" text-anchor="middle" font-size="23" font-weight="800" fill="${p.ink}">${lines[0]}</text>`
+      : `<text x="0" y="0" text-anchor="middle" font-size="22" font-weight="800" fill="${p.ink}">${lines[0]}</text>
+         <text x="0" y="24" text-anchor="middle" font-size="22" font-weight="800" fill="${p.ink}">${lines[1]}</text>`;
+    nodes += `<g class="dkc" transform="translate(${x.toFixed(1)},${y.toFixed(1)})" onclick="openDuyenKhoiSheet(${i})">
+      <circle r="${NR}" fill="${p.fill}" stroke="${p.stroke}" stroke-width="3.5" class="dk-shape"/>
+      <text x="0" y="-30" text-anchor="middle" font-size="16" font-weight="700" fill="${p.stroke}">${i+1}</text>
+      ${texts}
+    </g>`;
+    // mũi tên nối chi i -> i+1 (cung ngắn giữa 2 nút)
+    const a1=-90+i*30+13.5, a2=-90+i*30+17.5;
+    arrows += `<path d="${dkArc(R,a1,a2,1)}" stroke="#c8471f" stroke-width="7" fill="none" marker-end="url(#dkarr)"/>`;
+  }
 
   extra.innerHTML = `
-    <p class="info-note" style="margin-bottom:6px">Biểu đồ Thập Nhị Nhân Duyên (truyền thống Mogok). Chạm 1 lần để chọn (ô/chữ chuyển xanh), chạm lần 2 để xem chi pháp. Chạm nhãn đỏ để xem tóm tắt từng phần, chạm tâm để xem các yếu tố chính. Chụm 2 ngón tay để phóng to.</p>
+    <p class="info-note" style="margin-bottom:6px">Vòng Thập Nhị Nhân Duyên — chạm 1 lần để chọn, chạm lần 2 để xem chi pháp và giảng giải. Chạm <b>tâm vòng tròn</b> để xem các yếu tố chính (2 gốc rễ, 2 đế, 3 mối nối, 3 luân, 20 yếu tố...).</p>
     <svg viewBox="0 0 720 720" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <marker id="dkarr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#e01b1b"/>
+        <marker id="dkarr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#c8471f"/>
         </marker>
       </defs>
-      ${corner}
-      <circle cx="360" cy="360" r="332" fill="${BROWN}"/>
-      <circle cx="360" cy="360" r="272" fill="#fffdf5"/>
-      <rect x="337" y="28" width="46" height="664" fill="${BROWN}"/>
-      <rect x="28" y="337" width="664" height="46" fill="${BROWN}"/>
-      <path d="M 360 14 L 360 118" stroke="#e01b1b" stroke-width="11" marker-end="url(#dkarr)"/>
-      <path d="M 360 604 L 360 708" stroke="#e01b1b" stroke-width="11" marker-end="url(#dkarr)"/>
-      ${cross}
-      ${arcs}
+      <circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="#d8c9b2" stroke-width="2.5" stroke-dasharray="3 7"/>
+      ${arrows}
       ${nodes}
       <g class="dkc" onclick="openDKCenterSheet()">
-        <circle cx="360" cy="360" r="95" fill="${BROWN}" stroke="#7a5218" stroke-width="3" class="dk-shape"/>
-        <text x="360" y="352" text-anchor="middle" font-size="30" font-weight="800" fill="#fff">VÔ MINH</text>
-        <text x="360" y="388" text-anchor="middle" font-size="28" font-weight="800" fill="#fff">ÁI</text>
+        <circle cx="${C}" cy="${C}" r="118" fill="#96651f" stroke="#7a5218" stroke-width="3" class="dk-shape"/>
+        <text x="${C}" y="${C-30}" text-anchor="middle" font-size="26" font-weight="800" fill="#fff">VÔ MINH · ÁI</text>
+        <text x="${C}" y="${C+2}" text-anchor="middle" font-size="15.5" fill="#f5e4c3">hai gốc rễ của luân hồi</text>
+        <text x="${C}" y="${C+34}" text-anchor="middle" font-size="15.5" fill="#f5e4c3">Paṭicca-samuppāda</text>
+        <text x="${C}" y="${C+62}" text-anchor="middle" font-size="13.5" fill="#e8d1a5">(chạm để xem các yếu tố chính)</text>
       </g>
-      ${de}
-      <text x="642" y="105" font-size="52" font-weight="800" fill="#e01b1b">1</text>
-      <text x="642" y="650" font-size="52" font-weight="800" fill="#e01b1b">2</text>
-      <text x="52" y="650" font-size="52" font-weight="800" fill="#e01b1b">3</text>
-      <text x="52" y="105" font-size="52" font-weight="800" fill="#e01b1b">4</text>
     </svg>
-    <p class="info-note" style="margin-top:6px">Nguồn: Biểu đồ Thập Nhị Nhân Duyên — tài liệu truyền thống Mogok; chi pháp theo Đường Vào Thắng Pháp (TK Chánh Minh).</p>
+    <div class="qbtn-row" style="justify-content:center">
+      <button class="qbtn" style="border-color:#b34a32;color:#8a2f18" onclick="openDKQuarterSheet(1)">P1 · 5 nhân quá khứ</button>
+      <button class="qbtn" style="border-color:#4c7a3a;color:#33591f" onclick="openDKQuarterSheet(2)">P2 · 5 quả hiện tại</button>
+      <button class="qbtn" style="border-color:#b07a1f;color:#7c550e" onclick="openDKQuarterSheet(3)">P3 · 5 nhân hiện tại</button>
+      <button class="qbtn" style="border-color:#6b4fa0;color:#4b3380" onclick="openDKQuarterSheet(4)">P4 · 5 quả vị lai</button>
+    </div>
+    <p class="info-note" style="margin-top:4px"><b>Màu 4 phần:</b> <span style="color:#b34a32">■</span> Nhân quá khứ (Vô minh, Hành) · <span style="color:#4c7a3a">■</span> Quả hiện tại (Thức → Thọ) · <span style="color:#b07a1f">■</span> Nhân hiện tại (Ái, Thủ, Hữu) · <span style="color:#6b4fa0">■</span> Quả vị lai (Sanh, Già chết).<br>Chi pháp theo Đường Vào Thắng Pháp (TK Chánh Minh); giảng giải theo tài liệu truyền thống Mogok.</p>
   `;
 }
-
-const DK_QUARTER = {
- 1:{ten:'Phần 1 — Nhân Quá Khứ Tương Tục',de:'Tập Đế · Thời Quá Khứ',
-    body:'<b>5 nhân quá khứ:</b> Vô Minh, Hành, Ái, Thủ, Nghiệp Hữu.<br><br>Trong đó: <b>3 Phiền Não Luân</b> (Vô Minh, Ái, Thủ) và <b>2 Nghiệp Luân</b> (Hành, Nghiệp Hữu).<br><br>5 nhân quá khứ làm duyên cho 5 quả hiện tại (mối nối Hành – Thức).'},
- 2:{ten:'Phần 2 — Quả Hiện Tại Tương Tục',de:'Khổ Đế · Thời Hiện Tại',
-    body:'<b>5 quả hiện tại:</b> Thức, Danh-Sắc, Lục Nhập, Xúc, Thọ — thuộc <b>8 Quả Luân</b>.<br><br>Mối nối quan trọng nhất nằm ở cuối phần này: <b>Thọ duyên Ái</b> — nếu Thọ diệt, Ái diệt thì đó là <b>con đường thoát ra khỏi vòng luân hồi</b> (ghi ở vành ngoài).'},
- 3:{ten:'Phần 3 — Nhân Hiện Tại Tương Tục',de:'Tập Đế · Thời Hiện Tại',
-    body:'<b>5 nhân hiện tại:</b> Ái, Thủ, Nghiệp Hữu, Vô Minh, Hành.<br><br><b>Thọ duyên Ái là con đường luân hồi</b>: từ quả hiện tại (Thọ) khởi lên Ái, Thủ, tạo Nghiệp Hữu mới — gieo nhân cho đời sau.<br><br>5 nhân hiện tại làm duyên cho 5 quả vị lai (mối nối Nghiệp Hữu – Sanh).'},
- 4:{ten:'Phần 4 — Quả Vị Lai Tương Tục',de:'Khổ Đế · Thời Vị Lai',
-    body:'<b>5 quả vị lai:</b> Thức, Danh-Sắc, Lục Nhập, Xúc, Thọ — hiện khởi qua <b>Sanh / Sanh Hữu</b> và <b>Lão - Tử</b>, thuộc <b>8 Quả Luân</b>.<br><br>Sanh duyên Lão Tử, kéo theo Sầu, Bi, Khổ, Ưu, Não — rồi Vô minh lại làm duyên cho vòng xoay tiếp tục.'}
-};
 
 function openDKQuarterSheet(q){
   const d = DK_QUARTER[q];
@@ -1104,4 +1068,113 @@ function openQuyenDuyenTQ(){
   }
   html += `<p class="info-note">Nữ quyền và Nam quyền không làm năng duyên trong Quyền duyên vì không có 3 chức năng: tạo ra – hỗ trợ – duy trì (ví như khuôn bánh không sinh ra, không nuôi bánh).</p>`;
   showAttrSheet(html);
+}
+
+// ===== Trang "12 Xứ · 18 Giới" (Āyatana – Dhātu) =====
+// Nguồn: tài liệu "12 Xứ & 18 Giới" (Abhidhammattha Saṅgaha — Āyatana-saṅgaha, Dhātu-saṅgaha)
+
+const XU_DATA = [
+ {ten:'Nhãn xứ', pali:'Cakkhāyatana', nhom:'noi', chiphap:'Nhãn tịnh sắc (cakkhu-pasāda) — sắc thần kinh nhãn.'},
+ {ten:'Nhĩ xứ', pali:'Sotāyatana', nhom:'noi', chiphap:'Nhĩ tịnh sắc (sota-pasāda) — sắc thần kinh nhĩ.'},
+ {ten:'Tỷ xứ', pali:'Ghānāyatana', nhom:'noi', chiphap:'Tỷ tịnh sắc (ghāna-pasāda) — sắc thần kinh tỷ.'},
+ {ten:'Thiệt xứ', pali:'Jivhāyatana', nhom:'noi', chiphap:'Thiệt tịnh sắc (jivhā-pasāda) — sắc thần kinh thiệt.'},
+ {ten:'Thân xứ', pali:'Kāyāyatana', nhom:'noi', chiphap:'Thân tịnh sắc (kāya-pasāda) — sắc thần kinh thân.'},
+ {ten:'Ý xứ', pali:'Manāyatana', nhom:'noi', chiphap:'Toàn bộ <b>89 (hay 121) tâm</b>. Trong 18 Giới, Ý xứ được tách thành 7 giới về thức: 5 đôi thức giới + Ý giới + Ý thức giới.'},
+ {ten:'Sắc xứ', pali:'Rūpāyatana', nhom:'ngoai', chiphap:'Sắc cảnh — hình sắc, màu sắc (đối tượng của nhãn thức).'},
+ {ten:'Thinh xứ', pali:'Saddāyatana', nhom:'ngoai', chiphap:'Thinh cảnh — âm thanh (đối tượng của nhĩ thức).'},
+ {ten:'Khí xứ', pali:'Gandhāyatana', nhom:'ngoai', chiphap:'Khí cảnh — mùi (đối tượng của tỷ thức).'},
+ {ten:'Vị xứ', pali:'Rasāyatana', nhom:'ngoai', chiphap:'Vị cảnh — mùi vị (đối tượng của thiệt thức).'},
+ {ten:'Xúc xứ', pali:'Phoṭṭhabbāyatana', nhom:'ngoai', chiphap:'3 pháp: <b>địa đại, hỏa đại, phong đại</b> (đất – lửa – gió), đối tượng của thân thức. (Thủy đại thuộc sắc tế, không xúc chạm được.)'},
+ {ten:'Pháp xứ', pali:'Dhammāyatana', nhom:'ngoai', chiphap:'<b>69 pháp</b>: 52 tâm sở + 16 sắc tế (sukhuma-rūpa) + Níp-bàn — đồng phạm vi với Pháp giới.'}
+];
+
+const GIOI_DATA = [
+ {ten:'Nhãn giới', pali:'Cakkhu-dhātu', nhom:'can', chiphap:'1 pháp: nhãn tịnh sắc (cakkhu-pasāda).'},
+ {ten:'Sắc giới', pali:'Rūpa-dhātu', nhom:'canh', chiphap:'1 pháp: sắc cảnh (hình sắc, màu sắc).'},
+ {ten:'Nhãn thức giới', pali:'Cakkhu-viññāṇa-dhātu', nhom:'thuc', chiphap:'2 tâm: Nhãn thức quả thiện + Nhãn thức quả bất thiện.'},
+ {ten:'Nhĩ giới', pali:'Sota-dhātu', nhom:'can', chiphap:'1 pháp: nhĩ tịnh sắc (sota-pasāda).'},
+ {ten:'Thinh giới', pali:'Sadda-dhātu', nhom:'canh', chiphap:'1 pháp: thinh cảnh (âm thanh).'},
+ {ten:'Nhĩ thức giới', pali:'Sota-viññāṇa-dhātu', nhom:'thuc', chiphap:'2 tâm: Nhĩ thức quả thiện + Nhĩ thức quả bất thiện.'},
+ {ten:'Tỷ giới', pali:'Ghāna-dhātu', nhom:'can', chiphap:'1 pháp: tỷ tịnh sắc (ghāna-pasāda).'},
+ {ten:'Khí giới', pali:'Gandha-dhātu', nhom:'canh', chiphap:'1 pháp: khí cảnh (mùi).'},
+ {ten:'Tỷ thức giới', pali:'Ghāna-viññāṇa-dhātu', nhom:'thuc', chiphap:'2 tâm: Tỷ thức quả thiện + Tỷ thức quả bất thiện.'},
+ {ten:'Thiệt giới', pali:'Jivhā-dhātu', nhom:'can', chiphap:'1 pháp: thiệt tịnh sắc (jivhā-pasāda).'},
+ {ten:'Vị giới', pali:'Rasa-dhātu', nhom:'canh', chiphap:'1 pháp: vị cảnh (mùi vị).'},
+ {ten:'Thiệt thức giới', pali:'Jivhā-viññāṇa-dhātu', nhom:'thuc', chiphap:'2 tâm: Thiệt thức quả thiện + Thiệt thức quả bất thiện.'},
+ {ten:'Thân giới', pali:'Kāya-dhātu', nhom:'can', chiphap:'1 pháp: thân tịnh sắc (kāya-pasāda).'},
+ {ten:'Xúc giới', pali:'Phoṭṭhabba-dhātu', nhom:'canh', chiphap:'3 pháp: địa đại, hỏa đại, phong đại (đất – lửa – gió).'},
+ {ten:'Thân thức giới', pali:'Kāya-viññāṇa-dhātu', nhom:'thuc', chiphap:'2 tâm: Thân thức quả thiện (thọ lạc) + Thân thức quả bất thiện (thọ khổ).'},
+ {ten:'Ý giới', pali:'Mano-dhātu', nhom:'thuc', chiphap:'<b>3 tâm</b> tiếp nhận cảnh nơi ngũ môn: tâm Hướng ngũ môn (pañcadvārāvajjana) + 2 tâm Tiếp thâu (sampaṭicchana quả thiện và quả bất thiện).'},
+ {ten:'Pháp giới', pali:'Dhamma-dhātu', nhom:'canh', chiphap:'<b>69 pháp</b>: 52 tâm sở + 16 sắc tế (sukhuma-rūpa) + Níp-bàn. Không gồm 12 sắc thô (đã có ở các giới căn – cảnh) và không gồm tâm (đã thuộc 7 giới về thức).'},
+ {ten:'Ý thức giới', pali:'Mano-viññāṇa-dhātu', nhom:'thuc', chiphap:'<b>76 tâm</b>: tất cả tâm còn lại = 89 tâm − 10 tâm ngũ song thức (giới 3, 6, 9, 12, 15) − 3 tâm Ý giới (giới 16).'}
+];
+
+function renderXuGioiPage(){
+  const extra = document.getElementById('extra-content');
+  const XGC = {noi:'circle-sac', ngoai:'circle-canh', can:'circle-sac', canh:'circle-canh', thuc:'circle-vt'};
+  const xu = (arr, from) => arr.map((d,i)=>{
+    const idx = from + i;
+    return `<div class="circle ${XGC[d.nhom]}" onclick="openXuSheet(${XU_DATA.indexOf(d)})">
+      <div class="cp" style="font-weight:800">${idx}</div><div class="cn">${d.ten}</div><div class="cp">${d.pali.replace('āyatana','')}</div></div>`;
+  }).join('');
+  const gioi = GIOI_DATA.map((d,i)=>`<div class="circle ${XGC[d.nhom]}" onclick="openGioiSheet(${i})">
+      <div class="cp" style="font-weight:800">${i+1}</div><div class="cn">${d.ten}</div><div class="cp">${d.pali.replace('-dhātu','')}</div></div>`).join('');
+
+  extra.innerHTML = `
+    <p class="info-note" style="margin-bottom:10px"><b>Xứ (āyatana)</b> và <b>Giới (dhātu)</b> là hai cách phân loại các pháp chân đế (tâm, tâm sở, sắc pháp) nhìn dưới góc độ "cửa ngõ tiếp xúc" và "yếu tố cấu thành kinh nghiệm". 12 Xứ nhóm theo 6 cặp căn – cảnh (nội xứ – ngoại xứ); 18 Giới tách rõ thêm phần <b>thức</b>: phân biệt riêng các loại tâm sinh khởi nơi mỗi căn.</p>
+    <div class="group-head">12 Xứ · 6 Nội xứ (ajjhattikāyatana)</div>
+    <div class="circle-grid">${xu(XU_DATA.filter(d=>d.nhom==='noi'), 1)}</div>
+    <div class="group-head">12 Xứ · 6 Ngoại xứ (bāhirāyatana)</div>
+    <div class="circle-grid">${xu(XU_DATA.filter(d=>d.nhom==='ngoai'), 7)}</div>
+    <div class="group-head">18 Giới (Dhātu)</div>
+    <p class="info-note" style="margin:4px 0 8px">Cấu trúc: 5 nhóm <b>Căn – Cảnh – Thức</b> (giới 1–15, mỗi căn 3 giới) + <b>Ý giới</b> (16) + <b>Pháp giới</b> (17) + <b>Ý thức giới</b> (18). Màu: <span style="color:#3f7cb8">■</span> căn (tịnh sắc) · <span style="color:#2f8d7c">■</span> cảnh · <span style="color:#8258b8">■</span> thức (tâm).</p>
+    <div class="circle-grid">${gioi}</div>
+    <p class="info-note" style="margin-top:10px">Nguồn: Abhidhammattha Saṅgaha — chương Āyatana-saṅgaha, Dhātu-saṅgaha (tài liệu "12 Xứ & 18 Giới").</p>
+  `;
+}
+
+function openXuSheet(i){
+  const d = XU_DATA[i];
+  const nhomLabel = d.nhom==='noi' ? 'Nội xứ (ajjhattikāyatana) — căn bên trong' : 'Ngoại xứ (bāhirāyatana) — cảnh bên ngoài';
+  let doichieu = '';
+  if(d.ten==='Ý xứ') doichieu = 'Trong 18 Giới, Ý xứ bao quát cả <b>7 giới thuộc về tâm</b>: 5 đôi thức giới (3, 6, 9, 12, 15) + Ý giới (16) + Ý thức giới (18) — tức toàn bộ 89 tâm.';
+  else if(d.ten==='Pháp xứ') doichieu = 'Đồng nhất phạm vi với <b>Pháp giới</b> (giới 17): 52 tâm sở + 16 sắc tế + Níp-bàn.';
+  else doichieu = 'Tương ứng trực tiếp với giới cùng tên trong 18 Giới (chỉ gồm căn và cảnh, KHÔNG bao gồm thức).';
+  showAttrSheet(`
+    <div class="sheet-head"><span class="num">${i+1}</span><h2>${d.ten}</h2></div>
+    <p class="sheet-pali">${d.pali} · ${nhomLabel}</p>
+    <div class="sec"><div class="sec-label">Chi pháp</div><div class="sec-body">${d.chiphap}</div></div>
+    <div class="sec" style="margin-top:12px"><div class="sec-label">Đối chiếu với 18 Giới</div><div class="sec-body">${doichieu}</div></div>
+  `);
+}
+
+function openGioiSheet(i){
+  const d = GIOI_DATA[i];
+  const NL = {can:'Giới thuộc căn (tịnh sắc)', canh:'Giới thuộc cảnh', thuc:'Giới thuộc thức (tâm)'};
+  showAttrSheet(`
+    <div class="sheet-head"><span class="num">${i+1}</span><h2>${d.ten}</h2></div>
+    <p class="sheet-pali">${d.pali} · ${NL[d.nhom]}</p>
+    <div class="sec"><div class="sec-label">Chi pháp / Số pháp</div><div class="sec-body">${d.chiphap}</div></div>
+  `);
+}
+
+function openXGDoiChieu(){
+  showAttrSheet(`
+    <div class="sheet-head"><h2>Đối chiếu 12 Xứ ↔ 18 Giới</h2></div>
+    <p class="sheet-pali">Āyatana ↔ Dhātu</p>
+    <div class="sec"><div class="sec-label">10 xứ căn – cảnh</div><div class="sec-body">Nhãn, Nhĩ, Tỷ, Thiệt, Thân xứ và Sắc, Thinh, Khí, Vị, Xúc xứ tương ứng <b>trực tiếp</b> với 10 giới cùng tên (giới 1, 2, 4, 5, 7, 8, 10, 11, 13, 14) — chỉ gồm căn và cảnh, KHÔNG bao gồm thức.</div></div>
+    <div class="sec" style="margin-top:12px"><div class="sec-label">Ý xứ (1 xứ → 7 giới)</div><div class="sec-body">Bao quát cả 7 giới thuộc về tâm: 5 đôi thức giới (3, 6, 9, 12, 15) + Ý giới (16) + Ý thức giới (18) — tức toàn bộ 89 tâm.</div></div>
+    <div class="sec" style="margin-top:12px"><div class="sec-label">Pháp xứ (1 xứ = 1 giới)</div><div class="sec-body">Đồng nhất phạm vi với Pháp giới (17): 52 tâm sở + 16 sắc tế + Níp-bàn (69 pháp).</div></div>
+    <p class="info-note">Như vậy 12 Xứ mở rộng thành 18 Giới bằng cách tách Ý xứ thành 7 giới về thức: 12 − 1 + 7 = 18.</p>
+  `);
+}
+
+function openXGTomTat(){
+  showAttrSheet(`
+    <div class="sheet-head"><h2>Tóm tắt số pháp</h2></div>
+    <p class="sheet-pali">Bảng tổng số pháp của hai hệ thống</p>
+    <div class="sec"><div class="sec-label">18 Giới → tổng số pháp</div><div class="sec-body">10 sắc thô làm căn + cảnh (giới 1–2, 4–5, 7–8, 10–11, 13) + 3 pháp Xúc giới (giới 14: đất – lửa – gió) + <b>89 tâm</b> (10 ngũ song thức + 3 Ý giới + 76 Ý thức giới) + 52 tâm sở + 16 sắc tế + Níp-bàn (Pháp giới).</div></div>
+    <div class="sec" style="margin-top:12px"><div class="sec-label">12 Xứ → tổng số pháp</div><div class="sec-body">10 xứ sắc thô (nội xứ 1–5 + ngoại xứ 7–11, trong đó Xúc xứ gồm 3 pháp) + <b>89 tâm</b> (Ý xứ) + 52 tâm sở + 16 sắc tế + Níp-bàn (Pháp xứ).</div></div>
+    <p class="info-note">Cả hai hệ thống đều bao quát toàn bộ thực tại: 28 sắc pháp (12 sắc thô + 16 sắc tế) + 89 tâm + 52 tâm sở + Níp-bàn — chỉ khác cách nhóm.</p>
+  `);
 }

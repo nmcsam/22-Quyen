@@ -144,6 +144,7 @@
   .pdot-sm.pdot-selected{outline:3px solid #1a73e8;outline-offset:2px;transform:scale(1.25);position:relative;z-index:2}
   .pdot-ring-big.pdot-selected{outline:4px solid #1a73e8;outline-offset:3px;transform:scale(1.06)}
   .circle.pdot-selected{outline:3px solid #1a73e8;outline-offset:2px;transform:scale(1.06)}
+  .pdot-dim{opacity:.13;filter:saturate(.35)}
   /* Sáng ô phối hợp (trang Tâm ↔ Tâm sở) */
   .pdot-lit{box-shadow:0 0 0 3px #f6a800, 0 0 9px 3px rgba(246,168,0,.6);position:relative;z-index:2}
   .pdot-lit-ani{box-shadow:0 0 0 3px rgba(246,168,0,.4);outline:2px dashed #f6a800;outline-offset:1px;position:relative;z-index:2}
@@ -153,7 +154,7 @@
   }
   /* Nút tổng quát (trang 22 Quyền) */
   .qbtn-row{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px;justify-content:center}
-  .qbtn{padding:9px 15px;border-radius:20px;border:1.5px solid #b06a28;background:var(--card);color:var(--ink);font-weight:700;font-family:inherit;font-size:14px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .qbtn{padding:6px 11px;border-radius:16px;border:1.5px solid #b06a28;background:var(--card);color:var(--ink);font-weight:700;font-family:inherit;font-size:12.5px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
   .qbtn:active{background:#f3cba4}
   .dkc{cursor:pointer}
   .dkc.pdot-selected text{fill:#1a73e8}
@@ -194,7 +195,9 @@
   .attr-pali{font-size:calc(15px * var(--fontscale));font-style:italic;color:#1c5b9e;margin-top:2px;line-height:1.5}
   @media (prefers-color-scheme: dark){ .attr-pali{color:#7ab3ea} }
 
-  #fontctrl{display:flex;align-items:center;justify-content:center;gap:2px;margin-top:8px}
+  #toolbar{display:flex;align-items:flex-start;gap:8px;margin-top:8px}
+  #page-actions{display:flex;gap:6px;flex-wrap:wrap;flex:1;justify-content:flex-start;align-items:center}
+  #fontctrl{display:flex;align-items:center;gap:2px;flex:none;margin-left:auto}
   #fontctrl button{width:30px;height:30px;border-radius:8px;border:1px solid rgba(128,128,128,.3);background:var(--card);color:var(--ink);font-size:15px;font-weight:700;font-family:inherit;display:flex;align-items:center;justify-content:center}
   #fontctrl button:active{background:rgba(201,118,46,.15)}
   #fontctrl .pct{font-size:11.5px;color:var(--ink-soft);min-width:38px;text-align:center}
@@ -206,10 +209,13 @@
     <h1 id="page-title">Thắng Pháp — Abhidhamma</h1>
     <p id="page-subtitle">Chạm vào một quyền để xem chi tiết</p>
     <div id="section-switch"></div>
-    <div id="fontctrl">
-      <button onclick="adjustFontScale(-0.1)" aria-label="Chữ nhỏ hơn">A−</button>
-      <span class="pct" id="fontscale-pct">100%</span>
-      <button onclick="adjustFontScale(0.1)" aria-label="Chữ lớn hơn">A+</button>
+    <div id="toolbar">
+      <div id="page-actions"></div>
+      <div id="fontctrl">
+        <button onclick="adjustFontScale(-0.1)" aria-label="Chữ nhỏ hơn">A−</button>
+        <span class="pct" id="fontscale-pct">100%</span>
+        <button onclick="adjustFontScale(0.1)" aria-label="Chữ lớn hơn">A+</button>
+      </div>
     </div>
   </header>
   <main id="main">

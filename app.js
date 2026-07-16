@@ -112,29 +112,36 @@ document.addEventListener('click', function(e){
   if(dot.dataset.k) tamsoHighlight(dot.dataset.k); // trang Tâm↔Tâm sở: sáng các ô phối hợp
 }, true);
 
-// ===== (Trang Tâm ↔ Tâm sở) Chạm lần 1: làm sáng các ô phối hợp =====
+// ===== (Trang Tâm ↔ Tâm sở) Chạm lần 1: làm MỜ các ô không phối hợp =====
 function clearTamsoLit(){
-  document.querySelectorAll('.pdot-lit,.pdot-lit-ani').forEach(x=>x.classList.remove('pdot-lit','pdot-lit-ani'));
+  document.querySelectorAll('.pdot-dim,.pdot-lit,.pdot-lit-ani').forEach(x=>x.classList.remove('pdot-dim','pdot-lit','pdot-lit-ani'));
 }
 function tamsoHighlight(key){
-  const [kind, rawId] = [key.slice(0,2), key.slice(3)];
-  const lit = (k, cls)=>{ const el=document.querySelector(`[data-k="${k}"]`); if(el) el.classList.add(cls); };
+  const kind = key.slice(0,2), rawId = key.slice(3);
+  const partners = new Set([key]);
+  const aniSet = new Set();
   if(kind==='ci'){
     const c = CITTA_DATA.find(x=>x.id===parseInt(rawId,10));
     if(!c) return;
-    c.ceta.forEach(cid=>lit('ce-'+cid,'pdot-lit'));
-    // tâm sở bất định có thể khởi với tâm này
+    c.ceta.forEach(cid=>partners.add('ce-'+cid));
     if(typeof ANIYATA_INFO!=='undefined'){
       for(const [cid,info] of Object.entries(ANIYATA_INFO)){
-        if(info.cittas.includes(c.id)) lit('ce-'+cid,'pdot-lit-ani');
+        if(info.cittas.includes(c.id)){ partners.add('ce-'+cid); aniSet.add('ce-'+cid); }
       }
     }
   } else if(kind==='ce'){
-    CITTA_DATA.forEach(c=>{ if(c.ceta.includes(rawId)) lit('ci-'+c.id,'pdot-lit'); });
+    CITTA_DATA.forEach(c=>{ if(c.ceta.includes(rawId)) partners.add('ci-'+c.id); });
     if(typeof ANIYATA_INFO!=='undefined' && ANIYATA_INFO[rawId]){
-      ANIYATA_INFO[rawId].cittas.forEach(cid=>lit('ci-'+cid,'pdot-lit-ani'));
+      ANIYATA_INFO[rawId].cittas.forEach(cid=>{ partners.add('ci-'+cid); aniSet.add('ci-'+cid); });
     }
-  }
+  } else return;
+  document.querySelectorAll('[data-k]').forEach(el=>{
+    const k = el.dataset.k;
+    if(!partners.has(k)) el.classList.add('pdot-dim');
+    else if(aniSet.has(k)) el.classList.add('pdot-lit-ani'); // bất định: viền nét đứt
+  });
+  // các ô ngoài phạm vi phối hợp (sắc pháp, Níp-bàn, chế định...) cũng mờ đi
+  document.querySelectorAll('#extra-content .pdot-sm:not([data-k]), #extra-content .pdot-ring-big').forEach(el=>el.classList.add('pdot-dim'));
 }
 
 if('serviceWorker' in navigator){
