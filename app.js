@@ -94,6 +94,7 @@ function closeSheet(){
   document.getElementById('sheet').classList.remove('show');
   document.getElementById('sheet-backdrop').classList.remove('show');
   document.querySelectorAll('.pdot-selected').forEach(x=>x.classList.remove('pdot-selected'));
+  if(typeof clearTamsoLit==='function') clearTamsoLit();
 }
 
 // Chạm 2 bước: chạm LẦN 1 vào ô tròn → ô phóng to + viền xanh (xác nhận đã chọn đúng ô);
@@ -106,8 +107,35 @@ document.addEventListener('click', function(e){
   e.stopPropagation();
   e.preventDefault();
   document.querySelectorAll('.pdot-selected').forEach(x=>x.classList.remove('pdot-selected'));
+  clearTamsoLit();
   dot.classList.add('pdot-selected');
+  if(dot.dataset.k) tamsoHighlight(dot.dataset.k); // trang Tâm↔Tâm sở: sáng các ô phối hợp
 }, true);
+
+// ===== (Trang Tâm ↔ Tâm sở) Chạm lần 1: làm sáng các ô phối hợp =====
+function clearTamsoLit(){
+  document.querySelectorAll('.pdot-lit,.pdot-lit-ani').forEach(x=>x.classList.remove('pdot-lit','pdot-lit-ani'));
+}
+function tamsoHighlight(key){
+  const [kind, rawId] = [key.slice(0,2), key.slice(3)];
+  const lit = (k, cls)=>{ const el=document.querySelector(`[data-k="${k}"]`); if(el) el.classList.add(cls); };
+  if(kind==='ci'){
+    const c = CITTA_DATA.find(x=>x.id===parseInt(rawId,10));
+    if(!c) return;
+    c.ceta.forEach(cid=>lit('ce-'+cid,'pdot-lit'));
+    // tâm sở bất định có thể khởi với tâm này
+    if(typeof ANIYATA_INFO!=='undefined'){
+      for(const [cid,info] of Object.entries(ANIYATA_INFO)){
+        if(info.cittas.includes(c.id)) lit('ce-'+cid,'pdot-lit-ani');
+      }
+    }
+  } else if(kind==='ce'){
+    CITTA_DATA.forEach(c=>{ if(c.ceta.includes(rawId)) lit('ci-'+c.id,'pdot-lit'); });
+    if(typeof ANIYATA_INFO!=='undefined' && ANIYATA_INFO[rawId]){
+      ANIYATA_INFO[rawId].cittas.forEach(cid=>lit('ci-'+cid,'pdot-lit-ani'));
+    }
+  }
+}
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
@@ -115,18 +143,21 @@ if('serviceWorker' in navigator){
   });
 }
 
-// ===== Điều chỉnh cỡ chữ (lưu lại giữa các lần mở app) =====
-let fontScale = parseFloat(localStorage.getItem('quyen22-fontscale')) || 1;
+// ===== Điều chỉnh cỡ chữ RIÊNG CHO TỪNG TRANG (lưu lại giữa các lần mở app) =====
+let fontScales = {};
+try{ fontScales = JSON.parse(localStorage.getItem('quyen22-fontscales')) || {}; }catch(e){ fontScales = {}; }
 
 function applyFontScale(){
-  document.documentElement.style.setProperty('--fontscale', fontScale.toFixed(2));
-  document.getElementById('fontscale-pct').textContent = Math.round(fontScale*100) + '%';
-  localStorage.setItem('quyen22-fontscale', fontScale.toFixed(2));
+  const sc = fontScales[currentSection] || 1;
+  document.documentElement.style.setProperty('--fontscale', sc.toFixed(2));
+  document.getElementById('fontscale-pct').textContent = Math.round(sc*100) + '%';
+  localStorage.setItem('quyen22-fontscales', JSON.stringify(fontScales));
 }
 
 function adjustFontScale(delta){
-  fontScale = Math.min(1.6, Math.max(0.8, fontScale + delta));
+  const sc = fontScales[currentSection] || 1;
+  fontScales[currentSection] = Math.min(1.6, Math.max(0.8, sc + delta));
   applyFontScale();
 }
 
-applyFontScale();
+window.addEventListener('load', applyFontScale);

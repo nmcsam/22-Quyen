@@ -144,6 +144,17 @@
   .pdot-sm.pdot-selected{outline:3px solid #1a73e8;outline-offset:2px;transform:scale(1.25);position:relative;z-index:2}
   .pdot-ring-big.pdot-selected{outline:4px solid #1a73e8;outline-offset:3px;transform:scale(1.06)}
   .circle.pdot-selected{outline:3px solid #1a73e8;outline-offset:2px;transform:scale(1.06)}
+  /* Sáng ô phối hợp (trang Tâm ↔ Tâm sở) */
+  .pdot-lit{box-shadow:0 0 0 3px #f6a800, 0 0 9px 3px rgba(246,168,0,.6);position:relative;z-index:2}
+  .pdot-lit-ani{box-shadow:0 0 0 3px rgba(246,168,0,.4);outline:2px dashed #f6a800;outline-offset:1px;position:relative;z-index:2}
+  @media (prefers-color-scheme: dark){
+    .pdot-lit{box-shadow:0 0 0 3px #ffc93d, 0 0 10px 3px rgba(255,201,61,.65)}
+    .pdot-lit-ani{box-shadow:0 0 0 3px rgba(255,201,61,.45);outline:2px dashed #ffc93d}
+  }
+  /* Nút tổng quát (trang 22 Quyền) */
+  .qbtn-row{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px;justify-content:center}
+  .qbtn{padding:9px 15px;border-radius:20px;border:1.5px solid #b06a28;background:var(--card);color:var(--ink);font-weight:700;font-family:inherit;font-size:14px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .qbtn:active{background:#f3cba4}
   .dkc{cursor:pointer}
   .dkc.pdot-selected text{fill:#1a73e8}
   .dkc.pdot-selected textPath{fill:#1a73e8}

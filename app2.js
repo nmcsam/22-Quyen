@@ -8,7 +8,7 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['quyen22','22 Quyền'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Đặc tính · Chức năng'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi'],['duyenhe','24 Duyên hệ']];
+  const sections = [['quyen22','22 Quyền'],['tamso','Tâm ↔ Tâm sở'],['dactinh','80 Pháp thực tính'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi'],['duyenhe','24 Duyên hệ']];
   document.getElementById('section-switch').innerHTML = sections.map(([k,label])=>
     `<button class="${k===currentSection?'active':''}" onclick="switchSection('${k}')">${label}</button>`
   ).join('');
@@ -16,6 +16,7 @@ function renderSectionSwitch(){
 
 function switchSection(s){
   currentSection = s;
+  if(typeof applyFontScale==='function') applyFontScale();
   renderSectionSwitch();
   closeSheet();
   const grid = document.getElementById('grid');
@@ -29,11 +30,16 @@ function switchSection(s){
   }
   if(s==='quyen22'){
     document.getElementById('page-subtitle').textContent = '22 Quyền (Bāvīsatindriya) · chạm vào một quyền để xem chi tiết';
-    extra.innerHTML = '';
-    grid.style.display='grid';
-    legend.style.display='flex';
-    renderQuyenNav();
+    document.getElementById('nav').innerHTML = '';
+    currentView = 'sacdanh';
     renderQuyenGrid();
+    document.getElementById('extra-content').innerHTML = `
+      <div class="qbtn-row">
+        <button class="qbtn" onclick="openQuyenDanhSac()">Danh quyền · Sắc quyền</button>
+        <button class="qbtn" onclick="openQuyenCoi()">Địa vức (Cõi)</button>
+        <button class="qbtn" onclick="openQuyenChiPhap16()">16 chi pháp chân đế</button>
+        <button class="qbtn" onclick="openQuyenDuyenTQ()">Quyền duyên</button>
+      </div>`;
   } else if(s==='tamso'){
     document.getElementById('page-subtitle').textContent = 'Tâm ↔ Tâm sở · chạm vào một ô để xem phối hợp';
     grid.style.display='none';
@@ -41,7 +47,7 @@ function switchSection(s){
     document.getElementById('nav').innerHTML = '';
     renderTamSoPage();
   } else if(s==='dactinh'){
-    document.getElementById('page-subtitle').textContent = 'Đặc tính · Chức năng · Thể hiện · Nhân gần (theo Aṭṭhasālinī)';
+    document.getElementById('page-subtitle').textContent = '80 Pháp thực tính (Sabhāvadhamma) · chạm để xem 4 khía cạnh';
     grid.style.display='none';
     legend.style.display='none';
     document.getElementById('nav').innerHTML = '';
@@ -141,7 +147,7 @@ function renderTamSoPage(){
     else if(chunk.indent) rowStyle += `;margin-left:${chunk.indent}px`;
     cittaHtml += `<div class="pblock${chunk.groupGap?' pblock-gap':''}" style="width:${REFW}px">
       <div class="prow" style="grid-template-columns:repeat(${cols2},20px);${rowStyle}">
-        ${items.map(c=>`<div class="pdot-sm" style="background:${VEDANA_COLOR[c.vedana]}" onclick="openCittaSheet(${c.id})"></div>`).join('')}${dashedDot}
+        ${items.map(c=>`<div class="pdot-sm" data-k="ci-${c.id}" style="background:${VEDANA_COLOR[c.vedana]}" onclick="openCittaSheet(${c.id})"></div>`).join('')}${dashedDot}
       </div>
     </div>`;
   }
@@ -154,7 +160,7 @@ function renderTamSoPage(){
     const cls = 'pblock' + (chunk.groupGap?' pblock-gap':'');
     cetaHtml += `<div class="${cls}">
       <div class="prow" style="grid-template-columns:repeat(${chunk.cols},20px)">
-        ${items.map(c=>`<div class="pdot-sm" style="${dotBackgroundStyle(vedanaSetOf(c.id))}" onclick="openCetasikaSheet('${c.id}')"></div>`).join('')}
+        ${items.map(c=>`<div class="pdot-sm" data-k="ce-${c.id}" style="${dotBackgroundStyle(vedanaSetOf(c.id))}" onclick="openCetasikaSheet('${c.id}')"></div>`).join('')}
       </div>
     </div>`;
   }
@@ -253,20 +259,29 @@ function openPannattiSheet(id){
 
 function openCittaSheet(id){
   const c = CITTA_DATA.find(x=>x.id===id);
-  const items = c.ceta.map(cid=>{
+  // Công thức theo nhóm: "36 = 13 Tợ tha + 23 Tịnh hảo"
+  const byGroup = {};
+  const groupOrder = [];
+  c.ceta.forEach(cid=>{
     const ces = CETASIKA_DATA.find(x=>x.id===cid);
-    if(!ces) return '';
-    const ccolor = CETASIKA_GROUP_COLOR[ces.nhom]||'gray';
-    return `<div class="combo-item"><div class="combo-badge cat-${ccolor}">${ces.ten[0]}</div><div class="combo-text"><span class="cname">${ces.ten}</span> <span class="cpali">(${ces.pali})</span></div></div>`;
-  }).join('');
+    if(!ces) return;
+    if(!byGroup[ces.nhom]){ byGroup[ces.nhom]=[]; groupOrder.push(ces.nhom); }
+    byGroup[ces.nhom].push(ces);
+  });
+  const NHOM_LABEL = {bienhanh:'Biến hành', toitha:'Biệt cảnh', batthien_bh:'Bất thiện biến hành', batthien_rieng:'Bất thiện', tinhhao_bh:'Tịnh hảo biến hành', tietche:'Tiết chế', voluong:'Vô lượng phần', tuequyen:'Trí tuệ'};
+  const groupFormula = groupOrder.map(g=>`${byGroup[g].length} ${NHOM_LABEL[g]||g}`).join(' + ');
+  // Công thức đầy đủ: "36 tâm sở = (An tịnh tâm + An tịnh thân + Cần + ...)" — xếp theo vần
+  const names = c.ceta.map(cid=>{const x=CETASIKA_DATA.find(y=>y.id===cid);return x?x.ten.replace(/ \(sở hữu\)/,''):null;}).filter(Boolean)
+    .sort((a,b)=>a.localeCompare(b,'vi'));
   const html = `
     <div class="sheet-head"><h2>${c.name}</h2></div>
     <p class="sheet-pali">${c.groupLabel} · Cảm thọ: ${c.vedanaLabel}</p>
     <div class="big-count"><span class="big-num">${c.ceta.length}</span><span class="big-unit">tâm sở phối hợp</span></div>
     ${c.note ? `<div class="info-note"><b>Trường hợp đặc biệt:</b> ${c.note}</div>` : ''}
     <div class="sec" style="margin-top:14px">
-      <div class="sec-label">Danh sách Tâm sở phối hợp</div>
-      <div class="combo-list">${items}</div>
+      <div class="sec-label">Tâm sở phối hợp</div>
+      <div class="sec-body"><b>${c.ceta.length}</b> = ${groupFormula}</div>
+      <div class="sec-body" style="margin-top:8px"><b>${c.ceta.length}</b> = (${names.join(' + ')})</div>
     </div>
   `;
   document.getElementById('sheet-content').innerHTML = html;
@@ -290,17 +305,23 @@ const ANIYATA_INFO = {
   chanhmang:   {cittas:[31,32,33,34,35,36,37,38], note:'Ngoài 40 tâm Siêu thế (phối hợp <b>cố định</b>), Chánh mạng còn khởi <b>bất định, riêng lẻ</b> trong 8 tâm Đại thiện — khi có dịp thực sự tránh xa nuôi mạng sai trái.'}
 };
 
-function buildCittaGroupList(list, badgeSuffix){
+function buildCittaGroupList(list){
+  // Kiểu công thức: "91 tâm = 24 Dục giới tịnh hảo + 15 Sắc giới + 12 Vô sắc giới + 40 Siêu thế"
   const groupsPresent = [];
   for(const m of list){ if(!groupsPresent.includes(m.group)) groupsPresent.push(m.group); }
-  let html = '';
+  const parts = [];
+  const partials = [];
   for(const g of groupsPresent){
     const sub = list.filter(m=>m.group===g);
-    const color = CITTA_GROUP_COLOR[g]||'gray';
-    html += `<div class="group-head" style="margin-top:10px">${sub[0].groupLabel} (${sub.length})${badgeSuffix||''}</div>`;
-    html += sub.map(m=>
-      `<div class="combo-item"><div class="combo-badge cat-${color}">●</div><div class="combo-text"><span class="cname">${m.name}</span></div></div>`
-    ).join('');
+    const total = CITTA_DATA.filter(m=>m.group===g).length;
+    parts.push(`${sub.length} ${sub[0].groupLabel}`);
+    if(sub.length < total){
+      partials.push(`<b>${sub.length} ${sub[0].groupLabel}</b> (trong ${total}): ${sub.map(m=>m.name).join('; ')}`);
+    }
+  }
+  let html = `<div class="sec-body"><b>${list.length}</b> = ${parts.join(' + ')}</div>`;
+  if(partials.length){
+    html += `<div class="sec-body" style="margin-top:8px;font-size:calc(15px * var(--fontscale))">${partials.join('<br><br>')}</div>`;
   }
   return html;
 }
@@ -319,14 +340,14 @@ function openCetasikaSheet(id){
   let listHtml = '';
   if(matching.length>0){
     listHtml += `<div class="sec" style="margin-top:14px">
-      <div class="sec-label">Danh sách ${matching.length} tâm phối hợp${ani?' cố định (niyata)':''}</div>
-      <div class="combo-list">${buildCittaGroupList(matching)}</div>
+      <div class="sec-label">${matching.length} tâm phối hợp${ani?' cố định (niyata)':''}</div>
+      ${buildCittaGroupList(matching)}
     </div>`;
   }
   if(aniCittas.length>0){
     listHtml += `<div class="sec" style="margin-top:14px">
       <div class="sec-label">${aniCittas.length} tâm có thể phối hợp — bất định (aniyata), chỉ khởi khi có dịp</div>
-      <div class="combo-list">${buildCittaGroupList(aniCittas)}</div>
+      ${buildCittaGroupList(aniCittas)}
     </div>`;
   }
 
@@ -357,45 +378,116 @@ function plainCircleHTML(id, label, pali, opener, cls){
 }
 
 function renderDacTinhGroup(title, items){
-  let html = `<div class="group-head">${title} (${items.length})</div><div class="circle-grid">`;
+  let html = `<div class="group-head">${title}</div><div class="circle-grid">`;
   html += items.join('');
   html += `</div>`;
   return html;
 }
 
+// Níp-bàn (pháp thực tính thứ 80) — theo Vi Diệu Pháp Sơ Cấp (Sư Giác Giới)
+const NIPBAN_DT = {
+  dt:'Vắng lặng', dtp:'santilakkhaṇaṃ',
+  cn:'Bất tử, không chuyển động', cnp:'accutarasaṃ, acalarasaṃ',
+  th:'Không có hiện tướng', thp:'animittapaccupaṭṭhānaṃ',
+  ng:'Không có nhân cần thiết — Níp-bàn không bị tạo tác nên không có nhân sanh; Níp-bàn chỉ làm cảnh, làm năng duyên cho tâm.', ngp:''
+};
+
+// 6 cặp tâm sở Tịnh hảo "thân – tâm" (kể chung 1 pháp thực tính mỗi cặp)
+const DT_PAIRS = [
+  {id1:'antinhthan', id2:'antinhtam', ten:'Tịnh thân · Tịnh tâm', pali:'Kāyapassaddhi · Cittapassaddhi'},
+  {id1:'khinhthan', id2:'khinhtam', ten:'Khinh thân · Khinh tâm', pali:'Kāyalahutā · Cittalahutā'},
+  {id1:'nhuthan', id2:'nhutam', ten:'Nhu thân · Nhu tâm', pali:'Kāyamudutā · Cittamudutā'},
+  {id1:'thichthan', id2:'thichtam', ten:'Thích thân · Thích tâm', pali:'Kāyakammaññatā · Cittakammaññatā'},
+  {id1:'thuanthan', id2:'thuantam', ten:'Thuần thân · Thuần tâm', pali:'Kāyapāguññatā · Cittapāguññatā'},
+  {id1:'chanhthan', id2:'chanhtam', ten:'Chánh thân · Chánh tâm', pali:'Kāyujukatā · Cittujukatā'}
+];
+
 function renderDacTinhPage(){
   const extra = document.getElementById('extra-content');
+  let n = 0;
+  const num = ()=>{ n++; return n; };
+  const circ = (id, ten, pali, opener, cls)=> plainCircleHTML(id, `${num()}. ${ten}`, pali, opener, cls);
 
-  const batthienIds = ["si","votam","voquy","phongdat","tham","takien","man","hontram","thuymien","san","tat","lan","hoi","hoainghi"];
-  const totthaIds = ["xuc","tho","tuong","tu","nhattam","mangquyen","tacy","tam","tu2","thangiai","can","hy","duc"];
-  const tinhhaoIds = ["tin","niem","hiri","ottapa","votham","vosan","hanhxa","antinhthan","antinhtam","khinhthan","khinhtam","nhuthan","nhutam","thichthan","thichtam","thuanthan","thuantam","chanhthan","chanhtam","chanhngu","chanhnghiep","chanhmang","bi","tuyhy","tue"];
+  // 1. Tâm
+  const tamCircle = circ('vt_vinnana', 'Tâm', 'Citta', 'openDacTinhVaitro', 'circle-vt');
 
-  const batthienCircles = batthienIds.map(id=>{
+  // 2–18: 17 Tợ tha (Thọ tách thành 5)
+  const toithaHtml = [
+    circ('xuc','Xúc','Phassa','openDacTinhCetasika','circle-tt'),
+    circ('tho_kho','Thọ khổ','Dukkha','openDacTinhTho','circle-tt'),
+    circ('tho_lac','Thọ lạc','Sukha','openDacTinhTho','circle-tt'),
+    circ('tho_hy','Thọ hỷ','Somanassa','openDacTinhTho','circle-tt'),
+    circ('tho_uu','Thọ ưu','Domanassa','openDacTinhTho','circle-tt'),
+    circ('tho_xa','Thọ xả','Upekkhā','openDacTinhTho','circle-tt'),
+    ...['tuong','tu','nhattam','mangquyen','tacy','tam','tu2','thangiai','can','hy','duc'].map(id=>{
+      const c = CETASIKA_DATA.find(x=>x.id===id);
+      return circ(id, c.ten, c.pali, 'openDacTinhCetasika', 'circle-tt');
+    })
+  ].join('');
+
+  // 19–32: 14 Bất thiện
+  const batthienIds = ["si","votam","voquy","phongdat","tham","takien","man","san","tat","lan","hoi","hontram","thuymien","hoainghi"];
+  const batthienHtml = batthienIds.map(id=>{
     const c = CETASIKA_DATA.find(x=>x.id===id);
-    return plainCircleHTML(id, c.ten, c.pali, 'openDacTinhCetasika', 'circle-bt');
-  });
-  const totthaCircles = totthaIds.map(id=>{
+    return circ(id, c.ten, c.pali, 'openDacTinhCetasika', 'circle-bt');
+  }).join('');
+
+  // 33–51: 19 Tịnh hảo (6 cặp thân–tâm kể chung)
+  const th1 = ["tin","niem","hiri","ottapa","votham","vosan","hanhxa"].map(id=>{
     const c = CETASIKA_DATA.find(x=>x.id===id);
-    return plainCircleHTML(id, c.ten, c.pali, 'openDacTinhCetasika', 'circle-tt');
-  });
-  const tinhhaoCircles = tinhhaoIds.map(id=>{
+    return circ(id, c.ten, c.pali, 'openDacTinhCetasika', 'circle-th');
+  }).join('');
+  const thPairs = DT_PAIRS.map((p,i)=> circ('pair'+i, p.ten, p.pali.split(' · ')[0].replace('Kāya','K./C.'), 'openDacTinhPairByIdx', 'circle-th')).join('');
+  const th2 = ["chanhngu","chanhnghiep","chanhmang","bi","tuyhy","tue"].map(id=>{
     const c = CETASIKA_DATA.find(x=>x.id===id);
-    return plainCircleHTML(id, c.ten, c.pali, 'openDacTinhCetasika', 'circle-th');
-  });
-  const rupaCircles = RUPA_DATA.map(r=> plainCircleHTML(r.id, r.ten, r.pali, 'openDacTinhRupa', 'circle-sac'));
-  const vaitroCircles = VAITRO_TAM_DATA.map(v=> plainCircleHTML(v.id, v.ten, v.pali, 'openDacTinhVaitro', 'circle-vt'));
-  const thoCircles = THO_CHITIET_DATA.map(t=> plainCircleHTML(t.id, t.ten, t.pali, 'openDacTinhTho', 'circle-tho'));
+    return circ(id, c.ten, c.pali, 'openDacTinhCetasika', 'circle-th');
+  }).join('');
+
+  // 52–79: 28 Sắc pháp
+  const rupaHtml = RUPA_DATA.map(r=> circ(r.id, r.ten, r.pali, 'openDacTinhRupa', 'circle-sac')).join('');
+
+  // 80. Níp-bàn
+  const nbCircle = circ('nipban', 'Níp-bàn', 'Nibbāna', 'openDacTinhNipban', 'circle-tho');
 
   extra.innerHTML = `
-    <p class="info-note" style="margin-bottom:12px">Dữ liệu trích từ Chú giải Bộ Pháp Tụ (Aṭṭhasālinī). Mỗi pháp có 4 đặc tính cố định: <b>Đặc tính (Lakkhaṇā)</b> — nét riêng để nhận diện; <b>Chức năng (Rasā)</b> — nhiệm vụ nó thực hiện; <b>Thể hiện (Paccupaṭṭhānā)</b> — cách nó hiện ra trước tâm hành giả; <b>Nhân gần (Padaṭṭhānā)</b> — điều kiện gần nhất làm nó sinh khởi.</p>
+    <p class="info-note" style="margin-bottom:12px"><b>Pháp thực tính (Sabhāvadhamma)</b> là pháp có bản thể thật: mỗi pháp có <b>Trạng thái / Đặc tính (Lakkhaṇā)</b> riêng, <b>Phận sự / Chức năng (Rasā)</b> riêng, có <b>Sự hiện bày / Thể hiện (Paccupaṭṭhānā)</b> và <b>Nhân cần thiết / Nhân gần (Padaṭṭhānā)</b>.<br>
+    Pháp thực tính có <b>80 pháp</b> = 1 Tâm + 50 tâm sở + 28 sắc pháp + 1 Níp-bàn. (Tâm 121 thứ kể là 1; tâm sở 52 thứ kể 50 pháp vì Thọ tách thành 5 loại còn 6 cặp "thân – tâm" mỗi cặp kể chung 1 pháp.)</p>
+    ${renderDacTinhGroup('1. Tâm (Citta)', [tamCircle])}
+    ${renderDacTinhGroup('2–18 · Tâm sở Tợ tha (17)', [toithaHtml])}
+    ${renderDacTinhGroup('19–32 · Tâm sở Bất thiện (14)', [batthienHtml])}
+    ${renderDacTinhGroup('33–51 · Tâm sở Tịnh hảo (19)', [th1+thPairs+th2])}
+    ${renderDacTinhGroup('52–79 · Sắc pháp (28)', [rupaHtml])}
+    ${renderDacTinhGroup('80. Níp-bàn (Nibbāna)', [nbCircle])}
+    ${renderDacTinhGroup('Phụ lục · 14 vai trò của Tâm theo phận sự', [VAITRO_TAM_DATA.filter(v=>v.id!=='vt_vinnana').map(v=> plainCircleHTML(v.id, v.ten, v.pali, 'openDacTinhVaitro', 'circle-vt')).join('')])}
+    <p class="info-note">Nguồn: Vi Diệu Pháp Sơ Cấp (mục "Tám mươi pháp thực tính") — Sư Giác Giới; chi tiết 4 khía cạnh đối chiếu Chú giải Bộ Pháp Tụ (Aṭṭhasālinī).</p>
+  `;
+}
 
-    ${renderDacTinhGroup('14 Tâm sở Bất thiện', batthienCircles)}
-    ${renderDacTinhGroup('13 Tâm sở Tợ tha (Biến hành + Biệt cảnh)', totthaCircles)}
-    ${renderDacTinhGroup('25 Tâm sở Tịnh hảo', tinhhaoCircles)}
-    ${renderDacTinhGroup('28 Sắc pháp', rupaCircles)}
-    ${renderDacTinhGroup('14 Vai trò của Tâm (theo phận sự trong lộ trình)', vaitroCircles)}
-    ${renderDacTinhGroup('5 Thọ chi tiết (Lạc/Khổ/Hỷ/Ưu/Xả)', thoCircles)}
-    <p class="info-note">Tri giác (Saññā/Tưởng) đã có ở nhóm "13 Tâm sở Tợ tha" phía trên — Chú giải mô tả giống hệt nhau ở cả hai nơi (Bảng Thọ-Tưởng và Bảng Tợ tha).</p>
+function openDacTinhPairByIdx(key){
+  const i = parseInt(String(key).replace('pair',''),10);
+  const p = DT_PAIRS[i];
+  const a = DACTINH_DATA[p.id1], b = DACTINH_DATA[p.id2];
+  const ca = CETASIKA_DATA.find(x=>x.id===p.id1), cb = CETASIKA_DATA.find(x=>x.id===p.id2);
+  showAttrSheet(`
+    <div class="sheet-head"><h2>${p.ten}</h2></div>
+    <p class="sheet-pali">${p.pali} — một pháp thực tính, hai mặt: nhóm tâm sở ("thân") và tâm</p>
+    <div class="group-head">${ca.ten} (${ca.pali})</div>
+    ${attrBlocksOnly(a)}
+    <div class="group-head" style="margin-top:14px">${cb.ten} (${cb.pali})</div>
+    ${attrBlocksOnly(b)}
+  `);
+}
+
+function openDacTinhNipban(){
+  showAttrSheet(attrSheetHTML('Níp-bàn', 'Nibbāna — pháp thực tính thứ 80, pháp vô vi', NIPBAN_DT));
+}
+
+function attrBlocksOnly(item){
+  return `
+    <div class="attr-block attr-dt"><div class="attr-label">Đặc tính (Lakkhaṇā)</div><div class="sec-body">${item.dt}</div><div class="attr-pali">${item.dtp||''}</div></div>
+    <div class="attr-block attr-cn"><div class="attr-label">Chức năng (Rasā)</div><div class="sec-body">${item.cn}</div><div class="attr-pali">${item.cnp||''}</div></div>
+    <div class="attr-block attr-th"><div class="attr-label">Thể hiện (Paccupaṭṭhānā)</div><div class="sec-body">${item.th}</div><div class="attr-pali">${item.thp||''}</div></div>
+    <div class="attr-block attr-ng"><div class="attr-label">Nhân gần (Padaṭṭhānā)</div><div class="sec-body">${item.ng}</div><div class="attr-pali">${item.ngp||''}</div></div>
   `;
 }
 
@@ -470,40 +562,52 @@ function openCanhSheet(id){
 const DUYENKHOI_DATA = [
  {ten:'Vô minh', pali:'Avijjā',
   duyen:'Vô minh duyên Hành — Avijjāpaccayā saṅkhārā',
-  chiphap:'Tâm sở <b>Si</b> hợp trong <b>12 tâm bất thiện</b>.'},
+  chiphap:'Tâm sở <b>Si</b> hợp trong <b>12 tâm bất thiện</b>.',
+  mogok:'Trạng thái không sáng suốt, bị si mê che lấp, không thấy rõ thực tánh của các pháp: bất tri trong <b>Tam tướng</b> (vô thường xem là trường tồn, khổ xem là hạnh phúc, vô ngã xem là "tôi, của tôi") và bất tri trong <b>Tứ Diệu Đế</b>. Vô minh có mặt do đời sống thất niệm — chính vì Vô minh nên làm duyên cho Hành có mặt.'},
  {ten:'Hành', pali:'Saṅkhāra',
   duyen:'Hành duyên Thức — Saṅkhārapaccayā viññāṇaṃ',
-  chiphap:'Tâm sở <b>Tư</b> hợp trong <b>12 tâm bất thiện</b> + <b>17 tâm thiện hiệp thế</b> (gom thành <b>29 Tư</b>).'},
+  chiphap:'Tâm sở <b>Tư</b> hợp trong <b>12 tâm bất thiện</b> + <b>17 tâm thiện hiệp thế</b> (gom thành <b>29 Tư</b>).',
+  mogok:'Sự chủ ý tạo tác nghiệp thiện, bất thiện, bất động, dẫn đến tái sanh trong ba giới bốn loài. Có 3 kiểu: <b>Phúc hành</b> (Puññābhisaṅkhāra — làm thiện, sanh cõi người, trời Dục giới, Sắc giới), <b>Phi phúc hành</b> (Apuññābhisaṅkhāra — làm bất thiện, sanh 4 đường ác đạo), <b>Bất động hành</b> (Āneñjābhisaṅkhāra — tu thiền Vô sắc, sanh cõi Vô sắc, thọ tối đa 84.000 đại kiếp).'},
  {ten:'Thức', pali:'Viññāṇa',
   duyen:'Thức duyên Danh sắc — Viññāṇapaccayā nāmarūpaṃ',
-  chiphap:'<b>32 tâm quả hiệp thế</b>.'},
+  chiphap:'<b>32 tâm quả hiệp thế</b>.',
+  mogok:'Thức tái sanh do chủ ý: mỗi chủ ý tạo tác thiện – bất thiện là sự quyết định tái sanh trong các cõi. Thức quy tụ năng lực ở chặng tư tưởng cuối cùng (cận tử) để quyết định tái sanh vào cảnh giới tương ứng. Thức (danh) luôn nương tựa sắc pháp, không thể đi riêng lẻ.'},
  {ten:'Danh sắc', pali:'Nāma-rūpa',
   duyen:'Danh sắc duyên Lục nhập — Nāmarūpapaccayā saḷāyatanaṃ',
-  chiphap:'<b>Danh:</b> 35 tâm sở hợp trong 32 tâm quả hiệp thế.<br><b>Sắc:</b> sắc nghiệp tái tục, sắc nghiệp bình nhật, sắc tâm.'},
+  chiphap:'<b>Danh:</b> 35 tâm sở hợp trong 32 tâm quả hiệp thế.<br><b>Sắc:</b> sắc nghiệp tái tục, sắc nghiệp bình nhật, sắc tâm.',
+  mogok:'Thức tái sanh thì tiếp tục có một Danh-Sắc mới để duy trì. Chết không phải là hết — chết là sự bắt đầu cho một hình hài mới, đời sống mới. Có 4 kiểu tái sanh: <b>Thai sanh, Noãn sanh, Hoá sanh, Thấp sanh</b>.'},
  {ten:'Lục nhập', pali:'Saḷāyatana',
   duyen:'Lục nhập duyên Xúc — Saḷāyatanapaccayā phasso',
-  chiphap:'<b>6 nội xứ:</b> 5 sắc thần kinh + 32 tâm quả hiệp thế (ý xứ).'},
+  chiphap:'<b>6 nội xứ:</b> 5 sắc thần kinh + 32 tâm quả hiệp thế (ý xứ).',
+  mogok:'Khi có Danh-Sắc thì hình thành 6 căn (6 nội xứ). <b>6 căn</b>: mắt, tai, mũi, lưỡi, thân, ý; <b>6 trần</b>: sắc, thanh, khí, vị, xúc, pháp; <b>6 thức</b>: nhãn, nhĩ, tỷ, thiệt, thân, ý. Khi 6 căn tiếp xúc 6 trần lập tức làm duyên cho 6 Xúc phát sanh.'},
  {ten:'Xúc', pali:'Phassa',
   duyen:'Xúc duyên Thọ — Phassapaccayā vedanā',
-  chiphap:'Tâm sở <b>Xúc</b> hợp trong <b>32 tâm quả hiệp thế</b>.'},
+  chiphap:'Tâm sở <b>Xúc</b> hợp trong <b>32 tâm quả hiệp thế</b>.',
+  mogok:'Sự giao tiếp, va chạm của 6 căn và 6 trần: 6 nội xứ tiếp xúc 6 ngoại xứ sinh ra 6 Xúc (nhãn xúc, nhĩ xúc, tỷ xúc, thiệt xúc, thân xúc, ý xúc). Do có 6 Xúc mà làm duyên cho 6 Thọ phát sanh.'},
  {ten:'Thọ', pali:'Vedanā',
   duyen:'Thọ duyên Ái — Vedanāpaccayā taṇhā',
-  chiphap:'Tâm sở <b>Thọ</b> hợp trong <b>32 tâm quả hiệp thế</b>.'},
+  chiphap:'Tâm sở <b>Thọ</b> hợp trong <b>32 tâm quả hiệp thế</b>.',
+  mogok:'Cảm giác tích cực, tiêu cực, trung tính của Thân – Tâm trước 6 trần cảnh: 3 loại (khổ, lạc, xả) hay 5 loại (khổ, lạc, hỷ, ưu, xả); theo môn có 6 thọ (nhãn thọ... ý thọ). Theo Mogok: <b>6 cảm thọ ngoại khách</b> (thọ xả nơi nhãn – nhĩ – tỷ – thiệt thức, thọ lạc và khổ nơi thân thức), <b>3 cảm thọ nội khách</b> (hỷ, ưu, xả sanh nơi tâm), <b>3 cảm thọ chủ</b> (hỷ, ưu, xả đi cùng hơi thở vô – ra). Do 6 Thọ dẫn đến 6 Ái.'},
  {ten:'Ái', pali:'Taṇhā',
   duyen:'Ái duyên Thủ — Taṇhāpaccayā upādānaṃ',
-  chiphap:'Tâm sở <b>Tham</b> hợp trong <b>8 tâm tham</b> (<b>6 ái</b>).'},
+  chiphap:'Tâm sở <b>Tham</b> hợp trong <b>8 tâm tham</b> (<b>6 ái</b>).',
+  mogok:'Sự thích thú, đam mê trên 6 trần cảnh — thèm khát không bao giờ thấy đủ. 6 ái: sắc ái... pháp ái. Có 3 loại: <b>Dục ái</b> (Kāmataṇhā — tham đắm trong 6 trần), <b>Hữu ái</b> (Bhavataṇhā — tham đắm hợp Thường kiến: tin cái tôi vĩnh cửu, đấng bề trên tối thượng, sự cứu cánh ngược lý nhân quả), <b>Phi hữu ái</b> (Vibhavataṇhā — tham đắm hợp Đoạn kiến: vô nhân kiến, vô hành kiến, vô hữu kiến). "Thọ duyên Ái" chính là mắt xích then chốt của vòng luân hồi.'},
  {ten:'Thủ', pali:'Upādāna',
   duyen:'Thủ duyên Hữu — Upādānapaccayā bhavo',
-  chiphap:'Tâm sở <b>Tham</b> + tâm sở <b>Tà kiến</b> hợp trong <b>8 tâm tham</b> (<b>4 thủ</b>).'},
+  chiphap:'Tâm sở <b>Tham</b> + tâm sở <b>Tà kiến</b> hợp trong <b>8 tâm tham</b> (<b>4 thủ</b>).',
+  mogok:'Nắm giữ, chấp chặt vào đối tượng, gắn liền với tà kiến. <b>4 loại Thủ</b>: Dục thủ (Kāmupādāna — bám víu 5 trần cảnh), Kiến thủ (Diṭṭhupādāna — chấp chặt quan điểm sai lầm), Giới cấm thủ (Sīlabbatupādāna — chấp pháp hành sai lạc ngược Đạo Đế, mê tín lễ lạy cúng kiếng cầu xin), Ngã chấp thủ (Attavādupādāna — chấp "cái tôi" thường còn; thật ra chỉ có sự buồn, sự khổ chứ không có "tôi buồn, tôi khổ"). Chính 4 Thủ làm duyên cho Hữu có mặt.'},
  {ten:'Hữu', pali:'Bhava',
   duyen:'Hữu duyên Sanh — Bhavapaccayā jāti',
-  chiphap:'<b>Nghiệp hữu:</b> tâm sở Tư hợp trong 12 tâm bất thiện + 17 tâm thiện hiệp thế (gom thành 29 Tư).<br><b>Sanh hữu:</b> 32 tâm quả hiệp thế, 35 tâm sở hợp, 20 sắc nghiệp.'},
+  chiphap:'<b>Nghiệp hữu:</b> tâm sở Tư hợp trong 12 tâm bất thiện + 17 tâm thiện hiệp thế (gom thành 29 Tư).<br><b>Sanh hữu:</b> 32 tâm quả hiệp thế, 35 tâm sở hợp, 20 sắc nghiệp.',
+  mogok:'Tiến trình tạo tác và tái sanh. <b>2 loại</b>: <b>Nghiệp hữu</b> (Kammabhava — nhân: tiến trình tạo nghiệp thiện, bất thiện, bất động) và <b>Sanh hữu</b> (Upapattibhava — quả: Danh-Sắc của kiếp sống mới). Sanh hữu gồm 3 cảnh giới tái sanh: Dục hữu, Sắc hữu, Vô sắc hữu.'},
  {ten:'Sanh', pali:'Jāti',
   duyen:'Sanh duyên Già chết, sầu, bi, khổ, ưu, não — Jātipaccayā jarāmaraṇaṃ soka-parideva-dukkha-domanass-upāyāsā',
-  chiphap:'<b>Danh sanh (nāmajāti):</b> sự sanh lên của 32 tâm quả hiệp thế, 35 tâm sở hợp.<br><b>Sắc sanh (rūpajāti):</b> sự hiện khởi của 20 sắc nghiệp.'},
+  chiphap:'<b>Danh sanh (nāmajāti):</b> sự sanh lên của 32 tâm quả hiệp thế, 35 tâm sở hợp.<br><b>Sắc sanh (rūpajāti):</b> sự hiện khởi của 20 sắc nghiệp.',
+  mogok:'Tiến trình tái sanh kế tiếp trong tương lai do nghiệp tạo tác trong quá khứ — nghiệp làm duyên cho Thức tái sanh qua một cảnh giới khác (Tục Sanh). Khi tái sanh qua cảnh giới khác thì Sanh làm duyên cho Lão, Tử.'},
  {ten:'Già chết', pali:'Jarā-maraṇa',
   duyen:'Vòng luân hồi tiếp nối: sầu, bi, khổ, ưu, não nuôi dưỡng Vô minh',
   chiphap:'<b>Già (jarā):</b> sự già của 32 tâm quả hiệp thế, 35 tâm sở hợp (sát-na trụ).<br><b>Chết (maraṇa):</b> sự diệt của 32 tâm quả hiệp thế, 35 tâm sở hợp (sát-na diệt).',
+  mogok:'Có Sanh thì có già, chết — quả đương nhiên của Sanh. Từ Sanh đến Lão Tử thường kéo theo: <b>Sầu, Bi, Khổ, Ưu, Não</b>. Thập Nhị Nhân Duyên là chuỗi mắt xích dính liền bởi 12 khoen liên tục, tạo nên vòng tròn luân hồi tái sanh; muốn thấu hiểu, chấm dứt sinh tử và thoát khỏi vòng tròn trôi lăn này chỉ có thiền <b>Tứ Niệm Xứ</b>, tu tập Chánh Niệm và Trí Tuệ.',
   extra:[
    ['Sầu','Soka','Ưu thọ đồng sanh trong 2 tâm sân (sanh lên từ 5 sự suy vong).'],
    ['Bi','Parideva','Tâm bấn loạn, than vãn — âm thanh do tâm sinh (cittajavippallāsasadda).'],
@@ -522,7 +626,7 @@ function dkArc(r,a1,a2,sweep){
 let dkPid = 0;
 function dkArcText(r,a1,a2,sweep,txt,{fill='#111',size=15,weight=600,click=null}={}){
   const id = 'dkp'+(dkPid++);
-  const hit = click!==null ? `<path d="${dkArc(r,a1,a2,sweep)}" stroke="rgba(0,0,0,0)" stroke-width="34" fill="none"/>` : '';
+  const hit = click!==null ? `<path d="${dkArc(r,a1,a2,sweep)}" stroke="rgba(0,0,0,0)" stroke-width="46" fill="none"/>` : '';
   const inner = `<path id="${id}" d="${dkArc(r,a1,a2,sweep)}" fill="none"/>${hit}
     <text font-size="${size}" font-weight="${weight}" fill="${fill}"><textPath href="#${id}" startOffset="50%" text-anchor="middle">${txt}</textPath></text>`;
   return click!==null ? `<g class="dkc" onclick="${click}">${inner}</g>` : inner;
@@ -532,9 +636,9 @@ function dkNode(a,r,label,idx,w){
   const x=c+r*Math.cos(rad), y=c+r*Math.sin(rad);
   const rot = Math.sin(rad)>0 ? a-90 : a+90;
   return `<g class="dkc" transform="translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${rot.toFixed(1)})" onclick="openDuyenKhoiSheet(${idx})">
-    <rect x="${-w/2}" y="-19" width="${w}" height="38" rx="19" fill="#fffdf2" stroke="#d21" stroke-width="3" class="dk-shape"/>
-    <rect x="${-w/2-4}" y="-23" width="${w+8}" height="46" rx="23" fill="none" stroke="#f0c419" stroke-width="2.5" opacity=".9"/>
-    <text text-anchor="middle" dominant-baseline="central" font-size="19" font-weight="800" fill="#111">${label}</text>
+    <rect x="${-w/2}" y="-22" width="${w}" height="44" rx="22" fill="#fffdf2" stroke="#d21" stroke-width="3" class="dk-shape"/>
+    <rect x="${-w/2-4}" y="-26" width="${w+8}" height="52" rx="26" fill="none" stroke="#f0c419" stroke-width="2.5" opacity=".9"/>
+    <text text-anchor="middle" dominant-baseline="central" font-size="21" font-weight="800" fill="#111">${label}</text>
   </g>`;
 }
 
@@ -568,23 +672,23 @@ function renderDuyenKhoiPage(){
     dkArcText(300,174,96,0,'THỌ DUYÊN ÁI LÀ CON ĐƯỜNG LUÂN HỒI',{fill:'#fff',size:13.5,weight:700}) +
     dkArcText(300,84,6,0,'THỌ DIỆT, ÁI DIỆT LÀ ĐƯỜNG THOÁT KHỎI LUÂN HỒI',{fill:'#fff',size:12.5,weight:700}) +
     // ---- Nhãn đỏ 4 phần (chạm xem tóm tắt phần) ----
-    dkArcText(248,-82,-8,1,'5 NHÂN QUÁ KHỨ TƯƠNG TỤC',{fill:'#d21',size:16,weight:800,click:'openDKQuarterSheet(1)'}) +
-    dkArcText(248,82,8,0,'5 QUẢ HIỆN TẠI TƯƠNG TỤC',{fill:'#d21',size:16,weight:800,click:'openDKQuarterSheet(2)'}) +
-    dkArcText(248,172,98,0,'5 NHÂN HIỆN TẠI TƯƠNG TỤC',{fill:'#d21',size:16,weight:800,click:'openDKQuarterSheet(3)'}) +
-    dkArcText(248,-172,-98,1,'5 QUẢ VỊ LAI TƯƠNG TỤC',{fill:'#d21',size:16,weight:800,click:'openDKQuarterSheet(4)'}) +
+    dkArcText(248,-82,-8,1,'5 NHÂN QUÁ KHỨ TƯƠNG TỤC',{fill:'#d21',size:17.5,weight:800,click:'openDKQuarterSheet(1)'}) +
+    dkArcText(248,82,8,0,'5 QUẢ HIỆN TẠI TƯƠNG TỤC',{fill:'#d21',size:17.5,weight:800,click:'openDKQuarterSheet(2)'}) +
+    dkArcText(248,172,98,0,'5 NHÂN HIỆN TẠI TƯƠNG TỤC',{fill:'#d21',size:17.5,weight:800,click:'openDKQuarterSheet(3)'}) +
+    dkArcText(248,-172,-98,1,'5 QUẢ VỊ LAI TƯƠNG TỤC',{fill:'#d21',size:17.5,weight:800,click:'openDKQuarterSheet(4)'}) +
     // ---- Danh sách chi (đen) ----
-    dkArcText(214,-80,-10,1,'Vô Minh, Hành, Ái, Thủ, Hữu',{size:15}) +
-    dkArcText(214,170,100,0,'Ái, Thủ, Hữu, Vô Minh, Hành',{size:15}) +
-    dkArcText(222,-170,-100,1,'Thức, Danh-Sắc, Lục Nhập, Xúc, Thọ',{size:13.5}) +
-    // Phần 2: 5 chi bấm được từng chi
-    dkArcText(214,84,69,0,'Thức',{size:16,weight:800,click:'openDuyenKhoiSheet(2)'}) +
-    dkArcText(214,68,49,0,'Danh-Sắc',{size:16,weight:800,click:'openDuyenKhoiSheet(3)'}) +
-    dkArcText(214,48,30,0,'Lục Nhập',{size:16,weight:800,click:'openDuyenKhoiSheet(4)'}) +
-    dkArcText(214,29,19,0,'Xúc',{size:16,weight:800,click:'openDuyenKhoiSheet(5)'}) +
-    dkArcText(214,18,6,0,'Thọ',{size:16,weight:800,click:'openDuyenKhoiSheet(6)'}) +
+    dkArcText(214,-80,-10,1,'Vô Minh, Hành, Ái, Thủ, Hữu',{size:16}) +
+    dkArcText(214,170,100,0,'Ái, Thủ, Hữu, Vô Minh, Hành',{size:16}) +
+    dkArcText(220,-168,-98,1,'Thức, Danh-Sắc, Lục Nhập, Xúc, Thọ',{size:14.5}) +
+    // Phần 2: 5 chi bấm được từng chi (so le 2 bán kính cho dễ đọc, dễ chạm)
+    dkArcText(222,86,64,0,'Thức',{size:20,weight:800,click:'openDuyenKhoiSheet(2)'}) +
+    dkArcText(192,72,42,0,'Danh-Sắc',{size:20,weight:800,click:'openDuyenKhoiSheet(3)'}) +
+    dkArcText(222,52,26,0,'Lục Nhập',{size:20,weight:800,click:'openDuyenKhoiSheet(4)'}) +
+    dkArcText(192,32,14,0,'Xúc',{size:20,weight:800,click:'openDuyenKhoiSheet(5)'}) +
+    dkArcText(222,18,2,0,'Thọ',{size:20,weight:800,click:'openDuyenKhoiSheet(6)'}) +
     // Phần 4: Sanh / Lão-Tử bấm được
-    dkArcText(190,-172,-128,1,'SANH · SANH HỮU',{size:15.5,weight:800,click:'openDuyenKhoiSheet(10)'}) +
-    dkArcText(190,-124,-96,1,'LÃO - TỬ',{size:15.5,weight:800,click:'openDuyenKhoiSheet(11)'}) +
+    dkArcText(190,-176,-126,1,'SANH · SANH HỮU',{size:19,weight:800,click:'openDuyenKhoiSheet(10)'}) +
+    dkArcText(190,-122,-92,1,'LÃO - TỬ',{size:19,weight:800,click:'openDuyenKhoiSheet(11)'}) +
     // ---- Thời & nhãn trong ----
     dkArcText(148,-72,-18,1,'Thời Quá Khứ',{size:14}) +
     dkArcText(126,-76,-14,1,'Nhân Quá Khứ Tương Tục',{size:11.5}) +
@@ -597,11 +701,11 @@ function renderDuyenKhoiPage(){
 
   // Nút chi (khung viền đỏ + vàng như bản gốc)
   const nodes =
-    dkNode(-62,180,'VÔ MINH',0,104) +
-    dkNode(-27,180,'HÀNH',1,86) +
-    dkNode(111,180,'ÁI',7,72) +
-    dkNode(139,180,'THỦ',8,78) +
-    dkNode(167,180,'NGHIỆP HỮU',9,128);
+    dkNode(-62,180,'VÔ MINH',0,116) +
+    dkNode(-27,180,'HÀNH',1,94) +
+    dkNode(111,180,'ÁI',7,78) +
+    dkNode(139,180,'THỦ',8,84) +
+    dkNode(167,180,'NGHIỆP HỮU',9,142);
 
   extra.innerHTML = `
     <p class="info-note" style="margin-bottom:6px">Biểu đồ Thập Nhị Nhân Duyên (truyền thống Mogok). Chạm 1 lần để chọn (ô/chữ chuyển xanh), chạm lần 2 để xem chi pháp. Chạm nhãn đỏ để xem tóm tắt từng phần, chạm tâm để xem các yếu tố chính. Chụm 2 ngón tay để phóng to.</p>
@@ -686,6 +790,7 @@ function openDuyenKhoiSheet(i){
     <div class="sheet-head"><h2>${i+1}. ${d.ten}</h2></div>
     <p class="sheet-pali">${d.pali}</p>
     <div class="sec"><div class="sec-label">Chi pháp</div><div class="sec-body">${d.chiphap}</div></div>
+    ${d.mogok ? `<div class="sec" style="margin-top:12px"><div class="sec-label">Giảng giải (truyền thống Mogok)</div><div class="sec-body">${d.mogok}</div></div>` : ''}
     <div class="info-note" style="margin-top:10px"><b>Duyên:</b> ${d.duyen}</div>
     ${extraHtml}
   `;
@@ -700,195 +805,175 @@ function openDuyenKhoiSheet(i){
 
 const DUYENHE_DATA = [
  {ten:'Nhân duyên', pali:'Hetupaccaya',
-  dn:'Mãnh lực trợ sinh, giúp đỡ bằng <b>nhân tương ưng</b> (sampayuttahetu). Pāli: <i>"Mūlaṭṭhena upakārako dhammo = hetupaccayo — Pháp ủng hộ như gốc rễ, gọi là nhân duyên"</i> (Paṭṭhāna Aṭṭhakathā).<br><br>Có 4 loại nhân: nhân-nhân (hetuhetu), duyên nhân, chí thượng nhân, phổ biến nhân; trong nhân duyên chỉ lấy <b>nhân-nhân</b>, tức 6 nhân làm cội rễ: 3 nhân bất thiện là cội rễ của đau khổ, 3 nhân thiện là cội rễ của hạnh phúc — ví như rễ cây giúp cây đứng vững, hút nhựa sống nuôi thân, cành, lá.<br><br>Sự trợ giúp của nhân đối với các pháp sở duyên diễn ra cả 3 thời: tục sinh, bình nhật và tử.',
-  nang:'6 nhân: Tham, Sân, Si, Vô tham, Vô sân, Vô si. Phân rộng thành 9 nhân: 3 nhân bất thiện (tham, sân, si trong 12 tâm bất thiện), 3 nhân thiện (vô tham, vô sân, vô si trong các tâm thiện), 3 nhân vô ký (vô tham, vô sân, vô si trong tâm quả hữu nhân và tâm duy tác).',
-  so:'103 tâm hữu nhân + 52 tâm sở hợp (trừ tâm sở Si trong 2 tâm Si — vì đang làm năng duyên) + sắc nghiệp tục sinh (hữu nhân) + sắc tâm (hữu nhân) thời bình nhật.',
-  phiso:'18 tâm vô nhân + 12 tâm sở hợp; lấy trở lại tâm sở Si trong 2 tâm Si; sắc tâm vô nhân, sắc nghiệp bình nhật, sắc nghiệp Vô tưởng, sắc khí hậu (utujarūpa), sắc vật thực (āhārajarūpa).'},
+  dn:'Trợ sinh, giúp đỡ bằng <b>nhân tương ưng</b> — ủng hộ các pháp như <b>gốc rễ</b> làm cây vững vàng.',
+  nang:'6 nhân: Tham, Sân, Si, Vô tham, Vô sân, Vô si (phân rộng: 9 nhân — 3 bất thiện, 3 thiện, 3 vô ký).',
+  so:'103 tâm hữu nhân + 52 tâm sở (trừ Si trong 2 tâm Si) + sắc nghiệp tục sinh + sắc tâm hữu nhân.',
+  phiso:'18 tâm vô nhân + 12 tâm sở hợp; Si trong 2 tâm Si; sắc tâm vô nhân, sắc nghiệp bình nhật, sắc nghiệp Vô tưởng, sắc khí hậu, sắc vật thực.'},
  {ten:'Cảnh duyên', pali:'Ārammaṇapaccaya',
-  dn:'Mãnh lực trợ sinh bằng cách <b>làm cảnh</b> cho tâm nhận biết. Pāli: <i>"Ārammaṇabhāvena upakārako dhammo = ārammaṇapaccayo — Pháp trợ giúp bằng cách làm thành cảnh, gọi là cảnh duyên"</i> (Thanh Tịnh Đạo).<br><br>Cảnh (ārammaṇa) là pháp bị tâm biết, nơi tâm và tâm sở "bám lấy, vui thích đi đến". Bất cứ pháp nào bị tâm biết, pháp ấy là cảnh — như âm thanh sóng biển: khi không ai nghe, nó là "pháp"; khi có người nghe, nó thành "cảnh thinh". Có 6 cảnh: sắc, thinh, khí (mùi), vị, xúc và cảnh pháp.<br><br>Cảnh duyên trợ giúp đủ 3 thời và ngoại thời (Níp-bàn, chế định).',
-  nang:'Tất cả pháp khi bị tâm và tâm sở biết: 121 tâm + 52 tâm sở + 28 sắc pháp + Níp-bàn + chế định (sammuti). Níp-bàn và chế định là năng duyên thuần túy — chỉ trợ pháp khác, không sinh ra từ pháp nào.',
-  so:'Tâm + tâm sở khi biết cảnh (tâm nào đang bắt cảnh nào thì cảnh ấy là năng duyên của tâm ấy).',
-  phiso:'Sắc pháp + Níp-bàn + chế định — vì các pháp này không biết cảnh, không thể là sở duyên.'},
+  dn:'Trợ sinh bằng cách <b>làm cảnh</b> cho tâm nhận biết — pháp nào bị tâm biết, pháp ấy là cảnh.',
+  nang:'Tất cả pháp khi bị tâm biết: 121 tâm + 52 tâm sở + 28 sắc pháp + Níp-bàn + chế định.',
+  so:'Tâm + tâm sở khi biết cảnh.',
+  phiso:'Sắc pháp + Níp-bàn + chế định (không biết cảnh).'},
  {ten:'Trưởng duyên', pali:'Adhipatipaccaya',
-  dn:'Mãnh lực trợ sinh và ủng hộ bằng cách <b>lớn trội, dẫn đầu</b>. Pāli: <i>"Jeṭṭhakaṭṭhena upakārako dhammo = adhipaccayo — Pháp nâng đỡ bằng cách dẫn đầu, gọi là trưởng duyên"</i>. Adhipati nghĩa đen là "chủ nhân cao nhất, người thống trị" — cách trợ giúp ví như Đức vua đối với quần thần.',
+  dn:'Trợ sinh và ủng hộ bằng cách <b>lớn trội, dẫn đầu</b> — ví như Đức vua với quần thần.',
   subs:[
    {ten:'Cảnh trưởng duyên', pali:'Ārammaṇādhipatipaccaya',
-    dn:'Trợ giúp tâm – tâm sở sinh lên vững mạnh bằng cách thành <b>cảnh rất tốt</b>: cảnh "dẫn dắt" tâm, tâm nằm trong quyền lực của cảnh, bị cảnh ràng buộc. Khác với cảnh duyên thường (ví như bạn giúp bạn), cảnh trưởng ví như vị lãnh chúa với thần dân.<br>Cảnh trưởng có hai mô thức: cảnh đa số đồng ý là tốt đẹp (vàng ngọc, tâm thiền, tâm Siêu thế, Níp-bàn...) và cảnh chỉ hấp dẫn riêng với người này mà không với người khác — như vị thịt người là cảnh trưởng của vua Porisāda (Bổn sanh Sutasoma) nhưng không là cảnh trưởng của ai khác.',
-    nang:'Níp-bàn (cảnh trưởng nhất định của tâm Đạo – Quả Siêu thế) + 18 sắc thành tựu (nipphannarūpa) thành cảnh tốt theo 3 thời + 116 tâm (trừ 2 tâm Sân, 2 tâm Si, tâm Thân thức thọ khổ — vì cảnh của chúng không đáng hài lòng) + 47 tâm sở hợp (trừ 4 Sân phần + Hoài nghi).',
-    so:'40 tâm Siêu thế + 8 tâm Tham + 8 tâm Đại thiện + 4 tâm Đại hạnh hợp trí, cùng 45 tâm sở hợp.',
-    phiso:'81 tâm hiệp thế + 52 tâm sở khi không nương sinh từ cảnh trưởng + Níp-bàn + chế định + sắc pháp.'},
+    dn:'Cảnh rất tốt "dẫn dắt" tâm, tâm bị cảnh ràng buộc.',
+    nang:'Níp-bàn + 18 sắc thành tựu thành cảnh tốt + 116 tâm (trừ 2 Sân, 2 Si, Thân thức thọ khổ) + 47 tâm sở (trừ 4 Sân phần + Hoài nghi).',
+    so:'40 tâm Siêu thế + 8 tâm Tham + 8 Đại thiện + 4 Đại hạnh hợp trí + 45 tâm sở hợp.'},
    {ten:'Đồng sinh trưởng duyên', pali:'Sahajātādhipatipaccaya',
-    dn:'Một trong <b>4 pháp trưởng</b> làm chủ đạo trợ các pháp đồng sinh: <b>Dục trưởng</b> (tâm sở Dục — ước muốn vượt trội), <b>Cần trưởng</b> (tâm sở Cần — tinh tấn vượt trội), <b>Tâm trưởng</b> (tâm đổng lực vượt trội), <b>Thẩm trưởng</b> (tâm sở Trí — xem xét vượt trội, như khi quán tam tướng).<br>Trong một sát-na chỉ có <b>một</b> pháp làm trưởng — ví như một nước không thể có hai vua đồng cai trị; ví như bầy thú có một con mạnh nhất làm đầu đàn.',
-    nang:'Tâm sở Dục, hoặc tâm sở Cần, hoặc Tâm (trong 84 tâm đổng lực đa nhân — có thể là tham, sân, thiện hay duy tác hữu nhân của vị Alahán), hoặc tâm sở Trí — pháp nào đang làm trưởng.',
-    so:'52 tâm đổng lực nhị nhân/tam nhân + 52 tâm sở hợp (hoặc 51, trừ pháp đang làm trưởng) + sắc tâm trưởng.',
-    phiso:'54 tâm Dục giới và tâm sở hợp khi không là sở duyên + 5 tâm quả thiền Sắc giới + 4 tâm quả thiền Vô sắc; sắc tâm phi trưởng + sắc nghiệp + sắc thời tiết + sắc vật thực.'}
+    dn:'Một trong 4 pháp trưởng (Dục, Cần, Tâm, Thẩm/Trí) làm chủ đạo — mỗi thời điểm chỉ một pháp làm trưởng.',
+    nang:'Tâm sở Dục / tâm sở Cần / Tâm (84 đổng lực đa nhân) / tâm sở Trí — pháp đang làm trưởng.',
+    so:'52 tâm đổng lực nhị–tam nhân + 52 tâm sở (trừ pháp đang làm trưởng) + sắc tâm trưởng.'}
   ]},
  {ten:'Vô gián duyên', pali:'Anantarapaccaya',
-  dn:'Mãnh lực trợ sinh bằng cách <b>không gián đoạn</b> (na + antara = không có khoảng cách). Pāli: <i>"Anantarabhāvena upakārako dhammo = anantarapaccayo — Pháp nâng đỡ làm cho không có khoảng cách, là Vô gián duyên"</i>.<br><br>Tâm và tâm sở vừa diệt đi, giúp cho tâm và tâm sở kế tiếp "có dịp" sinh lên — ví như đoàn người xếp hàng mua vé: người này mua xong đi ra, người kế tiếp mới có cơ hội; sự tiếp nối không hề có kẽ hở.<br><br>Ví dụ trong lộ trình tâm: nhãn thức diệt trợ tâm Tiếp thâu sinh; Tiếp thâu diệt trợ tâm Quan sát sinh; Quan sát diệt trợ tâm Phân đoán sinh... cứ thế suốt dòng tâm thức.',
-  nang:'Tâm + tâm sở sinh trước, vừa diệt (trừ tâm Tử của vị Thánh Alahán — vì sau đó không còn tâm nào sinh lên nữa).',
-  so:'Tâm + tâm sở sinh kế sau ngay đó (kể cả tâm Tử của vị Alahán, vì nó cũng do tâm trước trợ sinh).',
+  dn:'Tâm + tâm sở vừa diệt trợ cho tâm + tâm sở kế tiếp sinh lên, <b>không có kẽ hở</b>.',
+  nang:'Tâm + tâm sở sinh trước vừa diệt (trừ tâm Tử của vị Alahán).',
+  so:'Tâm + tâm sở sinh kế sau.',
   phiso:'Sắc pháp + Níp-bàn + chế định.'},
  {ten:'Đẳng vô gián duyên', pali:'Samanantarapaccaya',
-  dn:'Cách trợ giúp <b>như Vô gián duyên</b> — sama (giống như, hoàn toàn) + anantara (không kẽ hở) = "hoàn toàn không kẽ hở, khít khao một cách tốt đẹp".<br><br>Theo Sớ giải Đại Xứ: khi thuyết Vô gián duyên, Đức Phật xét thấy có người chưa tỏ ngộ nên Ngài thuyết thêm Đẳng vô gián duyên — dù <b>trùng chi pháp</b> — để củng cố cho chặt chẽ. Ví như hai cách bắt tay: bắt tay bình thường (Vô gián duyên) và xiết chặt bàn tay (Đẳng vô gián duyên).',
-  nang:'Tâm + tâm sở sinh trước, vừa diệt (trừ tâm Tử của vị Thánh Alahán).',
-  so:'Tâm + tâm sở sinh kế sau.',
+  dn:'Như Vô gián duyên, nhấn mạnh sự <b>khít khao hoàn toàn</b> — <b>trùng chi pháp với Vô gián duyên</b>.',
+  nang:'Tâm + tâm sở sinh trước (trừ tâm Tử vị Alahán).',
+  so:'Tâm + tâm sở sinh sau.',
   phiso:'Sắc pháp.'},
  {ten:'Đồng sinh duyên', pali:'Sahajātapaccaya',
-  dn:'Trợ giúp bằng cách <b>cùng sinh lên</b> (saha + jāta). Pāli: <i>"Uppajjamānova saha uppādabhāvena upakārako dhammo = sahajātapaccayo — Pháp nâng đỡ pháp khác cùng sinh lên với mình"</i> (Thanh Tịnh Đạo) — ví như ngọn lửa sinh lên thì ánh sáng và sức nóng cùng sinh lên.<br><br>Pháp hữu vi không bao giờ sinh riêng lẻ: danh pháp ít nhất 8 pháp cùng sinh (1 trong ngũ song thức + 7 tâm sở biến hành), sắc pháp ít nhất 8 sắc cùng sinh (đoàn bất ly: tứ đại + sắc, mùi, vị, vật thực).<br><br>Mô thức tổng quát 4 cách: <b>danh trợ danh</b> (uẩn trợ uẩn: 1 trợ 3, 2 trợ 2, 3 trợ 1; tâm sở trợ tâm sở như "xúc duyên thọ"), <b>danh trợ sắc</b> (danh uẩn trợ sắc tục sinh, tâm trợ sắc tâm), <b>sắc trợ sắc</b> (tứ đại trợ nhau và trợ sắc y sinh), <b>sắc trợ danh</b> (sắc Ý vật trợ tâm tục sinh).',
-  nang:'Tất cả pháp hữu vi. Thời tục sinh — cõi ngũ uẩn: 15 tâm tục sinh (2 Quan sát thọ xả + 8 Đại quả + 5 quả thiền Sắc giới) + sắc tục sinh; cõi Vô sắc: 4 tâm quả Vô sắc; cõi Vô tưởng: đoàn sắc mạng quyền. Thời bình nhật: tất cả tâm + tâm sở + sắc pháp.',
-  so:'Tất cả pháp hữu vi (tương tự năng duyên — năng và sở cùng có mặt).',
-  phiso:'Níp-bàn + chế định (pháp vô vi, không sinh lên).'},
+  dn:'Trợ giúp bằng cách <b>cùng sinh lên</b> — như ngọn lửa với ánh sáng. 4 cách: danh trợ danh, danh trợ sắc, sắc trợ sắc, sắc trợ danh.',
+  nang:'Tất cả pháp hữu vi (tục sinh: 15 tâm tục sinh + sắc tục sinh; 4 quả Vô sắc; đoàn sắc mạng quyền cõi Vô tưởng. Bình nhật: tâm + tâm sở + sắc pháp).',
+  so:'Tất cả pháp hữu vi (như năng).',
+  phiso:'Níp-bàn + chế định.'},
  {ten:'Hổ tương duyên', pali:'Aññamaññapaccaya',
-  dn:'Mãnh lực trợ giúp <b>qua lại</b>: năng trợ sở và sở cũng trợ năng — ví như ba cây chụm đầu vào nhau, mỗi cây lệ thuộc hai cây kia, một cây ngã thì hai cây kia cũng ngã.<br><br>Ba trường hợp: 4 danh uẩn trợ lẫn nhau (tâm không thể thiếu tâm sở, tâm sở không thể thiếu tâm — như không có 7 báu thì không gọi là vua Chuyển luân); tứ đại trợ lẫn nhau; khi nhập thai (okkanti), tâm Tục sinh ↔ sắc Ý vật trợ lẫn nhau.<br><br>Phân biệt: <b>Hổ tương duyên vừa đồng sinh vừa tương trợ; Đồng sinh duyên chỉ là "cùng có mặt"</b>. Hổ tương duyên là Đồng sinh duyên, nhưng Đồng sinh duyên không hẳn là Hổ tương duyên (như tâm trợ sắc tâm: chỉ đồng sinh, sắc tâm không trợ lại tâm).',
-  nang:'Tâm + tâm sở + sắc Tứ đại + sắc Ý vật (thời tái tục).',
-  so:'Tâm + tâm sở + sắc Tứ đại + sắc Ý vật (thời tái tục).',
-  phiso:'Các sắc y sinh (nhất định — như sắc thân biểu tri, ngữ biểu tri: do tâm sinh nhưng không trợ lại tâm); sắc Ý vật là phi sở duyên bất định (thời bình nhật không hổ tương, chỉ hổ tương vào thời tục sinh).'},
+  dn:'Trợ giúp <b>qua lại</b>: năng trợ sở, sở trợ lại năng — như ba cây chụm đầu nương nhau.',
+  nang:'Tâm + tâm sở + sắc Tứ đại + sắc Ý vật (tái tục).',
+  so:'Như năng duyên.',
+  phiso:'Sắc y sinh (nhất định); sắc Ý vật thời bình nhật (bất định).'},
  {ten:'Y duyên', pali:'Nissayapaccaya',
-  dn:'Mãnh lực trợ giúp bằng cách làm <b>chỗ nương nhờ</b> vững vàng. Pāli: <i>"Adhiṭṭhānākārena nissayākārena ca upakārako dhammo = nissayapaccayo — Pháp trợ giúp vững vàng và ủng hộ cho những pháp nương nhờ"</i> — ví như trái đất là nơi nương của người, loài vật, cây cối; như nhà cửa, tự viện là nơi nương trú.',
-  nang:'Tứ danh uẩn + 6 sắc vật (5 sắc thần kinh + sắc Ý vật).',
+  dn:'Trợ giúp bằng cách làm <b>chỗ nương nhờ</b> vững vàng — như đất cho cây nương.',
+  nang:'Tứ danh uẩn + 6 sắc vật.',
   so:'Tứ danh uẩn.',
   phiso:'Sắc pháp.',
   subs:[
-   {ten:'Đồng sinh y duyên', pali:'Sahajātanissayapaccaya',
-    dn:'Nương nhờ pháp cùng sinh với mình — <b>trùng chi pháp với Đồng sinh duyên</b> (4 danh uẩn nương nhau; danh nương sắc Ý vật tái tục; tứ đại nương nhau...).'},
+   {ten:'Đồng sinh y duyên', pali:'Sahajātanissayapaccaya', dn:'Nương pháp cùng sinh — <b>trùng Đồng sinh duyên</b>.'},
    {ten:'Vật sinh tiền y duyên', pali:'Vatthupurejātanissayapaccaya',
-    dn:'Sắc vật <b>sinh trước ít nhất 1 sát-na tiểu</b>, đang hiện hữu, làm chỗ nương cho tâm sinh sau: thần kinh Nhãn cho 2 Nhãn thức, thần kinh Nhĩ cho 2 Nhĩ thức... và sắc Ý vật cho 111 tâm còn lại (trong đó Ý giới = 2 Tiếp thâu + Hướng ngũ môn chỉ biết 5 cảnh; 108 tâm còn lại là Ý thức giới).',
-    nang:'6 sắc vật sinh trước, đang hiện hữu (thời bình nhật).',
-    so:'Tâm nương vật, sinh sau (117 tâm — trừ 4 tâm quả Vô sắc).',
-    phiso:'Sắc pháp + những tâm không nương vật: 72 tâm sinh ở cõi Vô sắc (8 Tham, 2 Si, Hướng ý môn, 8 Đại thiện, 8 Đại hạnh, 12 tâm thiền Vô sắc, 35 tâm Siêu thế trừ 5 Sơ đạo).'},
+    dn:'Sắc vật sinh trước làm chỗ nương cho tâm sinh sau.',
+    nang:'6 sắc vật sinh trước, đang hiện hữu.',
+    so:'Tâm nương vật sinh sau (117 tâm, trừ 4 quả Vô sắc).'},
    {ten:'Vật-cảnh sinh tiền y duyên', pali:'Vatthārammaṇapurejātanissayapaccaya',
-    dn:'Chỉ có trong <b>lộ cận tử</b>: sắc Ý vật sinh trước vừa làm <b>chỗ nương</b> vừa làm <b>cảnh</b> cho tâm lộ tử nắm lấy — như người sắp lâm chung nhận biết "sự sống qua nhịp tim" của chính mình.',
-    nang:'Sắc Ý vật sinh vào sát-na sinh của tâm hữu phần thứ 16 kể từ tâm Tử lui lại (nhóm Ý vật sinh lần cuối, cùng diệt với tâm Tử).',
-    so:'32 tâm khách trong lộ tử (tâm Hướng ý môn + 29 đổng lực dục giới + 2 tâm thông) + 44 tâm sở hợp (trừ Tật, Lận, Hối, 3 Giới phần, 2 Vô lượng phần).',
-    phiso:'Nhất định: sắc pháp + ngũ song thức + Ý giới + tâm Siêu thế + tâm Đáo đại và tâm sở hợp. Bất định: 41 tâm Dục giới (trừ ngũ song thức + Ý giới) + 52 tâm sở khi không bắt Ý vật làm cảnh.'}
+    dn:'Trong lộ cận tử: sắc Ý vật vừa là chỗ nương vừa là cảnh.',
+    nang:'Sắc Ý vật sinh ở sát-na sinh của hữu phần thứ 16 kể từ tâm Tử lui lại.',
+    so:'32 tâm khách lộ tử (Hướng ý môn + 29 đổng lực dục giới + 2 tâm thông) + 44 tâm sở.'}
   ]},
  {ten:'Cận y duyên', pali:'Upanissayapaccaya',
-  dn:'Mãnh lực trợ giúp, ủng hộ bằng cách làm chỗ nương <b>rất vững chắc, có sức mạnh lớn</b>. Pāli: <i>"Balavarato nissayoti = upanissayo — Nơi nương có sức mạnh lớn, gọi là cận y"</i>.<br><br>Y duyên ví như đất là nơi cây nương; Cận y duyên ví như mưa thuận gió hòa giúp cây tăng trưởng lớn mạnh. Như Phật ngôn "Attā hi attano nātho — Ta là nơi nương của chính ta": ta là "cận y" của chính ta.',
+  dn:'Làm chỗ nương <b>rất vững chắc, có sức mạnh lớn</b> — Y duyên như đất, Cận y như mưa thuận gió hòa giúp cây lớn mạnh.',
   subs:[
-   {ten:'Cảnh cận y duyên', pali:'Ārammaṇūpanissayapaccaya',
-    dn:'Trợ giúp bằng cách làm thành cảnh rất vững mạnh. <b>Chi pháp giống Cảnh trưởng duyên</b>. Khác biệt: cảnh trưởng nói khía cạnh <b>quan trọng</b> (garu) — như hành giả phản khán thiền chứng, bậc hữu học xem xét Đạo – Quả; cảnh cận y nói khía cạnh <b>sức mạnh</b> (bala) — như người từng bị cảnh gây kinh hoàng, nay gặp lại thì tâm kinh hoàng ngay; người từng hài lòng cảnh nào, gặp lại không cưỡng được.'},
-   {ten:'Vô gián cận y duyên', pali:'Anantarūpanissayapaccaya',
-    dn:'Trợ giúp bằng cách liên tiếp rất vững mạnh. <b>Chi pháp giống Vô gián duyên</b> nhưng mạnh mẽ hơn — ví như dòng nước chảy xiết so với dòng chảy thường. Đặc biệt chỉ cho các tâm trong <b>lộ đổng lực</b>: 7 sát-na đổng lực thỏa hai điều kiện — tâm sau giống tâm trước, và tâm trước có sức mạnh trợ tâm sau sinh lên.'},
+   {ten:'Cảnh cận y duyên', pali:'Ārammaṇūpanissayapaccaya', dn:'Cảnh rất vững mạnh — <b>chi pháp giống Cảnh trưởng duyên</b> (trưởng: khía cạnh quan trọng; cận y: khía cạnh sức mạnh).'},
+   {ten:'Vô gián cận y duyên', pali:'Anantarūpanissayapaccaya', dn:'Liên tiếp rất vững mạnh — <b>chi pháp giống Vô gián duyên</b>, như dòng nước chảy xiết.'},
    {ten:'Thường cận y duyên', pali:'Pakatūpanissayapaccaya',
-    dn:'Trợ giúp vững mạnh theo cách <b>tự nhiên (pakati), thành thói quen</b> do thường làm, thường thực hiện — "ăn cắp quen tay, ngủ ngày quen mắt".<br>Theo Kinh tạng: giao du bạn lành/bạn xấu, trú xứ, thời tiết, vật thực, tín – giới – văn – thí – tuệ đã huân tập... đều tác động tâm lý về sau bằng thường cận y duyên. Đây là duyên có phạm vi rộng nhất trong 24 duyên.',
-    nang:'Tâm + tâm sở + sắc pháp + chế định có sức mạnh, thuộc cả 3 thời (trừ chế định nghiệp xứ như đề mục kasiṇa — vì thuộc cảnh cận y).',
-    so:'Tâm + tâm sở sinh về sau.',
+    dn:'Trợ giúp vững mạnh theo <b>thói quen tự nhiên</b> do thường làm — duyên có phạm vi rộng nhất.',
+    nang:'Tâm + tâm sở + sắc pháp + chế định có sức mạnh, cả 3 thời (trừ chế định nghiệp xứ).',
+    so:'Tâm + tâm sở sinh sau.',
     phiso:'Sắc pháp.'}
   ]},
  {ten:'Sinh tiền duyên', pali:'Purejātapaccaya',
-  dn:'Mãnh lực trợ giúp bằng cách <b>sinh ra trước</b>. Pāli: <i>"Purejāto ca so paccayo cāti = purejātapaccayo — Xuất hiện trước để trợ giúp, gọi là Sinh tiền duyên"</i>.<br><br>Lưu ý: sinh tiền duyên chỉ cho cái sinh trước <b>đang hiện hữu</b> (sát-na trụ), không phải cái sinh trước đã diệt (khác Vô gián duyên).',
+  dn:'Trợ giúp bằng cách <b>sinh ra trước và đang hiện hữu</b> (sát-na trụ).',
   subs:[
-   {ten:'Vật sinh tiền duyên', pali:'Vatthupurejātapaccaya',
-    dn:'Sắc vật sinh trước làm chỗ nương — <b>chi pháp như Vật sinh tiền y duyên</b> (xem Y duyên), chỉ khác khía cạnh nhấn mạnh "sinh trước" thay vì "nương nhờ".'},
-   {ten:'Vật-cảnh sinh tiền duyên', pali:'Vatthārammaṇapurejātapaccaya',
-    dn:'Sắc Ý vật cận tử vừa là vật vừa là cảnh — <b>chi pháp như Vật-cảnh sinh tiền y duyên</b> (xem Y duyên).'},
+   {ten:'Vật sinh tiền duyên', pali:'Vatthupurejātapaccaya', dn:'<b>Như Vật sinh tiền y duyên</b> (xem Y duyên).'},
+   {ten:'Vật-cảnh sinh tiền duyên', pali:'Vatthārammaṇapurejātapaccaya', dn:'<b>Như Vật-cảnh sinh tiền y duyên</b> (xem Y duyên).'},
    {ten:'Cảnh sinh tiền duyên', pali:'Ārammaṇapurejātapaccaya',
-    dn:'Sắc pháp sinh trước, <b>đang hiện hữu</b>, làm <b>cảnh</b> cho tâm sinh sau nhận lấy — ví như dây đàn và vật va chạm phải có trước, đang hiện hữu, thì âm thanh (tâm) mới sinh lên.<br>Trong 18 sắc thành tựu: 7 sắc rõ (4 sắc cảnh + đất, lửa, gió) làm cảnh cho ngũ song thức và Ý giới; 11 sắc còn lại (nước, 5 sắc thần kinh, 2 sắc tính, Ý vật, mạng quyền, vật thực) làm cảnh pháp cho Ý thức giới qua ý môn.',
-    nang:'18 sắc thành tựu (nipphannarūpa) sinh trước, đang hiện hữu, làm cảnh hiện tại.',
-    so:'Nhất định: ngũ song thức + Ý giới (3 tâm). Bất định: 41 tâm Dục giới còn lại + 2 tâm thông và 50 tâm sở hợp (trừ 2 Vô lượng phần).',
-    phiso:'Nhất định: sắc pháp + 27 tâm Đáo đại + 40 tâm Siêu thế. Bất định: 41 tâm Dục giới khi không bắt 18 sắc thành tựu làm cảnh.'}
+    dn:'Sắc sinh trước, đang hiện hữu, làm <b>cảnh</b> cho tâm sinh sau.',
+    nang:'18 sắc thành tựu sinh trước, đang làm cảnh hiện tại.',
+    so:'Nhất định: ngũ song thức + Ý giới. Bất định: 41 tâm Dục giới + 2 tâm thông + 50 tâm sở (trừ Vô lượng phần).',
+    phiso:'Nhất định: sắc pháp + 27 tâm Đáo đại + 40 Siêu thế. Bất định: 41 tâm Dục giới khi không bắt 18 sắc làm cảnh.'}
   ]},
  {ten:'Sinh hậu duyên', pali:'Pacchājātapaccaya',
-  dn:'Mãnh lực trợ giúp bằng cách <b>sinh ra sau</b> nhưng giúp pháp sinh trước được vững mạnh. Pāli (Thanh Tịnh Đạo): <i>"Pháp vô sắc ủng hộ, trợ giúp cho pháp sắc sinh trước, gọi là sinh hậu duyên"</i> — ví như những trận mưa đến sau giúp cây, lúa gieo trồng trước được nảy mầm lớn mạnh.<br><br>Đây là sự trợ giúp của <b>tâm</b> đối với <b>sắc pháp</b> sinh trước: mỗi bọn sắc tồn tại 17 sát-na tâm, nên sau sát-na đồng sinh, 16 tâm sinh kế đó liên tục hậu thuẫn cho bọn sắc ấy được duy trì. Thân sắc uẩn này sống còn là nhờ dòng tâm thức sẽ sinh tiếp nối trợ duyên.',
-  nang:'117 tâm sinh sau (kể từ tâm hữu phần thứ 1 trở đi; trừ 4 tâm quả Vô sắc) và tâm sở hợp. Nhất định: 2 Sân + ngũ song thức + Ý giới + 11 Na cảnh + Sinh tiếu + 15 tâm Sắc giới + 5 Sơ đạo (cõi ngũ uẩn). Bất định: 8 Tham + 2 Si + Hướng ý môn + 8 Đại thiện + 8 Đại hạnh + 8 đổng lực Vô sắc + 35 Siêu thế (trừ 5 Sơ đạo).',
-  so:'Sắc do 3 nhân sinh và 4 nhân sinh (nghiệp, tâm, thời tiết, vật thực) đang ở sát-na trụ, đồng sinh với tâm trước đó.',
-  phiso:'121 tâm + tâm sở; sắc đang ở sát-na sinh; sắc tâm + sắc nghiệp tục sinh (đồng sinh, không phải sinh trước); sắc ngoại, sắc nghiệp Vô tưởng.'},
+  dn:'Tâm <b>sinh sau</b> trợ cho sắc sinh trước được vững mạnh — như mưa đến sau giúp cây gieo trước.',
+  nang:'117 tâm sinh sau (từ hữu phần thứ 1; trừ 4 quả Vô sắc) + tâm sở hợp.',
+  so:'Sắc do 3–4 nhân sinh đang ở sát-na trụ, đồng sinh với tâm trước.',
+  phiso:'121 tâm + tâm sở; sắc ở sát-na sinh; sắc tâm + sắc nghiệp tục sinh; sắc ngoại, sắc nghiệp Vô tưởng.'},
  {ten:'Tập hành duyên', pali:'Āsevanapaccaya',
-  dn:'Trợ giúp, ủng hộ bằng cách <b>lập đi lập lại</b> làm thuần thục, tạo năng lực (bala). Pāli: <i>"Āsevanaṃ ca taṃ paccayaṃ cāti = āsevanapaccayaṃ — Trợ giúp bằng cách chính nó được lập đi lập lại"</i> — như người tụng bài kinh nhiều lần, sự thuộc lòng càng thuần thục, bài kinh càng tăng uy lực.<br><br>Chỉ có nơi các sát-na <b>đổng lực</b> (javana) thiện, bất thiện và duy tác — đổng lực quả Siêu thế thuộc giống quả (vipākajāti) nên không kể. Trong lộ đổng lực: đổng lực thứ 1 chỉ làm năng; đổng lực chót chỉ làm sở; từ thứ 2 đến áp chót vừa là sở (của sát-na trước) vừa là năng (của sát-na sau). Có thể nói Tập hành duyên là một khía cạnh riêng của Vô gián duyên.',
-  nang:'47 tâm đổng lực hiệp thế (12 bất thiện + Sinh tiếu + 8 Đại thiện + 8 Đại hạnh + 9 thiện Đáo đại + 9 duy tác Đáo đại), sát-na trước — trừ đổng lực cuối trong lộ.',
-  so:'67 tâm đổng lực sinh nối tiếp (47 hiệp thế + 20 tâm Đạo) — trừ đổng lực thứ nhất trong lộ.',
-  phiso:'Đổng lực sát-na thứ 1; 2 tâm hướng môn; 52 tâm quả; tâm quả Siêu thế trong lộ nhập thiền quả; sắc pháp.'},
+  dn:'Trợ giúp bằng cách <b>lập đi lập lại</b> làm thuần thục — chỉ nơi các sát-na <b>đổng lực</b> thiện, bất thiện, duy tác.',
+  nang:'47 đổng lực hiệp thế sát-na trước (trừ đổng lực cuối của lộ).',
+  so:'67 đổng lực sinh nối tiếp — 47 hiệp thế + 20 tâm Đạo (trừ đổng lực thứ nhất).',
+  phiso:'Đổng lực thứ 1; 2 tâm hướng môn; 52 tâm quả; sắc pháp.'},
  {ten:'Nghiệp duyên', pali:'Kammapaccaya',
-  dn:'Trợ giúp bằng cách <b>tạo tác, hành khiển</b>. Phật ngôn: <i>"Cetanāhaṃ bhikkhave kammaṃ vadāmi — Này chư tỳ khưu, Như Lai tuyên thuyết chính sự cố ý (cetanā) là nghiệp"</i>. Nghiệp chính là <b>tâm sở Tư</b> — khi có bất kỳ việc làm nào của thân, khẩu, ý, đó chính là tác lực của tâm sở Tư.',
+  dn:'Trợ giúp bằng cách <b>tạo tác</b> — nghiệp chính là <b>tâm sở Tư</b> (cetanā).',
   subs:[
    {ten:'Đồng sinh nghiệp duyên', pali:'Sahajātakammapaccaya',
-    dn:'Tâm sở Tư hành khiển, đôn đốc các pháp <b>đồng sinh</b> cùng tạo tác — ví như kỹ sư trưởng của công trình, vừa điều hành các cộng sự vừa thực hiện công trình.',
-    nang:'Tâm sở Tư trong tất cả tâm (121 tâm).',
-    so:'Tâm + 51 tâm sở hợp (trừ tâm sở Tư) + sắc tâm + sắc nghiệp tục sinh.',
-    phiso:'Tâm sở Tư (đang làm năng duyên) + sắc nghiệp bình nhật + sắc vật thực + sắc khí hậu + sắc ngoại + sắc nghiệp Vô tưởng.'},
+    dn:'Tâm sở Tư điều phối các pháp đồng sinh.',
+    nang:'Tâm sở Tư trong tất cả tâm.',
+    so:'Tâm + 51 tâm sở (trừ Tư) + sắc tâm + sắc nghiệp tục sinh.'},
    {ten:'Vô gián nghiệp duyên', pali:'Anantarakammapaccaya',
-    dn:'Tâm sở Tư trong <b>tâm Đạo</b> trợ liền cho tâm quả Siêu thế sinh kế tục <b>không gián đoạn</b> trong lộ đắc đạo. Đạo trợ Quả cũng là "nghiệp khác thời" nhưng vì quả sinh liền kề vô gián — không như nghiệp hiệp thế cho quả cách xa — nên các Ngài lập riêng thành một duyên.',
+    dn:'Tư trong tâm Đạo trợ liền cho quả Siêu thế, không gián đoạn.',
     nang:'Tâm sở Tư trong 20 tâm Đạo.',
-    so:'20 tâm quả Siêu thế + 36 tâm sở hợp, sinh kế tục tâm Đạo trong lộ đắc đạo.',
-    phiso:'Những tâm ngoài tâm quả Siêu thế sinh kế tiếp tâm Đạo + sắc pháp.'},
+    so:'20 tâm quả Siêu thế + 36 tâm sở, sinh kế tục tâm Đạo.'},
    {ten:'Dị thời nghiệp duyên', pali:'Nānakkhaṇikakammapaccaya',
-    dn:'Tâm sở Tư trợ giúp các pháp <b>cách xa thời gian</b> — thời điểm Tư khởi lên là khác, thời điểm tâm quả khởi lên là khác; ví như lời di chúc của người quá cố được con cháu thực hiện về sau. Đây chính là "nghiệp báo nhân quả" thông thường.<br>Ba cách khác thời: quá khứ → hiện tại; hiện tại → vị lai; quá khứ → vị lai. Tâm sở Tư tuy đã diệt nhưng năng lực vẫn còn như chủng tử chờ đủ duyên trổ quả.',
-    nang:'Tâm sở Tư hợp trong tâm thiện hay tâm bất thiện (thuộc quá khứ).',
-    so:'Sắc nghiệp + tâm quả và tâm sở hợp (trừ tâm sở Tư), trong hiện tại.',
-    phiso:'Tâm thiện, tâm bất thiện, tâm duy tác + sắc tâm, sắc ngoại, sắc vật thực, sắc khí hậu.'}
+    dn:'Tư đã diệt trợ quả <b>khác thời</b> — "nghiệp báo nhân quả" thông thường.',
+    nang:'Tâm sở Tư trong tâm thiện, bất thiện (quá khứ).',
+    so:'Sắc nghiệp + tâm quả và tâm sở hợp (trừ Tư).',
+    phiso:'Tâm thiện, bất thiện, duy tác + sắc tâm, sắc ngoại, sắc vật thực, sắc khí hậu.'}
   ]},
  {ten:'Quả duyên', pali:'Vipākapaccaya',
-  dn:'Mãnh lực trợ giúp bằng <b>kết quả của nghiệp</b>. Vipāka = vi (khác, sai biệt) + pāka (sự chín muồi) — sự chín muồi của thiện hay bất thiện. Thanh Tịnh Đạo: <i>"Pháp dị thục quả trợ giúp bằng cách thành tựu sự yên lặng (santa), diễn tiến sự yên lặng"</i> — quả sinh lên tự nhiên không cần nỗ lực, ví như trái cây nuôi hạt mầm.<br><br>Bốn uẩn quả vô sắc trợ lẫn nhau bằng quả duyên: trong một tâm quả, khi một uẩn làm năng thì ba uẩn kia làm sở (như tâm Nhãn thức + 7 tâm sở Biến hành — cả 8 pháp đều là kết quả của tâm sở Tư trước đó, trợ giúp lẫn nhau).',
-  nang:'52 tâm quả (15 quả vô nhân + 8 Đại quả + 9 quả Đáo đại + 20 quả Siêu thế) + 38 tâm sở hợp.',
-  so:'52 tâm quả + 38 tâm sở hợp (khi không làm năng duyên) + sắc nghiệp tục sinh + sắc tâm quả (trừ 2 sắc biểu tri).',
-  phiso:'Tâm thiện, tâm bất thiện, tâm duy tác + 52 tâm sở hợp + sắc nghiệp bình nhật, sắc nghiệp Vô tưởng, sắc ngoại, sắc khí hậu, sắc vật thực, sắc tâm của các tâm phi quả.'},
+  dn:'Pháp <b>quả của nghiệp</b> trợ giúp bằng sự "thành tựu yên lặng", không cần nỗ lực.',
+  nang:'52 tâm quả + 38 tâm sở hợp.',
+  so:'52 tâm quả + 38 tâm sở (khi không làm năng) + sắc nghiệp tục sinh + sắc tâm quả (trừ 2 sắc biểu tri).',
+  phiso:'Tâm thiện, bất thiện, duy tác + tâm sở; sắc nghiệp bình nhật, sắc nghiệp Vô tưởng, sắc ngoại, sắc khí hậu, sắc vật thực.'},
  {ten:'Vật thực duyên', pali:'Āhārapaccaya',
-  dn:'Mãnh lực trợ giúp, ủng hộ bằng cách <b>mang dưỡng tố (ojā) vào, nuôi dưỡng cho tồn tại vững mạnh</b>. Pāli: <i>"Āharantīti = āhārā — Mang lại, gọi là vật thực"</i>.<br><br>Căn bản là <b>Tứ thực</b>: <b>Đoàn thực</b> (thực phẩm — chi pháp là dưỡng tố ojā), <b>Xúc thực</b> (tâm sở Xúc — thức ăn cho thọ sinh khởi), <b>Tư niệm thực</b> (tâm sở Tư — thức ăn cho quả dị thục), <b>Thức thực</b> (tâm — thức ăn bổ trợ cho danh sắc). Ý nghĩa chủ yếu của vật thực là "làm cho tồn tại chắc chắn" — ví như bà mẹ sinh con và nuôi con, thì nuôi dưỡng là chủ yếu.',
+  dn:'Trợ giúp bằng cách <b>mang dưỡng tố vào, nuôi dưỡng cho tồn tại vững mạnh</b> (Tứ thực).',
   subs:[
    {ten:'Sắc vật thực duyên', pali:'Rūpāhārapaccaya',
-    dn:'Dưỡng tố trong thực phẩm nuôi dưỡng sắc pháp. Sắc vật thực nội (dưỡng tố trong thân) không tạo sắc mới, chỉ nuôi dưỡng; chính dưỡng tố bên ngoài được cơ thể hấp thụ mới tạo ra sắc vật thực.',
-    nang:'Tất cả sắc vật thực nội hay ngoại, đã ăn hay chưa ăn (dưỡng tố trong và ngoài cơ thể).',
-    so:'Sắc do vật thực tạo và các sắc đồng nhóm với sắc vật thực (nuôi các bọn sắc do 4 nhân sinh).',
-    phiso:'Tâm + tâm sở + sắc tâm + sắc ngoại + sắc nghiệp + sắc âm dương.'},
+    dn:'Dưỡng tố (ojā) nuôi dưỡng sắc pháp.',
+    nang:'Sắc vật thực nội và ngoại.',
+    so:'Sắc do vật thực tạo + các sắc đồng nhóm.'},
    {ten:'Danh vật thực duyên', pali:'Nāmāhārapaccaya',
-    dn:'Ba danh thực "bám chặt lấy cảnh" trợ giúp các danh pháp đồng sinh thêm vững mạnh. Theo Kinh tạng, "thức ăn" còn được thuyết rộng: thức ăn của vô minh là 5 triền cái, thức ăn của minh giải thoát là 7 giác chi, thức ăn của 7 giác chi là 4 niệm xứ...',
-    nang:'3 danh vật thực: Xúc thực (tâm sở Xúc), Thức thực (tâm — 121 tâm), Tư niệm thực (tâm sở Tư).',
-    so:'Tâm + tâm sở + sắc do tâm tạo + sắc nghiệp tục sinh.',
-    phiso:'Các sắc pháp ngoài ra + pháp vật thực đang làm năng duyên.'}
+    dn:'3 danh thực trợ các danh pháp đồng sinh.',
+    nang:'Xúc thực (tâm sở Xúc), Thức thực (tâm), Tư niệm thực (tâm sở Tư).',
+    so:'Tâm + tâm sở + sắc tâm + sắc nghiệp tục sinh.'}
   ]},
  {ten:'Quyền duyên', pali:'Indriyapaccaya',
-  dn:'Mãnh lực trợ giúp, ủng hộ bằng cách <b>cai quản, kiểm soát, điều hành</b> trong lãnh vực riêng của mình. Pāli: <i>"Indati parama issariyaṃ karotīti = indriyaṃ — Có uy quyền như vị chúa tể cao nhất, gọi là quyền"</i>.<br><br>Trong 22 quyền, năng duyên tổng quát là <b>20 quyền</b>, trừ Nữ quyền và Nam quyền — vì 2 sắc tính này không có 3 chức năng của năng duyên (tạo ra – hỗ trợ – duy trì); ví như khuôn bánh: bánh có hình dáng theo khuôn nhưng khuôn không sinh ra, không nuôi bánh.<br><br>So sánh: 5 sắc thần kinh là quyền vì mỗi thần kinh chỉ "chấp nhận và cai quản" đúng loại tâm tương ứng (như chủ nhà); sắc Ý vật tuy là chỗ nương nhưng dung chứa mọi loại tâm, không kiểm soát được tâm nào (như người cho mướn nhà) — nên không là quyền.',
+  dn:'Trợ giúp bằng cách <b>cai quản, điều hành</b> trong lãnh vực riêng — năng duyên là 20 quyền (trừ Nữ, Nam quyền).',
   subs:[
    {ten:'Đồng sinh quyền duyên', pali:'Sahajātindriyapaccaya',
-    dn:'Các <b>danh quyền</b> huấn luyện và kiểm soát các pháp đồng sinh cùng thực hiện chức năng như mình: tâm làm quyền thì kiểm soát các tâm sở cùng "biết cảnh"; Tín làm quyền thì các pháp đồng sinh cùng "hướng tin"; Cần — cùng "nỗ lực"; Niệm — cùng "ghi nhớ"; Định — cùng "an trú"; Trí — cùng "hiểu biết".',
-    nang:'8 danh quyền: Tâm (ý quyền) + tâm sở Thọ (lạc, khổ, hỷ, ưu, xả quyền) + tâm sở Mạng quyền (danh) + Tín, Cần, Niệm, Nhất hành (định quyền), Trí (tuệ quyền — gồm cả Vị tri, Dĩ tri, Cụ tri quyền).',
-    so:'Tâm + 52 tâm sở hợp + sắc tục sinh + sắc do tâm tạo.',
-    phiso:'Sắc ngoại + sắc thời tiết + sắc vật thực + sắc nghiệp bình nhật + sắc nghiệp Vô tưởng.'},
+    dn:'8 danh quyền kiểm soát pháp đồng sinh.',
+    nang:'Tâm (ý quyền) + Thọ + Mạng quyền danh + Tín, Cần, Niệm, Nhất hành, Trí.',
+    so:'Tâm + 52 tâm sở + sắc tục sinh + sắc tâm.'},
    {ten:'Quyền sinh tiền duyên', pali:'Purejātindriyapaccaya',
-    dn:'5 <b>sắc thần kinh</b> sinh trước, cai quản tâm nương trú thực hiện đúng chức năng thấy, nghe, ngửi, nếm, đụng — ví như người nương trú nhà nào phải theo quy định nhà ấy. Trong 49 sát-na trụ của sắc thần kinh, sát-na thứ 26 là giai đoạn phát triển cao tột ("sát-na Quyền") mới đủ năng lực điều hành sở duyên.',
-    nang:'5 sắc thần kinh ở sát-na thứ 26 (tuổi trung thọ).',
-    so:'Ngũ song thức + 7 tâm sở hợp.',
-    phiso:'111 tâm còn lại + 52 tâm sở + tất cả sắc pháp.'},
+    dn:'5 sắc thần kinh sinh trước cai quản tâm nương.',
+    nang:'5 sắc thần kinh ở sát-na thứ 26 (trung thọ).',
+    so:'Ngũ song thức + 7 tâm sở hợp.'},
    {ten:'Sắc mạng quyền duyên', pali:'Rūpajīvitindriyapaccaya',
-    dn:'Sắc Mạng quyền <b>cai quản tuổi thọ</b>, duy trì các sắc nghiệp đồng bọn tồn tại tròn đủ tuổi thọ (51 sát-na tiểu).',
+    dn:'Sắc Mạng quyền duy trì tuổi thọ sắc nghiệp đồng bọn.',
     nang:'Tất cả sắc Mạng quyền.',
-    so:'Các bọn sắc nghiệp sinh chung với sắc Mạng quyền — 9 bọn: bọn Nhãn, Nhĩ, Tỷ, Thiệt, Thân, Nữ tính, Nam tính, Ý vật (mỗi bọn 9 sắc còn lại là sở) và bọn Mạng quyền (8 sắc bất ly là sở).',
-    phiso:'Tâm + tâm sở + sắc tâm + sắc thời tiết + sắc vật thực + chính sắc Mạng quyền.'}
+    so:'Các bọn sắc nghiệp sinh chung (9 bọn).'}
   ]},
  {ten:'Thiền duyên', pali:'Jhānapaccaya',
-  dn:'Mãnh lực trợ giúp bằng cách <b>chăm chú vào đối tượng làm cảnh "chói sáng"</b> (ngữ căn jhe) hay <b>"thiêu đốt" các pháp nghịch</b> (ngữ căn jhā).<br><br>7 chi thiền và pháp bị thiêu đốt: <b>Tầm</b> ↔ hôn trầm – thụy miên; <b>Tứ</b> ↔ hoài nghi; <b>Hỷ</b> ↔ bất mãn, khó chịu; <b>Lạc</b> ↔ phóng dật; <b>Xả</b> ↔ hối tiếc; <b>Ưu</b> ↔ dính mắc; <b>Định</b> ↔ tham dục. Theo bản thể pháp, 7 chi thiền chỉ có 5 pháp thực tính (chi lạc, ưu, xả đều là tâm sở Thọ).',
-  nang:'5 pháp thực tính của 7 chi thiền — Tầm, Tứ, Hỷ, Thọ, Nhất hành — có trong 103 tâm (trừ 18 tâm vô nhân).',
-  so:'103 tâm + 52 tâm sở hợp (trừ chi thiền đang làm năng duyên) + sắc nghiệp tục sinh + sắc do tâm tạo.',
-  phiso:'Ngũ song thức + 7 tâm sở hợp + sắc nghiệp bình nhật + sắc ngoại + sắc vật thực + sắc âm dương + sắc nghiệp Vô tưởng.'},
+  dn:'Trợ giúp bằng cách <b>chăm chú vào đối tượng</b> hay <b>thiêu đốt pháp nghịch</b> (7 chi thiền, thực tính 5 pháp).',
+  nang:'Tầm, Tứ, Hỷ, Thọ, Nhất hành trong 103 tâm (trừ 18 tâm vô nhân).',
+  so:'103 tâm + 52 tâm sở (trừ chi thiền đang làm năng) + sắc nghiệp tục sinh + sắc tâm.',
+  phiso:'Ngũ song thức + 7 tâm sở + sắc nghiệp bình nhật + sắc ngoại + sắc vật thực + sắc âm dương + sắc nghiệp Vô tưởng.'},
  {ten:'Đạo duyên', pali:'Maggapaccaya',
-  dn:'Mãnh lực trợ giúp bằng cách <b>như con đường</b>, dẫn đến đích: tà đạo dẫn đến khổ cảnh, chánh đạo dẫn đến lạc cảnh và Níp-bàn. Pāli: <i>"Maggabhāvena upakārako dhammo = maggapaccayo — Pháp trợ giúp làm tăng trưởng con đường"</i>.<br><br>Chi đạo theo Kinh tạng có 16 (8 chánh + 8 tà); theo tạng Diệu pháp gom lại 12 chi (trừ tà ngữ, tà nghiệp, tà mạng, tà niệm — vì không có chi pháp thực tính riêng); theo Duyên hệ chỉ kể <b>9 chi pháp thực tính</b>.',
-  nang:'9 chi đạo trong những tâm hữu nhân: Trí (chánh kiến), Tầm (chánh/tà tư duy), Chánh ngữ, Chánh nghiệp, Chánh mạng (3 Giới phần), Cần (chánh/tà tinh tấn), Niệm (chánh niệm), Nhất hành (chánh/tà định), Tà kiến.',
-  so:'103 tâm hữu nhân + 52 tâm sở hợp + sắc tâm hữu nhân + sắc nghiệp tục sinh với tâm hữu nhân.',
-  phiso:'18 tâm vô nhân + 12 tâm sở hợp + sắc ngoại, sắc âm dương, sắc vật thực, sắc nghiệp bình nhật, sắc nghiệp Vô tưởng, sắc tâm vô nhân, sắc nghiệp tục sinh với tâm vô nhân.'},
+  dn:'Trợ giúp <b>như con đường</b> — tà đạo dẫn khổ cảnh, chánh đạo dẫn lạc cảnh và Níp-bàn (9 chi pháp thực tính).',
+  nang:'Trí, Tầm, Chánh ngữ, Chánh nghiệp, Chánh mạng, Cần, Niệm, Nhất hành, Tà kiến — trong tâm hữu nhân.',
+  so:'103 tâm hữu nhân + 52 tâm sở + sắc tâm hữu nhân + sắc nghiệp tục sinh với tâm hữu nhân.',
+  phiso:'18 tâm vô nhân + 12 tâm sở + sắc ngoại, sắc âm dương, sắc vật thực, sắc nghiệp bình nhật, sắc nghiệp Vô tưởng, sắc tâm vô nhân.'},
  {ten:'Tương ưng duyên', pali:'Sampayuttapaccaya',
-  dn:'Mãnh lực trợ giúp theo cách <b>hòa hợp</b>, chỉ có giữa <b>danh với danh</b>. Thanh Tịnh Đạo: <i>"Các pháp vô sắc trợ giúp bằng cách làm tăng trưởng sự hòa hợp theo phương cách đồng sinh, đồng diệt, đồng biết một cảnh, đồng nương một vật"</i> — 4 nghĩa "đồng".<br><br>Hòa hợp nghĩa là "như một, không còn phân biệt được" — ví như nước hòa với sữa. Như tâm Nhãn thức kết hợp 7 tâm sở Biến hành: 8 pháp này khó nhận biết riêng lẻ, được gọi chung theo phận sự là "sự thấy".',
-  nang:'Tất cả tâm và tâm sở đồng sinh với nhau (4 danh uẩn: 1 trợ 3, 3 trợ 1, 2 trợ 2).',
-  so:'Tất cả tâm và tâm sở đồng sinh với nhau.',
+  dn:'Trợ giúp theo cách <b>hòa hợp</b> (đồng sinh, đồng diệt, đồng cảnh, đồng vật) — chỉ danh với danh, như nước hòa sữa.',
+  nang:'Tất cả tâm và tâm sở đồng sinh.',
+  so:'Như năng duyên.',
   phiso:'Sắc pháp + Níp-bàn + chế định.'},
  {ten:'Bất tương ưng duyên', pali:'Vippayuttapaccaya',
-  dn:'Mãnh lực trợ giúp bằng cách <b>không hòa hợp</b> — ví như nước lăn trên lá sen, hay vị ngọt – đắng không hòa lẫn. Là mối liên hệ giữa <b>danh và sắc</b>: danh trợ sắc, hoặc sắc trợ danh (không đồng nương một vật, không đồng cảnh).',
+  dn:'Trợ giúp bằng cách <b>không hòa hợp</b> — giữa danh và sắc, như nước trên lá sen.',
   subs:[
    {ten:'Đồng sinh bất tương ưng duyên', pali:'Sahajātavippayuttapaccaya',
-    dn:'Danh trợ sắc cùng sinh lên nhưng không hòa hợp: tâm trợ sắc tâm; tâm sở Tư trong tâm Tục sinh trợ sắc nghiệp tục sinh; ngược lại sắc Ý vật tái tục trợ tâm tái tục cõi ngũ uẩn.',
-    nang:'107 tâm (trừ ngũ song thức + 4 tâm quả Vô sắc) cùng tâm sở hợp; sắc Ý vật tái tục.',
-    so:'Sắc do tâm tạo, sắc nghiệp tục sinh; tâm tái tục cõi ngũ uẩn cùng tâm sở hợp.',
-    phiso:'121 tâm + tâm sở khi không là sở duyên; sắc ngoại, sắc vật thực, sắc âm dương, sắc nghiệp Vô tưởng, sắc nghiệp bình nhật.'},
-   {ten:'Sinh hậu bất tương ưng duyên', pali:'Pacchājātavippayuttapaccaya',
-    dn:'Danh sinh sau trợ sắc sinh trước — <b>chi pháp như Sinh hậu duyên</b>.'},
-   {ten:'Vật sinh tiền bất tương ưng duyên', pali:'Vatthupurejātavippayuttapaccaya',
-    dn:'Sắc vật sinh trước làm chỗ nương cho danh — <b>chi pháp như Vật sinh tiền (y) duyên</b>.'},
-   {ten:'Vật-cảnh sinh tiền bất tương ưng duyên', pali:'Vatthārammaṇapurejātavippayuttapaccaya',
-    dn:'Vật vừa là chỗ nương vừa là cảnh trong lộ cận tử — <b>chi pháp như Vật-cảnh sinh tiền (y) duyên</b>.'}
+    dn:'Danh trợ sắc cùng sinh (và Ý vật tái tục trợ tâm tái tục).',
+    nang:'107 tâm (trừ ngũ song thức + 4 quả Vô sắc) + tâm sở; sắc Ý vật tái tục.',
+    so:'Sắc tâm, sắc nghiệp tục sinh; tâm tái tục cõi ngũ uẩn.'},
+   {ten:'Sinh hậu bất tương ưng duyên', pali:'Pacchājātavippayuttapaccaya', dn:'<b>Như Sinh hậu duyên</b>.'},
+   {ten:'Vật sinh tiền bất tương ưng duyên', pali:'Vatthupurejātavippayuttapaccaya', dn:'<b>Như Vật sinh tiền (y) duyên</b>.'},
+   {ten:'Vật-cảnh sinh tiền bất tương ưng duyên', pali:'Vatthārammaṇapurejātavippayuttapaccaya', dn:'<b>Như Vật-cảnh sinh tiền (y) duyên</b>.'}
   ]},
  {ten:'Hiện hữu duyên', pali:'Atthipaccaya',
-  dn:'Mãnh lực trợ giúp theo phương cách <b>"đang tồn tại"</b> — năng duyên đang hiện trú thì mới ủng hộ được sở duyên. Có 7 trường hợp năng – sở cùng hiện hữu: (1) 4 danh uẩn với nhau; (2) tứ đại với nhau; (3) danh – sắc lúc nhập thai cõi ngũ uẩn; (4) tâm + tâm sở với sắc tâm tạo; (5) tứ đại với sắc y sinh; (6) 5 sắc thần kinh với 5 thức; (7) sắc Ý vật với Ý giới – Ý thức giới.',
-  nang:'Tổng hợp năng duyên của 6 duyên thành phần bên dưới.',
-  so:'Tổng hợp sở duyên của 6 duyên thành phần bên dưới.',
+  dn:'Trợ giúp theo phương cách <b>"đang tồn tại"</b> — năng và sở cùng hiện hữu (7 trường hợp).',
+  nang:'Tổng hợp năng duyên của 6 duyên thành phần.',
+  so:'Tổng hợp sở duyên của 6 duyên thành phần.',
   subs:[
    {ten:'Đồng sinh hiện hữu duyên', pali:'Sahajātatthipaccaya', dn:'<b>Tức Đồng sinh duyên</b>.'},
    {ten:'Cảnh sinh tiền hiện hữu duyên', pali:'Ārammaṇapurejātatthipaccaya', dn:'<b>Tức Cảnh sinh tiền duyên</b>.'},
@@ -898,18 +983,18 @@ const DUYENHE_DATA = [
    {ten:'Quyền hiện hữu duyên', pali:'Indriyatthipaccaya', dn:'<b>Tức Sắc mạng quyền duyên</b>.'}
   ]},
  {ten:'Vô hữu duyên', pali:'Natthipaccaya',
-  dn:'Mãnh lực trợ giúp bằng cách <b>"vắng mặt"</b>: pháp vô sắc vừa diệt theo diễn tiến của mình, nhường chỗ trợ cho pháp vô sắc mới sinh lên (Thanh Tịnh Đạo). Chính là Vô gián duyên / Đẳng vô gián duyên nhìn theo khía cạnh "vắng mặt" — <b>trùng chi pháp với Vô gián duyên</b>.<br><br>Ý nghĩa sâu: Hiện hữu duyên và Vô hữu duyên chỉ ra sự liên hệ "có mặt – vắng mặt", qua đó Đức Phật bác bỏ hai cực đoan thường kiến – đoạn kiến: <i>"Này Kaccāna, tất cả đều có là một cực đoan; tất cả đều không có là cực đoan thứ hai"</i>. Pháp diệt rồi không phải đoạn diệt — vì còn trợ pháp khác sinh lên, chỉ là "vắng mặt".',
-  nang:'Tâm + tâm sở vừa diệt (trừ tâm Tử của vị Thánh Alahán).',
+  dn:'Trợ giúp bằng cách <b>"vắng mặt"</b>: pháp vô sắc vừa diệt nhường chỗ cho pháp mới sinh — <b>trùng chi pháp Vô gián duyên</b>.',
+  nang:'Tâm + tâm sở vừa diệt (trừ tâm Tử vị Alahán).',
   so:'Tâm + tâm sở sinh kế sau.',
   phiso:'Sắc pháp.'},
  {ten:'Ly duyên', pali:'Vigatapaccaya',
-  dn:'Mãnh lực trợ giúp bằng cách <b>"lìa nhau, diệt mất"</b>. Thanh Tịnh Đạo: <i>"Cũng chính chúng (tâm và tâm sở vừa diệt) trợ giúp bằng cách biến mất, gọi là ly duyên"</i> — <b>chi pháp tương tự Vô hữu duyên</b> (nhấn mạnh khía cạnh "đã lìa khỏi").',
-  nang:'Tâm + tâm sở vừa diệt, lìa đi (trừ tâm Tử của vị Thánh Alahán).',
+  dn:'Trợ giúp bằng cách <b>"lìa nhau, diệt mất"</b> — <b>chi pháp tương tự Vô hữu duyên</b>.',
+  nang:'Tâm + tâm sở vừa diệt, lìa đi (trừ tâm Tử vị Alahán).',
   so:'Tâm + tâm sở sinh kế sau.',
   phiso:'Sắc pháp.'},
  {ten:'Bất ly duyên', pali:'Avigatapaccaya',
-  dn:'Mãnh lực trợ giúp bằng cách <b>"không xa lìa"</b> — pháp đang còn, không diệt mất, ủng hộ pháp khác. Pāli: <i>"Avigatabhāvena upakārattā avigatapaccayo — Ủng hộ theo cách không lìa bỏ, là bất ly duyên"</i> (Thanh Tịnh Đạo) — <b>chi pháp tương tự Hiện hữu duyên</b> (nhấn mạnh khía cạnh "chưa lìa khỏi").<br><br>Đức Phật thuyết đôi Ly – Bất ly để nhấn mạnh thêm đôi Vô hữu – Hiện hữu, phá chấp "còn tự ngã – không còn tự ngã".',
-  nang:'Như Hiện hữu duyên (tổng hợp 6 duyên thành phần).',
+  dn:'Trợ giúp bằng cách <b>"không xa lìa"</b> — pháp đang còn, không diệt mất — <b>chi pháp tương tự Hiện hữu duyên</b>.',
+  nang:'Như Hiện hữu duyên.',
   so:'Như Hiện hữu duyên.'}
 ];
 
@@ -961,4 +1046,62 @@ function openDuyenHeSheet(i){
   document.getElementById('sheet-content').innerHTML = html;
   document.getElementById('sheet').classList.add('show');
   document.getElementById('sheet-backdrop').classList.add('show');
+}
+
+// ===== (Trang 22 Quyền) 4 bảng tổng quát =====
+function qList(arr){ return arr.map(d=>`${d.id}. ${d.ten} <i style="color:var(--ink-soft)">(${d.pali.split(' ')[0]})</i>`).join('<br>'); }
+
+function openQuyenDanhSac(){
+  const sac = QUYEN_DATA.filter(d=>d.sacdanh==='sac');
+  const danh = QUYEN_DATA.filter(d=>d.sacdanh==='danh');
+  const dacbiet = QUYEN_DATA.filter(d=>d.sacdanh!=='sac' && d.sacdanh!=='danh');
+  showAttrSheet(`
+    <div class="sheet-head"><h2>Danh quyền · Sắc quyền</h2></div>
+    <p class="sheet-pali">Phân 22 quyền theo Danh – Sắc</p>
+    <div class="sec"><div class="sec-label">Sắc quyền (${sac.length})</div><div class="sec-body">${qList(sac)}</div></div>
+    <div class="sec" style="margin-top:12px"><div class="sec-label">Danh quyền (${danh.length})</div><div class="sec-body">${qList(danh)}</div></div>
+    ${dacbiet.length?`<div class="sec" style="margin-top:12px"><div class="sec-label">Đặc biệt: cả Sắc lẫn Danh (${dacbiet.length})</div><div class="sec-body">${qList(dacbiet)} — Mạng quyền có 2 chi pháp: sắc mạng quyền và danh mạng quyền (tâm sở Mạng quyền).</div></div>`:''}
+  `);
+}
+
+function openQuyenCoi(){
+  const groups = {};
+  QUYEN_DATA.forEach(d=>{ (groups[d.coi_label]=groups[d.coi_label]||[]).push(d); });
+  let html = `<div class="sheet-head"><h2>Địa vức (Cõi)</h2></div><p class="sheet-pali">Phạm vi có mặt và hoạt động của 22 quyền</p>`;
+  for(const [label, arr] of Object.entries(groups)){
+    html += `<div class="sec" style="margin-top:12px"><div class="sec-label">${label} (${arr.length})</div><div class="sec-body">${qList(arr)}</div></div>`;
+  }
+  showAttrSheet(html);
+}
+
+function openQuyenChiPhap16(){
+  showAttrSheet(`
+    <div class="sheet-head"><h2>16 chi pháp chân đế</h2></div>
+    <p class="sheet-pali">22 quyền quy nạp về 16 pháp chân đế</p>
+    <div class="sec"><div class="sec-body">
+      <b>1–5.</b> 5 sắc thần kinh (pasāda-rūpa) — chi pháp của Nhãn, Nhĩ, Tỷ, Thiệt, Thân quyền.<br><br>
+      <b>6.</b> Sắc nữ tính (itthibhāva-rūpa) — chi pháp của Nữ quyền.<br><br>
+      <b>7.</b> Sắc nam tính (purisabhāva-rūpa) — chi pháp của Nam quyền.<br><br>
+      <b>8–9.</b> Sắc mạng quyền (jīvitindriya-rūpa) và tâm sở Mạng quyền (danh) — 2 chi pháp của Mạng quyền.<br><br>
+      <b>10.</b> Tâm (citta, cả 121 thứ tâm) — chi pháp của Ý quyền.<br><br>
+      <b>11.</b> Tâm sở Thọ (vedanā) — chi pháp của 5 quyền: Lạc, Khổ, Hỷ, Ưu, Xả quyền.<br><br>
+      <b>12.</b> Tâm sở Tín — chi pháp của Tín quyền.<br><br>
+      <b>13.</b> Tâm sở Cần — chi pháp của Tấn quyền.<br><br>
+      <b>14.</b> Tâm sở Niệm — chi pháp của Niệm quyền.<br><br>
+      <b>15.</b> Tâm sở Nhất hành (ekaggatā) — chi pháp của Định quyền.<br><br>
+      <b>16.</b> Tâm sở Trí tuệ (paññā) — chi pháp của 4 quyền: Tuệ quyền, Tri vị tri quyền, Tri dĩ tri quyền, Tri cụ tri quyền.
+    </div></div>
+    <p class="info-note">22 quyền nhưng chi pháp chân đế chỉ có 16: vì 5 thọ quyền cùng là tâm sở Thọ, 4 quyền tuệ cùng là tâm sở Trí, và Mạng quyền gồm 2 chi pháp sắc + danh.</p>
+  `);
+}
+
+function openQuyenDuyenTQ(){
+  const groups = {};
+  QUYEN_DATA.forEach(d=>{ const k = d.duyen_loai || 'Không làm năng Quyền duyên (Nữ quyền, Nam quyền)'; (groups[k]=groups[k]||[]).push(d); });
+  let html = `<div class="sheet-head"><h2>Quyền duyên</h2></div><p class="sheet-pali">Indriyapaccaya — vai trò năng duyên của 22 quyền</p>`;
+  for(const [label, arr] of Object.entries(groups)){
+    html += `<div class="sec" style="margin-top:12px"><div class="sec-label">${label} (${arr.length})</div><div class="sec-body">${qList(arr)}</div></div>`;
+  }
+  html += `<p class="info-note">Nữ quyền và Nam quyền không làm năng duyên trong Quyền duyên vì không có 3 chức năng: tạo ra – hỗ trợ – duy trì (ví như khuôn bánh không sinh ra, không nuôi bánh).</p>`;
+  showAttrSheet(html);
 }
