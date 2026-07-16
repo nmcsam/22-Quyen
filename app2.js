@@ -8,7 +8,7 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['tamso','Tâm ↔ Tâm sở'],['quyen22','22 Quyền'],['dactinh','80 Pháp thực tính'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi'],['duyenhe','24 Duyên hệ'],['xugioi','12 Xứ · 18 Giới']];
+  const sections = [['tamso','Tâm ↔ Tâm sở'],['quyen22','22 Quyền'],['dactinh','Pháp thực tính'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi'],['duyenhe','24 Duyên hệ'],['xugioi','12 Xứ · 18 Giới']];
   document.getElementById('section-switch').innerHTML = sections.map(([k,label])=>
     `<button class="${k===currentSection?'active':''}" onclick="switchSection('${k}')">${label}</button>`
   ).join('');
@@ -52,7 +52,7 @@ function switchSection(s){
     document.getElementById('nav').innerHTML = '';
     renderTamSoPage();
   } else if(s==='dactinh'){
-    document.getElementById('page-subtitle').textContent = '80 Pháp thực tính (Sabhāvadhamma) · chạm để xem 4 khía cạnh';
+    document.getElementById('page-subtitle').textContent = 'Pháp thực tính (Sabhāvadhamma) · chạm để xem 4 khía cạnh';
     grid.style.display='none';
     legend.style.display='none';
     document.getElementById('nav').innerHTML = '';
@@ -1001,7 +1001,7 @@ function renderDuyenHePage(){
   DUYENHE_DATA.forEach((d,i)=>{
     circles += `<div class="circle circle-dh" onclick="openDuyenHeSheet(${i})">
       <div class="cp" style="font-weight:800">${i+1}</div>
-      <div class="cn">${d.ten.replace(' duyên','')}</div>
+      <div class="cn">${d.ten}</div>
       <div class="cp">${d.pali.replace('paccaya','').replace('paccayo','')}</div>
     </div>`;
   });
@@ -1233,8 +1233,12 @@ function openSettingsSheet(){
       <div class="sec-body" style="margin-top:8px;font-size:calc(14px * var(--fontscale));color:var(--ink-soft)">Áp dụng cho các ô tròn/thẻ trên các trang. Trong bảng chi tiết luôn hiển thị đầy đủ cả Việt lẫn Pāli.</div>
     </div>
     <div class="sec" style="margin-top:14px"><div class="sec-label">Dữ liệu</div>
-      <div class="setopt"><button class="qbtn" onclick="exportAppData()">⬇ Xuất toàn bộ dữ liệu (JSON)</button></div>
-      <div class="sec-body" style="margin-top:8px;font-size:calc(14px * var(--fontscale));color:var(--ink-soft)">Tải về một tệp JSON gồm toàn bộ dữ liệu của app: 22 Quyền, Tâm – Tâm sở, 80 Pháp thực tính, 21 Cảnh, Duyên khởi, 24 Duyên hệ, 12 Xứ – 18 Giới.</div>
+      <div class="setopt">
+        <button class="qbtn" onclick="exportAppData()">⬇ Xuất dữ liệu (JSON)</button>
+        <button class="qbtn" onclick="document.getElementById('import-file').click()">⬆ Nhập dữ liệu (JSON)</button>
+        <input type="file" id="import-file" accept=".json,application/json" style="display:none" onchange="importAppData(this)">
+      </div>
+      <div class="sec-body" style="margin-top:8px;font-size:calc(14px * var(--fontscale));color:var(--ink-soft)"><b>Xuất:</b> tải về tệp JSON gồm toàn bộ dữ liệu các trang + cài đặt của bạn (ngôn ngữ, cỡ chữ từng trang, cỡ chữ bảng chi tiết).<br><b>Nhập:</b> chọn tệp JSON đã xuất trước đó để khôi phục các cài đặt.</div>
     </div>
   `;
   document.getElementById('sheet').classList.add('show');
@@ -1261,7 +1265,13 @@ function exportAppData(){
     duyenhe24: typeof DUYENHE_DATA!=='undefined'?DUYENHE_DATA:undefined,
     xu12: typeof XU_DATA!=='undefined'?XU_DATA:undefined,
     gioi18: typeof GIOI_DATA!=='undefined'?GIOI_DATA:undefined,
-    aniyata: typeof ANIYATA_INFO!=='undefined'?ANIYATA_INFO:undefined
+    aniyata: typeof ANIYATA_INFO!=='undefined'?ANIYATA_INFO:undefined,
+    cai_dat: {
+      ngon_ngu: getLangMode(),
+      co_chu_tung_trang: (typeof fontScales!=='undefined')?fontScales:{},
+      co_chu_bang_chi_tiet: (typeof sheetScale!=='undefined')?sheetScale:1,
+      trang_hien_tai: currentSection
+    }
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json;charset=utf-8'});
   const url = URL.createObjectURL(blob);
@@ -1312,4 +1322,40 @@ function glossCitta(c){
                              : 'tâm Quả siêu thế — hưởng quả giải thoát, lấy Níp-bàn làm cảnh';
   }
   return 'tâm';
+}
+
+
+function importAppData(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      const data = JSON.parse(ev.target.result);
+      let applied = [];
+      const cd = data.cai_dat || {};
+      if(cd.ngon_ngu){
+        try{ localStorage.setItem('quyen22-lang', cd.ngon_ngu); }catch(e){}
+        applyLangMode(); applied.push('ngôn ngữ');
+      }
+      if(cd.co_chu_tung_trang && typeof fontScales!=='undefined'){
+        Object.assign(fontScales, cd.co_chu_tung_trang);
+        try{ localStorage.setItem('quyen22-fontscales', JSON.stringify(fontScales)); }catch(e){}
+        applyFontScale(); applied.push('cỡ chữ từng trang');
+      }
+      if(cd.co_chu_bang_chi_tiet && typeof sheetScale!=='undefined'){
+        sheetScale = cd.co_chu_bang_chi_tiet; applySheetScale(); applied.push('cỡ chữ bảng chi tiết');
+      }
+      if(cd.trang_hien_tai){
+        try{ localStorage.setItem('quyen22-section', cd.trang_hien_tai); }catch(e){}
+      }
+      alert(applied.length ? ('Đã nhập và khôi phục: ' + applied.join(', ') + '.')
+        : 'Tệp hợp lệ nhưng không có phần cài đặt để khôi phục (dữ liệu giáo pháp của app là bản dựng sẵn, không bị ghi đè).');
+      openSettingsSheet();
+    }catch(err){
+      alert('Tệp không hợp lệ — cần tệp JSON đã xuất từ app này.');
+    }
+    input.value = '';
+  };
+  reader.readAsText(file, 'utf-8');
 }

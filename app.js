@@ -167,3 +167,17 @@ function adjustFontScale(delta){
 }
 
 window.addEventListener('load', applyFontScale);
+
+
+// ===== Cỡ chữ RIÊNG của bảng chi tiết (độc lập với zoom từng trang) =====
+let sheetScale = 1;
+try{ sheetScale = parseFloat(localStorage.getItem('quyen22-sheetscale')) || 1; }catch(e){}
+function applySheetScale(){
+  document.documentElement.style.setProperty('--sheetscale', sheetScale.toFixed(2));
+  try{ localStorage.setItem('quyen22-sheetscale', sheetScale.toFixed(2)); }catch(e){}
+}
+function adjustSheetScale(delta){
+  sheetScale = Math.min(1.7, Math.max(0.9, sheetScale + delta));
+  applySheetScale();
+}
+applySheetScale();
