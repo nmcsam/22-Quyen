@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v46'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v47'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -1387,7 +1387,7 @@ function openSettingsSheet(){
       </div>
       <div class="sec-body" style="margin-top:8px;font-size:calc(14px * var(--fontscale));color:var(--ink-soft)">Đồng bộ các mục đã chỉnh sửa và cài đặt hiển thị giữa điện thoại – máy tính, kèm bản lưu dự phòng trên đám mây.</div>
     </div>
-    <div class="sec" style="margin-top:14px"><div class="sec-label">Dữ liệu</div>
+    <div class="sec" style="margin-top:14px"><div class="sec-label">Xuất / Nhập dữ liệu</div>
       <div class="setopt">
         <button class="qbtn" onclick="exportAppData()">⬇ Xuất dữ liệu (JSON)</button>
         <button class="qbtn" onclick="document.getElementById('import-file').click()">⬆ Nhập dữ liệu (JSON)</button>
@@ -1398,9 +1398,9 @@ function openSettingsSheet(){
     <div class="sec" style="margin-top:14px"><div class="sec-label">Sao lưu định kỳ lên đám mây</div>
       <div class="setopt">
         <button class="qbtn ${abBkFreq()==='off'?'on':''}" onclick="abBkSetFreq('off')">Tắt</button>
-        <button class="qbtn ${abBkFreq()==='d'?'on':''}" onclick="abBkSetFreq('d')">Hàng ngày</button>
-        <button class="qbtn ${abBkFreq()==='w'?'on':''}" onclick="abBkSetFreq('w')">Hàng tuần</button>
-        <button class="qbtn ${abBkFreq()==='m'?'on':''}" onclick="abBkSetFreq('m')">Hàng tháng</button>
+        <button class="qbtn ${abBkFreq()==='d'?'on':''}" onclick="abBkSetFreq('d')">Ngày</button>
+        <button class="qbtn ${abBkFreq()==='w'?'on':''}" onclick="abBkSetFreq('w')">Tuần</button>
+        <button class="qbtn ${abBkFreq()==='m'?'on':''}" onclick="abBkSetFreq('m')">Tháng</button>
       </div>
       <div id="ab-bk-status" class="sec-body" style="margin-top:8px;font-size:calc(13px * var(--fontscale));color:var(--ink-soft)">${abBkStatusText()}</div>
       <div class="setopt" style="margin-top:8px">
@@ -2010,9 +2010,10 @@ function abDisconnect(){
 }
 function abUpdateSyncBtn(){
   const b=document.getElementById('ab-sync-btn'); if(!b)return;
-  if(abConflict){ b.style.background='#c0503e'; b.style.color='#fff'; b.title='Có khác biệt dữ liệu — chạm để xử lý'; }
-  else if(abSyncCode&&abDb){ b.style.background='#4c7a3a'; b.style.color='#fff'; b.title='Đang đồng bộ — mã: '+abSyncCode; }
-  else { b.style.background=''; b.style.color=''; b.title='Đồng bộ đám mây (chưa bật)'; }
+  b.classList.remove('on','warn');
+  if(abConflict){ b.classList.add('warn'); b.textContent='⚠️ Đám mây'; b.title='Có khác biệt dữ liệu — chạm để xử lý'; }
+  else if(abSyncCode&&abDb){ b.classList.add('on'); b.textContent='☁️ Đang bật'; b.title='Đang đồng bộ — mã: '+abSyncCode; }
+  else { b.textContent='☁️'; b.title='Đồng bộ đám mây (chưa bật)'; }
 }
 function abGenCode(){
   const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c='';
@@ -2050,7 +2051,7 @@ function openSyncSheet(){
       ${conflictHtml}
       <div style="display:flex;gap:8px;margin-top:14px">
         <button style="${qb};flex:1;background:var(--card);color:var(--ink);border:1px solid rgba(128,128,128,.4)" onclick="abDisconnect()">Ngắt kết nối</button>
-        <button style="${qb};flex:1;background:var(--card);color:var(--ink);border:1px solid rgba(128,128,128,.4)" onclick="openSettingsSheet()">← Cài đặt</button>
+        <button style="${qb};flex:1;background:var(--card);color:var(--ink);border:1px solid rgba(128,128,128,.4)" onclick="closeSheet()">Đóng</button>
       </div>
     </div>
   `;
