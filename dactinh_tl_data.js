@@ -182,3 +182,23 @@ const DACTINH_TL = [
 ]}
 
 ];
+
+// ============================================================
+// 14 CHỨC NĂNG CỦA TÂM — Đường Vào Thắng Pháp (TK Chánh Minh)
+// ============================================================
+const CHUCNANG_TAM_14 = [
+{ten:"Tục sinh (nối liền)", pali:"Paṭisandhi", giaithich:"Chức năng nối liền, còn gọi là sự Tục sinh. Sự chấm dứt kiếp sống cũ được gọi là chết và sự khởi đầu một kiếp sống mới gọi là tục sinh. Chết và tục sinh được nối liền nhau không có gián đoạn, không có khoảng trống.", tam:"<b>19 tâm</b> = 2 tâm Quan sát thọ xả + 8 tâm Đại quả + 9 tâm quả Đáo đại."},
+{ten:"Hữu phần", pali:"Bhavaṅga", giaithich:"Tâm hữu phần chỉ là loại tâm \"duy trì\" đời sống tâm pháp của một chúng sinh trong kiếp sống đó. Sở dĩ có tên gọi là hữu phần vì xuất hiện sau sát-na tục sinh.", tam:"Cũng chính là một trong <b>19 tâm tục sinh</b> (2 Quan sát thọ xả + 8 Đại quả + 9 quả Đáo đại)."},
+{ten:"Hướng môn", pali:"Āvajjana", giaithich:"Như tâm Hướng ngũ môn trong lộ ngũ môn, chận đứng dòng hữu phần không cho chúng sinh lên; tâm Hướng ý môn trong lộ ý cũng tương tự như vậy.", tam:"<b>2 tâm</b>: tâm Hướng ngũ môn (lộ ngũ môn) và tâm Hướng ý môn (lộ ý)."},
+{ten:"Thấy", pali:"Dassana", giaithich:"Thấy là \"nhận biết bằng mắt\" hay \"trực tiếp nhận biết cảnh sắc bằng mắt\".", tam:"<b>2 tâm Nhãn thức</b>."},
+{ten:"Nghe", pali:"Savana", giaithich:"Nghe là \"tiếp nhận âm thanh bằng tai\" hay \"trực tiếp nhận biết cảnh thinh bằng tai\".", tam:"<b>2 tâm Nhĩ thức</b>."},
+{ten:"Ngửi", pali:"Ghāyana", giaithich:"Ngửi là \"dùng mũi để nhận biết\" hay \"trực tiếp nhận biết cảnh mùi bằng mũi\".", tam:"<b>2 tâm Tỷ thức</b>."},
+{ten:"Nếm", pali:"Sāyana", giaithich:"Nếm là \"dùng lưỡi để biết vị chất\" hay \"trực tiếp nhận biết cảnh vị bằng lưỡi\".", tam:"<b>2 tâm Thiệt thức</b>."},
+{ten:"Đụng", pali:"Phusana", giaithich:"Đụng là \"va chạm vào\" hay \"trực tiếp nhận biết cảnh xúc bằng thân\".", tam:"<b>2 tâm Thân thức</b>."},
+{ten:"Tiếp nhận (Tiếp thu)", pali:"Sampaṭicchana", giaithich:"Tiếp thu là \"nhận cái gì đó do người khác trao lại\" hay \"tiếp nhận cảnh do tâm trước để lại\". Trong lộ ngũ môn, khi một trong 5 ngoại cảnh (sắc, thinh, mùi, vị và xúc) được một trong năm đôi thức nhận bắt; khi tâm này diệt đi, một tâm khác sinh lên nhận lại cảnh đó — tâm này có tên gọi là tâm Tiếp thu.", tam:"<b>2 tâm Tiếp thu</b>."},
+{ten:"Quan sát", pali:"Santīraṇa", giaithich:"Quan sát là \"xem xét để thấy rõ\" hay \"tâm xem xét cảnh khi nhận biết cảnh\".", tam:"<b>3 tâm Quan sát</b>."},
+{ten:"Xác định", pali:"Voṭṭhabbana", giaithich:"\"Xác\" là đúng theo sự thật, \"định\" là đề ra — tức \"xác định rõ là cảnh tốt hay xấu rồi đề ra cách xử lý cảnh\". Ví như người sau khi quan sát trái xoài, xác định \"trái xoài chín hay chưa chín\", rồi \"ăn hay không ăn\". Chính trong giai đoạn này tạo điều kiện cho tâm thiện hay tâm bất thiện sinh ra kế tiếp: nếu \"định ra\" phương án đúng thì tâm thiện sinh lên, nếu \"định ra\" phương án sai thì tâm bất thiện sinh lên.", tam:"Chỉ có <b>tâm Hướng ý môn</b> thực hiện được chức năng \"xác định\" này, để rồi sau đó là những tâm đổng lực thiện, bất thiện hay Duy tác đổng lực sinh khởi."},
+{ten:"Đổng lực", pali:"Javana", giaithich:"Đổng lực vừa \"nhanh và có sức mạnh\", giống như \"ánh sét\" vừa cực nhanh vừa có sức mạnh rất lớn.", tam:"<b>87 tâm</b> = 29 đổng lực dục giới + 18 đổng lực Đáo đại + 40 tâm Siêu thế."},
+{ten:"Na cảnh", pali:"Tadārammaṇa", giaithich:"Trong sự diễn hoạt của tâm, khi sát-na đổng lực thứ 7 đã diệt nhưng cảnh vẫn còn sức mạnh, kích động đến luồng hữu phần; bấy giờ có một loại tâm sinh lên 2 sát-na liên tục để nhận cảnh đó. Chức năng này được gọi là Na cảnh, nghĩa là \"nhận lại cảnh cũ\".", tam:"<b>11 tâm</b> = 3 tâm Quan sát + 8 tâm Đại quả. <i>(Tài liệu ghi \"3 tâm quan sát thọ xả\"; đúng là 3 tâm Quan sát gồm 2 thọ xả + 1 thọ hỷ.)</i>"},
+{ten:"Tử (chấm dứt kiếp sống cũ)", pali:"Cuti", giaithich:"Tâm tử là sát-na tâm sinh lên cuối cùng trong kiếp sống; thời điểm xuất hiện tâm tử gọi là thời tử.", tam:"Cũng chính là <b>19 tâm làm việc tục sinh</b>. Nói cách khác, loại tâm làm việc tục sinh, hữu phần hay tử cũng chính là một loại; sở dĩ có tên gọi \"tục sinh, hữu phần, tử\" là do chúng xuất hiện theo từng thời điểm: khởi đầu kiếp sống mới gọi là tâm tục sinh; sau tâm tục sinh một sát-na gọi là tâm hữu phần; chấm dứt kiếp sống cũ gọi là tâm tử."}
+];

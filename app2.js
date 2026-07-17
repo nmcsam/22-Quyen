@@ -429,7 +429,7 @@ function renderDacTinhPage(){
   extra.innerHTML = `
     <p class="info-note" style="margin-bottom:12px"><b>Bốn khía cạnh thực tính (Sabhāvadhamma) của các pháp chân đế (Paramattha)</b> — trình bày đầy đủ theo tài liệu (tr. 531–551): mỗi pháp có <b>Đặc tính (Lakkhaṇā)</b>, <b>Chức năng (Rasā)</b>, <b>Sự thể hiện (Paccupaṭṭhānā)</b> và <b>Nhân gần (Padaṭṭhānā)</b> riêng — tổng cộng <b>135 mục</b>: Tâm, Ngũ Uẩn, Ngũ Song Thức – Ý Giới – Ý Thức Giới – 2 Tâm Tố vô nhân, 52 Tâm sở (Thọ chia 5, 6 cặp thân·tâm), 28 Sắc pháp, 12 chi Duyên khởi cùng Sầu·Bi·Khổ·Ưu·Não, ba loại Khổ, Tứ Đế, Tứ Vô Lượng Tâm, Thập Độ và Níp-bàn. Chạm vào từng pháp để xem 4 khía cạnh kèm Pāli.</p>
     ${groupsHtml}
-    ${renderDacTinhGroup('Phụ lục · 14 vai trò của Tâm theo phận sự', [VAITRO_TAM_DATA.filter(v=>v.id!=='vt_vinnana').map(v=> plainCircleHTML(v.id, v.ten, v.pali, 'openDacTinhVaitro', 'circle-vt')).join('')])}
+    ${renderDacTinhGroup('Phụ lục · 14 chức năng của Tâm (Đường Vào Thắng Pháp — TK Chánh Minh)', [CHUCNANG_TAM_14.map((c,i)=>`<div class="circle circle-vt" onclick="openChucNangTam(${i})"><div class="cn">${i+1}. ${c.ten}</div><div class="cp">${c.pali}</div></div>`).join('')])}
     <p class="info-note">Nguồn: bảng "Bốn khía cạnh thực tính (Sabhāvadhamma) của các pháp chân đế (Paramattha)" theo <i>Milindapañhā, Visuddhimagga</i> và <i>Aṭṭhasālinī</i>; riêng phần giải thích về Thập Độ trích từ <i>Sīlakkhandhaṭīkā</i> và <i>Cariyapiṭaka-Aṭṭhakathā</i> (tài liệu tr. 531–551). Ô Nhân gần của Gió: tài liệu in "Nước, Lửa, Gió", đã sửa thành "Đất, Nước, Lửa" cho đúng ba Đại còn lại.</p>
   `;
 }
@@ -437,6 +437,22 @@ function renderDacTinhPage(){
 function openDacTinhTL(gi, ii){
   const it = DACTINH_TL[gi].items[ii];
   showAttrSheet(attrSheetHTML(it.ten, it.pali, it));
+}
+
+function openChucNangTam(i){
+  const c = CHUCNANG_TAM_14[i];
+  showAttrSheet(`
+    <div class="sheet-head"><h2>Chức năng ${i+1}: ${c.ten}</h2></div>
+    <p class="sheet-pali">${c.pali}</p>
+    <div class="sec">
+      <div class="sec-label">Giải thích</div>
+      <div class="sec-body">${c.giaithich}</div>
+    </div>
+    <div class="sec">
+      <div class="sec-label">Tâm đảm nhận chức năng này</div>
+      <div class="sec-body">${c.tam}</div>
+    </div>
+  `);
 }
 
 function openDacTinhPairByIdx(key){
@@ -1220,6 +1236,7 @@ function exportAppData(){
     cetasika: typeof CETASIKA_DATA!=='undefined'?CETASIKA_DATA:undefined,
     dactinh_4khiacanh: typeof DACTINH_DATA!=='undefined'?DACTINH_DATA:undefined,
     dactinh_tailieu_135phap: typeof DACTINH_TL!=='undefined'?DACTINH_TL:undefined,
+    chucnang_tam_14: typeof CHUCNANG_TAM_14!=='undefined'?CHUCNANG_TAM_14:undefined,
     sacphap: typeof RUPA_DATA!=='undefined'?RUPA_DATA:undefined,
     tho_chitiet: typeof THO_CHITIET_DATA!=='undefined'?THO_CHITIET_DATA:undefined,
     vaitro_tam: typeof VAITRO_TAM_DATA!=='undefined'?VAITRO_TAM_DATA:undefined,
