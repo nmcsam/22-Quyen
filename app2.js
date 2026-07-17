@@ -1,4 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
+const APP_VERSION = 'v37'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -1235,7 +1236,7 @@ function openSettingsSheet(){
   const btn = (val,label)=>`<button class="qbtn ${m===val?'on':''}" onclick="setLangMode('${val}')">${label}</button>`;
   document.getElementById('sheet-content').innerHTML = `
     <div class="sheet-head"><h2>Cài đặt</h2></div>
-    <p class="sheet-pali">Thắng Pháp — Abhidhamma</p>
+    <p class="sheet-pali">Thắng Pháp — Abhidhamma · phiên bản ${APP_VERSION}</p>
     <div class="sec"><div class="sec-label">Ngôn ngữ hiển thị (tên trên các ô)</div>
       <div class="setopt">
         ${btn('vi','Tiếng Việt')}

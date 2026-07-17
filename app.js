@@ -145,7 +145,21 @@ function tamsoHighlight(key){
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
+    const hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.register('sw.js').then(reg=>{
+      // Chủ động kiểm tra bản mới: ngay khi mở app, mỗi lần quay lại app, và mỗi 30 phút
+      const check = ()=>{ try{ reg.update(); }catch(e){} };
+      check();
+      document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') check(); });
+      setInterval(check, 30*60*1000);
+    }).catch(()=>{});
+    // Khi service worker mới tiếp quản → tự tải lại trang một lần để nhận ngay bản mới
+    let reloadedOnce = false;
+    navigator.serviceWorker.addEventListener('controllerchange', ()=>{
+      if(!hadController || reloadedOnce) return;
+      reloadedOnce = true;
+      location.reload();
+    });
   });
 }
 
