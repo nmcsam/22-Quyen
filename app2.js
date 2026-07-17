@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v42'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v43'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
