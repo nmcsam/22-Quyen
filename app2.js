@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v39'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v40'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -1320,6 +1320,7 @@ function exportAppData(){
       co_chu_tung_trang: (typeof fontScales!=='undefined')?fontScales:{},
       co_chu_bang_chi_tiet: (typeof sheetScale!=='undefined')?sheetScale:1,
       co_chu_tom_luoc_duyen: (typeof tomluocScale!=='undefined')?tomluocScale:1,
+      co_chu_tong_ket_de_muc: (typeof dmtScale!=='undefined')?dmtScale:1,
       trang_hien_tai: currentSection
     },
     noi_dung_da_sua: contentEdits
@@ -1354,6 +1355,16 @@ const DMT_NIMITTA_LABEL = {
   'tt': '<b>KHÔNG có tợ tướng</b> — đề mục lấy <b>pháp có thực tính riêng</b> (sabhāvadhamma) làm cảnh (Thanh Tịnh Đạo, đv. 117).',
   'kx': '<b>KHÔNG có tợ tướng</b> — cảnh của đề mục không xếp vào loại có quang tướng hay pháp thực tính (Thanh Tịnh Đạo, đv. 117).'
 };
+let dmtScale = (function(){ try{ const v=parseFloat(localStorage.getItem('quyen22-dmt-scale')); return (v>=0.6&&v<=2.0)?v:1; }catch(e){ return 1; } })();
+function adjustDmtScale(d){
+  dmtScale = Math.round(Math.min(2.0, Math.max(0.6, dmtScale + d))*10)/10;
+  try{ localStorage.setItem('quyen22-dmt-scale', String(dmtScale)); }catch(e){}
+  const w = document.getElementById('dmt-sum-wrap');
+  if(w) w.style.setProperty('--dmtscale', dmtScale);
+  const p = document.getElementById('dmt-sum-pct');
+  if(p) p.textContent = Math.round(dmtScale*100) + '%';
+}
+
 function renderDeMucThienPage(){
   const extra = document.getElementById('extra-content');
   let n = 0;
@@ -1367,38 +1378,56 @@ function renderDeMucThienPage(){
     return `<div class="group-head">${first}–${n} · ${g.ten}</div><div class="circle-grid">${circles}</div>`;
   }).join('');
 
-  const all = [].concat(...DEMUC_THIEN.map(g=>g.items));
-  const names = f => all.filter(f).map(x=>x.ten.replace(/^Đề mục /,'')).join(', ');
-  const cnt = f => all.filter(f).length;
-  const li = (label, f) => `<div style="padding:5px 0;border-top:1px dashed rgba(128,128,128,.3)"><b>${label}: ${cnt(f)} đề mục</b> — ${names(f)}.</div>`;
+  const zbtn = 'height:28px;min-width:32px;padding:0 7px;border-radius:8px;border:1px solid rgba(128,128,128,.35);background:var(--card);color:var(--ink);font-size:13px;font-weight:700;font-family:inherit';
+  const td = 'border:1px solid #555;padding:5px 8px;vertical-align:top';
+  const tdNum = td + ';text-align:center;font-weight:800;background:rgba(230,150,60,.28);white-space:nowrap';
+  const th = td + ';font-weight:800;background:rgba(128,128,128,.16);text-align:center';
+  const secRow = c => `<tr><td colspan="3" style="${td};font-weight:800;background:rgba(63,124,184,.16)">${c}</td></tr>`;
+  const row = (label, num, items) => `<tr><td style="${td}">${label}</td><td style="${tdNum}">${num}</td><td style="${td}">${items}</td></tr>`;
+
+  const bangTongKet = `
+  <table style="border-collapse:collapse;width:100%;background:var(--card)">
+    <tr><th style="${th};width:34%">Phân loại</th><th style="${th};width:12%">Số lượng</th><th style="${th}">Các đề mục</th></tr>
+    ${secRow('① Theo mức định chứng đắc (theo cột x trong bảng gốc)')}
+    ${row('Chỉ đạt <b>Cận định</b> (không lên an chỉ)','10','6 tùy niệm (Phật, Pháp, Tăng, Giới, Thí, Thiên) + niệm Níp-bàn + niệm tử + quán 4 giới + vật thực bất tịnh tưởng')}
+    ${row('Đắc <b>Sơ thiền</b>','25','10 hoàn tịnh (kasiṇa) + 10 tử thi + thân hành niệm + niệm hơi thở + từ, bi, hỷ')}
+    ${row('Đắc <b>Nhị thiền</b>','14','10 hoàn tịnh + niệm hơi thở + từ, bi, hỷ')}
+    ${row('Đắc <b>Tam thiền</b>','14','10 hoàn tịnh + niệm hơi thở + từ, bi, hỷ')}
+    ${row('Đắc <b>Tứ thiền</b>','14','10 hoàn tịnh + niệm hơi thở + từ, bi, hỷ')}
+    ${row('Đắc <b>Ngũ thiền</b>','12','10 hoàn tịnh + niệm hơi thở + xả')}
+    ${row('Đắc <b>Không vô biên xứ</b>','1','đề mục Không vô biên xứ')}
+    ${row('Đắc <b>Thức vô biên xứ</b>','1','đề mục Thức vô biên xứ')}
+    ${row('Đắc <b>Vô sở hữu xứ</b>','1','đề mục Vô sở hữu xứ')}
+    ${row('Đắc <b>Phi tưởng phi phi tưởng xứ</b>','1','đề mục Phi tưởng phi phi tưởng xứ')}
+    ${secRow('② Theo ấn tướng (Nimitta)')}
+    ${row('<b>CÓ tợ tướng</b> (paṭibhāganimitta)','22','10 hoàn tịnh + 10 tử thi + niệm hơi thở + thân hành niệm')}
+    ${row('<b>KHÔNG có tợ tướng</b> — cảnh là pháp thực tính','12','niệm Phật, Pháp, Tăng, Giới, Thí, Thiên, Níp-bàn, tử + quán 4 giới + vật thực + Thức vô biên xứ + Phi tưởng phi phi tưởng xứ')}
+    ${row('<b>KHÔNG có tợ tướng</b> — cảnh không xếp loại như vậy','6','từ, bi, hỷ, xả + Không vô biên xứ + Vô sở hữu xứ')}
+    ${row('→ Cộng KHÔNG có tợ tướng','18','12 + 6 đề mục trên')}
+    ${secRow('③ Theo tánh nết phù hợp')}
+    ${row('Phổ cập các tánh','10','đất, nước, lửa, gió, hư không, ánh sáng + 4 đề mục Vô sắc')}
+    ${row('Tánh ái tình (tham)','11','10 tử thi + thân hành niệm')}
+    ${row('Tánh sân','8','4 kasiṇa màu (xanh, vàng, đỏ, trắng) + từ, bi, hỷ, xả')}
+    ${row('Tánh tầm và si','1','niệm hơi thở')}
+    ${row('Tánh đức tin','6','niệm Phật, Pháp, Tăng, Giới, Thí, Thiên')}
+    ${row('Tánh giác','4','niệm Níp-bàn + niệm tử + quán 4 giới + vật thực bất tịnh tưởng <i>(bảng gốc đánh dấu 4 đề mục Vô sắc cả Phổ cập lẫn Tánh giác — ở đây xếp vào Phổ cập)</i>')}
+  </table>`;
 
   extra.innerHTML = `
     <p class="info-note" style="margin-bottom:12px"><b>40 đề mục thiền chỉ (Samatha-kammaṭṭhāna)</b> phân theo mức thiền chứng đắc và tánh nết phù hợp — theo Abhidhammatthasaṅgaha chương IX: Kammaṭṭhāna (Nghiệp Xứ). Phần ấn tướng (nimitta) theo Thanh Tịnh Đạo Giảng Giải — Giới và Định (Sayadaw U Sīlānanda, Pháp Triều dịch), đoạn văn 117. Chạm vào từng đề mục để xem chi tiết.</p>
     ${groupsHtml}
-    <div class="group-head" style="margin-top:18px">Tổng kết</div>
-    <div style="background:var(--card);border:1px solid rgba(128,128,128,.25);border-radius:12px;padding:10px 12px;font-size:calc(14.5px * var(--fontscale));line-height:1.55">
-      <div style="font-weight:800;margin-bottom:2px">① Theo mức định chứng đắc</div>
-      ${li('Chỉ đạt Cận định (không lên an chỉ)', x=>x.muc==='0')}
-      ${li('Đắc đến Sơ thiền', x=>x.muc==='1')}
-      ${li('Đắc Sơ thiền đến Tứ thiền', x=>x.muc==='1-4')}
-      ${li('Chỉ đắc Ngũ thiền', x=>x.muc==='5')}
-      ${li('Đắc đủ 5 tầng thiền (Sơ → Ngũ)', x=>x.muc==='1-5')}
-      ${li('Đắc thiền Vô sắc', x=>x.muc.startsWith('vs'))}
-      <div style="font-weight:800;margin:12px 0 2px">② Theo ấn tướng (Nimitta)</div>
-      ${li('CÓ tợ tướng (paṭibhāganimitta)', x=>x.nimitta==='pt')}
-      ${li('KHÔNG có tợ tướng — cảnh là pháp thực tính', x=>x.nimitta==='tt')}
-      ${li('KHÔNG có tợ tướng — cảnh không xếp loại như vậy', x=>x.nimitta==='kx')}
-      <div style="padding:5px 0;border-top:1px dashed rgba(128,128,128,.3)">→ Cộng: <b>22 đề mục có tợ tướng · 18 đề mục không có tợ tướng</b>.</div>
-      <div style="font-weight:800;margin:12px 0 2px">③ Theo tánh nết phù hợp</div>
-      ${li('Phổ cập các tánh', x=>x.tanh.startsWith('Phổ cập'))}
-      ${li('Tánh ái tình (tham)', x=>x.tanh==='Tánh ái tình')}
-      ${li('Tánh sân', x=>x.tanh==='Tánh sân')}
-      ${li('Tánh tầm và si', x=>x.tanh==='Tánh tầm và si')}
-      ${li('Tánh đức tin', x=>x.tanh==='Tánh đức tin')}
-      ${li('Tánh giác', x=>x.tanh==='Tánh giác')}
-      <div style="padding:5px 0;border-top:1px dashed rgba(128,128,128,.3)">Ghi chú: 4 đề mục Vô sắc trong bảng gốc được đánh dấu cả "Phổ cập các tánh" lẫn "Tánh giác" (ở đây xếp vào Phổ cập).</div>
+    <div class="group-head" style="margin-top:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="flex:1;min-width:120px">Tổng kết</span>
+      <span style="display:inline-flex;gap:4px;align-items:center;font-weight:600">
+        <button style="${zbtn}" onclick="adjustDmtScale(-0.1)" aria-label="Thu nhỏ bảng tổng kết">A−</button>
+        <span id="dmt-sum-pct" style="font-size:12px;color:var(--ink-soft);min-width:38px;text-align:center">${Math.round(dmtScale*100)}%</span>
+        <button style="${zbtn}" onclick="adjustDmtScale(0.1)" aria-label="Phóng to bảng tổng kết">A+</button>
+      </span>
     </div>
-    <p class="info-note" style="margin-top:10px">Nguồn: bảng "40 đề mục thiền chỉ phân theo thiền và tánh nết" — Abhidhammatthasaṅgaha ch. IX (tr. 545); "Thanh Tịnh Đạo Giảng Giải — Giới và Định" đv. 117 (22 đề mục có quang tướng: 10 hoàn tịnh, 10 bất mỹ, niệm hơi thở, thân hành niệm; 12 đề mục lấy pháp thực tính làm cảnh; 6 đề mục còn lại cảnh không xếp loại như vậy).</p>
+    <div id="dmt-sum-wrap" style="--dmtscale:${dmtScale};font-size:calc(14.5px * var(--dmtscale));line-height:1.5;overflow-x:auto">
+      ${bangTongKet}
+      <p class="info-note" style="margin-top:10px;font-size:calc(13px * var(--dmtscale));line-height:1.5">Nguồn: bảng "40 đề mục thiền chỉ phân theo thiền và tánh nết" — Abhidhammatthasaṅgaha ch. IX (tr. 545); "Thanh Tịnh Đạo Giảng Giải — Giới và Định" đv. 117 (22 đề mục có quang tướng; 12 đề mục lấy pháp thực tính làm cảnh; 6 đề mục còn lại cảnh không xếp loại như vậy). Số lượng mục ① đếm theo dấu x từng cột thiền trong bảng gốc: một đề mục đắc nhiều tầng được tính ở mọi tầng nó đạt tới.</p>
+    </div>
   `;
 }
 function openDeMucThien(gi, ii){
@@ -1638,6 +1667,11 @@ function importAppData(input){
         tomluocScale = cd.co_chu_tom_luoc_duyen;
         try{ localStorage.setItem('quyen22-tomluoc-scale', String(tomluocScale)); }catch(e){}
         applied.push('cỡ chữ bản tóm lược duyên');
+      }
+      if(cd.co_chu_tong_ket_de_muc && typeof dmtScale!=='undefined'){
+        dmtScale = cd.co_chu_tong_ket_de_muc;
+        try{ localStorage.setItem('quyen22-dmt-scale', String(dmtScale)); }catch(e){}
+        applied.push('cỡ chữ bảng tổng kết đề mục thiền');
       }
       if(cd.trang_hien_tai){
         try{ localStorage.setItem('quyen22-section', cd.trang_hien_tai); }catch(e){}
