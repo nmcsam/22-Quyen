@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v40'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v41'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -405,8 +405,8 @@ function renderDacTinhGroup(title, items){
 // Níp-bàn (pháp thực tính thứ 80) — theo Vi Diệu Pháp Sơ Cấp (Sư Giác Giới)
 const NIPBAN_DT = {
   dt:'Sự vắng lặng tuyệt đối', dtp:'Santi',
-  cn:'Bất động, bất tử', cnp:'Acalaṃ, Accuta',
-  th:'Sự lìa khỏi hoàn toàn mọi hiện hữu', thp:'Nissarana',
+  cn:'Sự bất tử; tạo sự an ổn', cnp:'Accuti, Assāsakaraṇa',
+  th:'Vô tướng; không còn hý luận', thp:'Animitta, Nippapañca',
   ng:'Không có — Níp-bàn là pháp vô vi, không bị tạo tác nên không có nhân cần thiết.', ngp:''
 };
 
@@ -437,7 +437,7 @@ function renderDacTinhPage(){
     <p class="info-note" style="margin-bottom:12px"><b>Bốn khía cạnh thực tính (Sabhāvadhamma) của các pháp chân đế (Paramattha)</b> — trình bày đầy đủ theo tài liệu (tr. 531–551): mỗi pháp có <b>Đặc tính (Lakkhaṇā)</b>, <b>Chức năng (Rasā)</b>, <b>Sự thể hiện (Paccupaṭṭhānā)</b> và <b>Nhân gần (Padaṭṭhānā)</b> riêng — tổng cộng <b>135 mục</b>: Tâm, Ngũ Uẩn, Ngũ Song Thức – Ý Giới – Ý Thức Giới – 2 Tâm Tố vô nhân, 52 Tâm sở (Thọ chia 5, 6 cặp thân·tâm), 28 Sắc pháp, 12 chi Duyên khởi cùng Sầu·Bi·Khổ·Ưu·Não, ba loại Khổ, Tứ Đế, Tứ Vô Lượng Tâm, Thập Độ và Níp-bàn. Chạm vào từng pháp để xem 4 khía cạnh kèm Pāli.</p>
     ${groupsHtml}
     ${renderDacTinhGroup('Phụ lục · 14 chức năng của Tâm (Đường Vào Thắng Pháp — TK Chánh Minh)', [CHUCNANG_TAM_14.map((c,i)=>`<div class="circle circle-vt" onclick="openChucNangTam(${i})"><div class="cn">${i+1}. ${c.ten}</div><div class="cp">${c.pali}</div></div>`).join('')])}
-    <p class="info-note">Nguồn: bảng "Bốn khía cạnh thực tính (Sabhāvadhamma) của các pháp chân đế (Paramattha)" theo <i>Milindapañhā, Visuddhimagga</i> và <i>Aṭṭhasālinī</i>; riêng phần giải thích về Thập Độ trích từ <i>Sīlakkhandhaṭīkā</i> và <i>Cariyapiṭaka-Aṭṭhakathā</i> (tài liệu tr. 531–551). Ô Nhân gần của Gió: tài liệu in "Nước, Lửa, Gió", đã sửa thành "Đất, Nước, Lửa" cho đúng ba Đại còn lại.</p>
+    <p class="info-note">Nguồn: bảng "Bốn khía cạnh thực tính (Sabhāvadhamma) của các pháp chân đế (Paramattha)" theo <i>Milindapañhā, Visuddhimagga</i> và <i>Aṭṭhasālinī</i>; riêng phần giải thích về Thập Độ trích từ <i>Sīlakkhandhaṭīkā</i> và <i>Cariyapiṭaka-Aṭṭhakathā</i> (tài liệu tr. 531–551). Ô Nhân gần của Gió: tài liệu in "Nước, Lửa, Gió", đã sửa thành "Đất, Nước, Lửa" cho đúng ba Đại còn lại. Toàn bộ thuật ngữ Pāli và các ô đặc tính – phận sự – thành tựu – nhân gần đã được đối chiếu và hiệu đính theo <i>Visuddhimagga</i> (XIV, XVI) và <i>Aṭṭhasālinī</i> bản VRI (v41).</p>
   `;
 }
 

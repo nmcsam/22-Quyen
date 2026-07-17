@@ -197,7 +197,7 @@ const QUYEN_DATA = [
   duyen_detail:"Là 1 trong 15 danh quyền, đồng sanh trợ lực cho danh pháp tương ưng."
 },
 {
-  id:16, ten:"Tấn quyền", pali:"Viriyindriya",
+  id:16, ten:"Tấn quyền", pali:"Vīriyindriya",
   canquan:"Cai quản sự siêng năng dũng mãnh, nỗ lực tinh tấn.",
   chiphap:"Sở hữu cần (Viriya) trong 105 tâm tương ưng cần.",
   sacdanh:"danh", sacdanh_label:"Danh quyền",
@@ -249,7 +249,7 @@ const QUYEN_DATA = [
   duyen_detail:"Là 1 trong 15 danh quyền, đồng sanh trợ lực cho danh pháp tương ưng."
 },
 {
-  id:20, ten:"Tri vị tri quyền", pali:"Anaññataññassāmītindriya",
+  id:20, ten:"Tri vị tri quyền", pali:"Anaññātaññassāmītindriya",
   canquan:"Trí tuệ cai quản việc thấu rõ Tứ Thánh Đế mà trước đây mình chưa từng thấu triệt hay chứng đắc.",
   chiphap:"Sở hữu trí tuệ hợp với 1 tâm Sơ đạo (Đạo Nhập Lưu — Sotāpattimagga).",
   sacdanh:"danh", sacdanh_label:"Danh quyền",
