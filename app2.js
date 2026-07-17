@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v49'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v50'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -1465,13 +1465,29 @@ function exportAppData(){
     noi_dung_da_sua: contentEdits
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'thang-phap-abhidhamma-data.json';
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 500);
+  abSaveFileAs('thang-phap-abhidhamma-' + new Date().toISOString().slice(0,10) + '.json', blob);
+}
+
+async function abSaveFileAs(fname, blob){
+  if(window.showSaveFilePicker){
+    try{
+      const h=await window.showSaveFilePicker({suggestedName:fname, types:[{description:'Tệp JSON', accept:{'application/json':['.json']}}]});
+      const w=await h.createWritable(); await w.write(blob); await w.close();
+      abToast('✓ Đã lưu vào vị trí bạn chọn'); return;
+    }catch(e){ if(e&&e.name==='AbortError'){ abToast('Đã hủy'); return; } console.error(e); }
+  }
+  try{
+    const file=new File([blob], fname, {type:'application/json'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:fname});
+      abToast('✓ Đã chuyển tới nơi bạn chọn'); return;
+    }
+  }catch(e){ if(e&&e.name==='AbortError'){ abToast('Đã hủy'); return; } console.error(e); }
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=fname;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); },500);
+  abToast('Trình duyệt không hỗ trợ chọn vị trí — đã tải về thư mục Tải xuống');
 }
 
 
