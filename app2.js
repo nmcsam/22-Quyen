@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v51'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v52'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -11,14 +11,31 @@ const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng'
 function renderSectionSwitch(){
   const sections = [['tamso','Tâm ↔ Tâm sở'],['quyen22','22 Quyền'],['dactinh','Pháp thực tính'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi'],['duyenhe','24 Duyên hệ'],['xugioi','12 Xứ · 18 Giới'],['demucthien','Đề mục thiền']];
   const cur = sections.find(x=>x[0]===currentSection);
+  const pct = Math.round(((typeof fontScales!=='undefined' && fontScales[currentSection])||1)*100) + '%';
   document.getElementById('section-switch').innerHTML = `
-    <div class="ddwrap">
-      <button class="ddbtn" onclick="toggleDD('dd-pages',event)">☰ Chức năng <span class="caret">▾</span></button>
-      <div class="ddmenu" id="dd-pages">
-        ${sections.map(([k,label])=>`<button class="dditem ${k===currentSection?'on':''}" onclick="closeAllDD();switchSection('${k}')">${label}</button>`).join('')}
+    <div style="display:flex;align-items:center;gap:8px;min-width:0">
+      <div class="ddwrap">
+        <button class="ddbtn" onclick="toggleDD('dd-pages',event)">☰ Chức năng <span class="caret">▾</span></button>
+        <div class="ddmenu" id="dd-pages">
+          ${sections.map(([k,label])=>`<button class="dditem ${k===currentSection?'on':''}" onclick="closeAllDD();switchSection('${k}')">${label}</button>`).join('')}
+        </div>
       </div>
+      <span class="cur-page">${cur?cur[1]:''}</span>
     </div>
-    <span class="cur-page">${cur?cur[1]:''}</span>`;
+    <div class="ddwrap">
+      <button class="ddbtn2" onclick="toggleDD('dd-settings',event)" aria-label="Cài đặt">⚙ Cài đặt<span id="ab-sync-dot"></span> <span class="caret">▾</span></button>
+      <div class="ddmenu right" id="dd-settings">
+        <div class="ddrow"><span class="lbl">Cỡ chữ (zoom)</span>
+          <button onclick="adjustFontScale(-0.1);event.stopPropagation()" aria-label="Chữ nhỏ hơn">A−</button>
+          <span class="pct" id="fontscale-pct">${pct}</span>
+          <button onclick="adjustFontScale(0.1);event.stopPropagation()" aria-label="Chữ lớn hơn">A+</button>
+        </div>
+        <button class="dditem" onclick="closeAllDD();startEdit('page')">✎ Sửa nội dung trang</button>
+        <button class="dditem" id="ab-sync-item" onclick="closeAllDD();openSyncSheet()">☁️ Đồng bộ đám mây</button>
+        <button class="dditem" onclick="closeAllDD();openSettingsSheet()">⚙ Cài đặt</button>
+      </div>
+    </div>`;
+  try{ abUpdateSyncBtn(); }catch(e){} // module đồng bộ nằm cuối file — lần vẽ đầu tiên lúc khởi động sẽ bỏ qua, abInitSync sẽ cập nhật lại sau
 }
 
 // ===== Trình đơn sổ xuống dùng chung =====
@@ -2047,11 +2064,19 @@ function abDisconnect(){
   openSyncSheet();
 }
 function abUpdateSyncBtn(){
-  const b=document.getElementById('ab-sync-btn'); if(!b)return;
-  b.classList.remove('on','warn');
-  if(abConflict){ b.classList.add('warn'); b.textContent='⚠️ Đám mây'; b.title='Có khác biệt dữ liệu — chạm để xử lý'; }
-  else if(abSyncCode&&abDb){ b.classList.add('on'); b.textContent='☁️ Đang bật'; b.title='Đang đồng bộ — mã: '+abSyncCode; }
-  else { b.textContent='☁️ Đám mây'; b.title='Đồng bộ đám mây (chưa bật)'; }
+  const it=document.getElementById('ab-sync-item');
+  const dot=document.getElementById('ab-sync-dot');
+  const st = abConflict ? 'warn' : (abSyncCode&&abDb ? 'on' : '');
+  if(it){
+    it.classList.remove('on','warn');
+    if(st) it.classList.add(st);
+    it.textContent = st==='warn' ? '⚠️ Đồng bộ — cần xử lý' : (st==='on' ? '☁️ Đồng bộ — Đang bật' : '☁️ Đồng bộ đám mây');
+    it.title = st==='warn' ? 'Có khác biệt dữ liệu — chạm để xử lý' : (st==='on' ? ('Đang đồng bộ — mã: '+abSyncCode) : 'Đồng bộ đám mây (chưa bật)');
+  }
+  if(dot){
+    dot.classList.remove('on','warn');
+    if(st) dot.classList.add(st);
+  }
 }
 function abGenCode(){
   const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c='';

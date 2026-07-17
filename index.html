@@ -79,7 +79,7 @@
   .pill{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:20px}
   .close-x{position:absolute;top:12px;right:14px;font-size:20px;color:var(--ink-soft);background:none;border:none;padding:4px}
 
-  #section-switch{display:flex;gap:6px;margin-top:10px;justify-content:center;flex-wrap:wrap}
+  #section-switch{display:flex;gap:6px;margin-top:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
   #section-switch button{font-size:11px;padding:6px 11px;border-radius:16px;border:1px solid rgba(128,128,128,.3);background:none;color:var(--ink-soft);font-family:inherit;font-weight:600}
   #section-switch button.active{background:#c9762e;color:#fff;border-color:#c9762e}
   .ddwrap{position:relative;display:inline-block}
@@ -234,9 +234,17 @@
   #fontctrl button:active{background:rgba(201,118,46,.15)}
   #fontctrl .pct{font-size:11.5px;color:var(--ink-soft);min-width:38px;text-align:center}
   #fontctrl{flex-wrap:wrap;justify-content:flex-end;row-gap:5px;max-width:100%}
-  #fontctrl #ab-sync-btn,#fontctrl #ab-settings-btn{width:auto;min-width:0;flex:none;padding:0 12px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;overflow:visible}
-  #ab-sync-btn.on{background:#4c7a3a !important;border-color:#4c7a3a !important;color:#fff !important}
-  #ab-sync-btn.warn{background:#c0503e !important;border-color:#c0503e !important;color:#fff !important}
+  #page-edit-btn{display:none !important}
+  #section-switch .ddbtn2{background:var(--card);color:var(--ink);border:1px solid rgba(128,128,128,.35);font-size:12.5px;padding:7px 14px;border-radius:16px;font-weight:700}
+  #section-switch .ddrow{display:flex;align-items:center;gap:6px;padding:8px 10px;font-size:13px;font-weight:600;color:var(--ink-soft);white-space:nowrap}
+  #section-switch .ddrow .lbl{flex:1}
+  #section-switch .ddrow button{width:30px;height:30px;padding:0;border-radius:8px;font-size:13px;font-weight:700;border:1px solid rgba(128,128,128,.3);background:var(--card);color:var(--ink)}
+  #section-switch .ddrow .pct{font-size:11.5px;color:var(--ink-soft);min-width:40px;text-align:center}
+  #ab-sync-dot{display:none;width:8px;height:8px;border-radius:50%;margin-left:5px;vertical-align:middle}
+  #ab-sync-dot.on{display:inline-block;background:#4c7a3a}
+  #ab-sync-dot.warn{display:inline-block;background:#c0503e}
+  #ab-sync-item.on{color:#3e6b2e;font-weight:700}
+  #ab-sync-item.warn{color:#c0503e;font-weight:700}
 </style>
 </head>
 <body>
@@ -254,18 +262,6 @@
           <button id="page-save-btn" class="save-btn" onclick="saveEdit()" style="display:none">✔ Lưu</button>
           <button id="page-cancel-btn" class="cancel-btn" onclick="cancelEdit()" style="display:none">✕ Hủy</button>
         </span>
-        <button id="ab-sync-btn" onclick="openSyncSheet()" aria-label="Đồng bộ đám mây" style="margin-left:4px">☁️ Đám mây</button>
-        <div class="ddwrap">
-          <button id="ab-settings-btn" class="ddbtn" onclick="toggleDD('dd-settings',event)" aria-label="Cài đặt">⚙ Cài đặt <span class="caret">▾</span></button>
-          <div class="ddmenu right" id="dd-settings">
-            <div class="ddrow"><span class="lbl">Cỡ chữ (zoom)</span>
-              <button onclick="adjustFontScale(-0.1);event.stopPropagation()" aria-label="Chữ nhỏ hơn">A−</button>
-              <span class="pct" id="fontscale-pct">100%</span>
-              <button onclick="adjustFontScale(0.1);event.stopPropagation()" aria-label="Chữ lớn hơn">A+</button>
-            </div>
-            <button class="dditem" onclick="closeAllDD();openSettingsSheet()">⚙ Cài đặt</button>
-          </div>
-        </div>
       </div>
     </div>
   </header>

@@ -171,7 +171,8 @@ try{ fontScales = JSON.parse(localStorage.getItem('quyen22-fontscales')) || {}; 
 function applyFontScale(){
   const sc = fontScales[currentSection] || 1;
   document.documentElement.style.setProperty('--fontscale', sc.toFixed(2));
-  document.getElementById('fontscale-pct').textContent = Math.round(sc*100) + '%';
+  const p = document.getElementById('fontscale-pct');
+  if(p) p.textContent = Math.round(sc*100) + '%';
   localStorage.setItem('quyen22-fontscales', JSON.stringify(fontScales));
 }
 
