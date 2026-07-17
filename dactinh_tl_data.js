@@ -202,3 +202,34 @@ const CHUCNANG_TAM_14 = [
 {ten:"Na cảnh", pali:"Tadārammaṇa", giaithich:"Trong sự diễn hoạt của tâm, khi sát-na đổng lực thứ 7 đã diệt nhưng cảnh vẫn còn sức mạnh, kích động đến luồng hữu phần; bấy giờ có một loại tâm sinh lên 2 sát-na liên tục để nhận cảnh đó. Chức năng này được gọi là Na cảnh, nghĩa là \"nhận lại cảnh cũ\".", tam:"<b>11 tâm</b> = 3 tâm Quan sát + 8 tâm Đại quả. <i>(Tài liệu ghi \"3 tâm quan sát thọ xả\"; đúng là 3 tâm Quan sát gồm 2 thọ xả + 1 thọ hỷ.)</i>"},
 {ten:"Tử (chấm dứt kiếp sống cũ)", pali:"Cuti", giaithich:"Tâm tử là sát-na tâm sinh lên cuối cùng trong kiếp sống; thời điểm xuất hiện tâm tử gọi là thời tử.", tam:"Cũng chính là <b>19 tâm làm việc tục sinh</b>. Nói cách khác, loại tâm làm việc tục sinh, hữu phần hay tử cũng chính là một loại; sở dĩ có tên gọi \"tục sinh, hữu phần, tử\" là do chúng xuất hiện theo từng thời điểm: khởi đầu kiếp sống mới gọi là tâm tục sinh; sau tâm tục sinh một sát-na gọi là tâm hữu phần; chấm dứt kiếp sống cũ gọi là tâm tử."}
 ];
+
+// ============================================================
+// BẢN TÓM LƯỢC 24 DUYÊN CHÍNH TRONG ĐẠI PHÁT THÚ
+// (duyên chính · duyên phụ · số kể 01–48)
+// ============================================================
+const DUYENHE_TOMLUOC = [
+{ten:"Nhân Duyên", so:"01", phu:[]},
+{ten:"Cảnh Duyên", so:"02", phu:[]},
+{ten:"Trưởng Duyên", so:"", phu:[["Cảnh Trưởng Duyên","03"],["Câu Sinh Trưởng Duyên","04"],["Vật Cảnh Tiền Sinh Trưởng Duyên","05"]]},
+{ten:"Vô Gián Duyên", so:"06", phu:[]},
+{ten:"Đẳng Vô Gián Duyên", so:"06*", phu:[]},
+{ten:"Câu Sinh Duyên", so:"07", phu:[]},
+{ten:"Hỗ Tương Duyên", so:"08", phu:[]},
+{ten:"Y Chỉ Duyên", so:"", phu:[["Câu Sinh Y Duyên","09"],["Vật Tiền Sinh Y Duyên","10"],["Vật Cảnh Tiền Sinh Y Duyên","11"]]},
+{ten:"Cận Y Duyên", so:"", phu:[["Cảnh Cận Y Duyên","12"],["Vô Gián Cận Y Duyên","13"],["Thường Cận Y Duyên","14"]]},
+{ten:"Tiền Sinh Duyên", so:"", phu:[["Vật Tiền Sinh Duyên","15"],["Cảnh Tiền Sinh Duyên","16"]]},
+{ten:"Hậu Sinh Duyên", so:"17", phu:[]},
+{ten:"Trùng Dụng Duyên", so:"18", phu:[]},
+{ten:"Nghiệp Duyên", so:"", phu:[["Câu Sinh Nghiệp Duyên","19"],["Dị Thời Nghiệp Duyên","20"],["Vô Gián Nghiệp Duyên","21"]]},
+{ten:"Dị Thục Quả Duyên", so:"22", phu:[]},
+{ten:"Vật Thực Duyên", so:"", phu:[["Sắc Vật Thực Duyên","23"],["Danh Vật Thực Duyên","24"]]},
+{ten:"Quyền Duyên", so:"", phu:[["Câu Sinh Quyền Duyên","25"],["Tiền Sinh Quyền Duyên","26"],["Sắc Mạng Quyền Duyên","27"]]},
+{ten:"Thiền Na Duyên", so:"28", phu:[]},
+{ten:"Đồ Đạo Duyên", so:"29", phu:[]},
+{ten:"Tương Ưng Duyên", so:"30", phu:[]},
+{ten:"Bất Tương Ưng Duyên", so:"", phu:[["Câu Sinh Bất Tương Ưng Duyên","31"],["Vật Tiền Sinh Bất Tương Ưng Duyên","32"],["Vật Cảnh Tiền Sinh Bất Tương Ưng Duyên","33"],["Hậu Sinh Bất Tương Ưng Duyên","34"]]},
+{ten:"Hiện Hữu Duyên", so:"", phu:[["Câu Sinh Hiện Hữu Duyên","35"],["Vật Tiền Sinh Hiện Hữu Duyên","36"],["Cảnh Tiền Sinh Hiện Hữu Duyên","37"],["Hậu Sinh Hiện Hữu Duyên","38"],["Vật Thực Hiện Hữu Duyên","39"],["Quyền Hiện Hữu Duyên","40"]]},
+{ten:"Vô Hữu Duyên", so:"41", phu:[]},
+{ten:"Ly Khứ Duyên", so:"42", phu:[]},
+{ten:"Bất Ly Duyên", so:"", phu:[["Câu Sinh Bất Ly Duyên","43"],["Vật Tiền Sinh Bất Ly Duyên","44"],["Cảnh Tiền Sinh Bất Ly Duyên","45"],["Hậu Sinh Bất Ly Duyên","46"],["Vật Thực Bất Ly Duyên","47"],["Quyền Bất Ly Duyên","48"]]}
+];

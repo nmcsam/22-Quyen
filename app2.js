@@ -990,6 +990,37 @@ function renderDuyenHePage(){
     <p class="info-note" style="margin-bottom:8px">24 duyên trong bộ Paṭṭhāna. Chạm 1 lần để chọn, chạm lần 2 để xem <b>định nghĩa tóm tắt</b> và <b>chi pháp năng duyên – sở duyên</b> (kèm phi sở duyên). Duyên nào phân rộng sẽ có chi pháp của từng duyên phụ.</p>
     <div class="circle-grid">${circles}</div>
     <p class="info-note" style="margin-top:10px"><b>5 đôi đặc trưng:</b> Vô gián – Đẳng vô gián (nghĩa lý đồng nhau) · Y – Cận y (âm thanh đồng nhau) · Sinh tiền – Sinh hậu (nghịch thời) · Tương ưng – Bất tương ưng (nghịch cách) · Nhân – Quả (nhân quả).<br>Nguồn: "Khái lược Duyên Hệ" — Tỳ khưu Chánh Minh.</p>
+    ${renderDuyenHeTomLuoc()}
+  `;
+}
+
+function renderDuyenHeTomLuoc(){
+  const rows = DUYENHE_TOMLUOC.map((d,i)=>{
+    const pali = (DUYENHE_DATA[i] && DUYENHE_DATA[i].pali) ? DUYENHE_DATA[i].pali : '';
+    const appTen = (DUYENHE_DATA[i] && DUYENHE_DATA[i].ten) ? DUYENHE_DATA[i].ten : '';
+    const alt = (appTen && appTen.toLowerCase() !== d.ten.toLowerCase()) ? ` <span style="color:var(--ink-soft);font-weight:600">= ${appTen}</span>` : '';
+    const stt = String(i+1).padStart(2,'0');
+    let head = `<div style="padding:7px 10px;border-top:1px solid rgba(128,128,128,.22);display:flex;gap:8px;align-items:baseline;flex-wrap:wrap">
+      <span style="font-weight:800;min-width:26px">${stt}</span>
+      <span style="flex:1;min-width:180px"><b>${d.ten}</b>${alt}<br><span class="cpali" style="font-style:italic;color:#1c5b9e;font-size:.92em">${pali}</span></span>
+      ${d.so ? `<span style="font-weight:800;background:rgba(192,140,34,.18);border-radius:6px;padding:1px 8px">${d.so}</span>` : `<span style="color:var(--ink-soft);font-size:.92em">phân ${d.phu.length} duyên phụ ↓</span>`}
+    </div>`;
+    if(d.phu.length){
+      head += d.phu.map(p=>`<div style="padding:3px 10px 3px 44px;display:flex;gap:8px;align-items:baseline">
+        <span style="flex:1">↳ ${p[0]}</span>
+        <span style="font-weight:700;background:rgba(192,140,34,.12);border-radius:6px;padding:0 8px">${p[1]}</span>
+      </div>`).join('');
+      head += `<div style="height:5px"></div>`;
+    }
+    return head;
+  }).join('');
+  const tongPhu = DUYENHE_TOMLUOC.reduce((s,d)=>s+d.phu.length,0);
+  const soPhanRong = DUYENHE_TOMLUOC.filter(d=>d.phu.length).length;
+  return `
+    <div class="group-head" style="margin-top:18px">Bản tóm lược 24 duyên chính trong Đại Phát Thú</div>
+    <p class="info-note" style="margin-bottom:8px"><b>24 duyên chính</b>, trong đó <b>${soPhanRong} duyên phân rộng</b> thành <b>${tongPhu} duyên phụ</b> (ghi thụt vào ↳ dưới duyên chính sinh ra nó). Số bên phải là <b>số kể 01–48</b> theo bảng: duyên không phân rộng mang một số; duyên phân rộng thì các duyên phụ mang số. Riêng <b>Đẳng Vô Gián Duyên</b> nghĩa lý đồng với Vô Gián Duyên nên kể chung số <b>06*</b>.</p>
+    <div style="background:var(--card);border:1px solid rgba(128,128,128,.25);border-radius:12px;overflow:hidden;font-size:calc(14.5px * var(--fontscale));line-height:1.45">${rows}</div>
+    <p class="info-note" style="margin-top:8px">Tên gọi theo "Bản tóm lược 24 duyên chính trong Đại Phát Thú"; tên khác trên các ô tròn phía trên được ghi kèm sau dấu "=".</p>
   `;
 }
 
@@ -1252,6 +1283,7 @@ function exportAppData(){
     duyenkhoi: typeof DUYENKHOI_DATA!=='undefined'?DUYENKHOI_DATA:undefined,
     duyenkhoi_4phan: typeof DK_QUARTER!=='undefined'?DK_QUARTER:undefined,
     duyenhe24: typeof DUYENHE_DATA!=='undefined'?DUYENHE_DATA:undefined,
+    duyenhe_tomluoc_48: typeof DUYENHE_TOMLUOC!=='undefined'?DUYENHE_TOMLUOC:undefined,
     xu12: typeof XU_DATA!=='undefined'?XU_DATA:undefined,
     gioi18: typeof GIOI_DATA!=='undefined'?GIOI_DATA:undefined,
     aniyata: typeof ANIYATA_INFO!=='undefined'?ANIYATA_INFO:undefined,
