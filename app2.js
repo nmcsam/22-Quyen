@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v53'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v54'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -9,7 +9,7 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['tamso','Tâm ↔ Tâm sở'],['quyen22','22 Quyền'],['dactinh','Pháp thực tính'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi'],['duyenhe','24 Duyên hệ'],['xugioi','12 Xứ · 18 Giới'],['coi31','31 Cõi'],['demucthien','Đề mục thiền']];
+  const sections = [['home','Trang đầu'],['xugioi','12 Xứ · 18 Giới'],['canh','21 Cảnh'],['quyen22','22 Quyền'],['duyenhe','24 Duyên hệ'],['coi31','31 Cõi'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Pháp thực tính'],['duyenkhoi','Duyên khởi'],['demucthien','Đề mục thiền']];
   const cur = sections.find(x=>x[0]===currentSection);
   const pct = Math.round(((typeof fontScales!=='undefined' && fontScales[currentSection])||1)*100) + '%';
   document.getElementById('section-switch').innerHTML = `
@@ -80,7 +80,13 @@ function switchSection(s){
   } else {
     vp.setAttribute('content','width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
   }
-  if(s==='quyen22'){
+  if(s==='home'){
+    document.getElementById('page-subtitle').textContent = 'Thắng Pháp — Vi Diệu Pháp · mở ☰ Chức năng để chọn trang';
+    grid.style.display='none';
+    legend.style.display='none';
+    document.getElementById('nav').innerHTML = '';
+    renderHomePage();
+  } else if(s==='quyen22'){
     document.getElementById('page-subtitle').textContent = '22 Quyền (Bāvīsatindriya) · chạm vào một quyền để xem chi tiết';
     document.getElementById('nav').innerHTML = '';
     currentView = 'sacdanh';
@@ -1804,7 +1810,7 @@ switchSection = function(s){
 // ===== Khởi tạo app (đặt cuối file để mọi const dữ liệu đã sẵn sàng) =====
 renderSectionSwitch();
 applyLangMode();
-switchSection((function(){ try{ return localStorage.getItem('quyen22-section') || 'tamso'; }catch(e){ return 'tamso'; } })());
+switchSection('home'); // Luôn mở app ở Trang đầu
 
 
 // ===== Tên đầy đủ + định nghĩa ngắn cho Tâm =====
@@ -2032,9 +2038,29 @@ function abConnect(code, silent){
       abApplyRemote(remoteST, doc.data().updatedAt); abAttach(ref);
       if(!silent){ abToast('✓ Đã kết nối'); openSyncSheet(); }
     }else{
-      abConflict={remoteST:remoteST, ref:ref};
-      abUpdateSyncBtn();
-      openSyncSheet();
+      // Cả hai bên đều có dữ liệu — so sánh trước, KHÔNG hỏi nếu không thật sự khác nhau
+      const remoteUp = doc.data().updatedAt || 0;
+      if(doc.data().payload === abPackState()){
+        // Giống hệt nhau -> chỉ kết nối
+        abStamp(Math.max(abUpdatedAt, remoteUp));
+        abLastPayload = abPackState();
+        abAttach(ref);
+        if(!silent){ abToast('✓ Đã kết nối — dữ liệu hai bên giống nhau'); openSyncSheet(); }
+      }else if(remoteUp > abUpdatedAt){
+        // Mây mới hơn (thiết bị khác vừa sửa) -> tải về
+        abApplyRemote(remoteST, remoteUp); abAttach(ref);
+        if(!silent){ abToast('☁️ Đã nhận bản mới hơn từ đám mây'); openSyncSheet(); }
+      }else if(remoteUp < abUpdatedAt){
+        // Máy này mới hơn -> đẩy lên
+        abLastPayload=''; abPush(); abAttach(ref);
+        if(!silent){ abToast('✓ Đã đẩy bản mới hơn của máy này lên đám mây'); openSyncSheet(); }
+      }else{
+        // Cùng mốc thời gian mà nội dung khác -> xung đột thật, mới cần hỏi
+        abConflict={remoteST:remoteST, ref:ref};
+        abUpdateSyncBtn();
+        if(silent){ abToast('⚠️ Dữ liệu máy và đám mây khác nhau — mở ⚙ Cài đặt → Đồng bộ để chọn bên giữ lại'); }
+        else openSyncSheet();
+      }
     }
   }).catch(function(err){
     console.error(err);
@@ -2417,4 +2443,18 @@ function tkCoi31(){
     tkRow('10','4 cõi Vô sắc','Arūpāvacarabhūmi','4 tâm','Tục sinh: 4 tâm Quả vô sắc tương ứng từng cõi. Nhân: đắc thiền Vô sắc tương ứng. Hạng người: 8 (Tam nhân + 7 Thánh, trừ Sơ đạo).');
   return tkBlock('Tổng kết — 31 Cõi', 'Tổng cộng 19 tâm tục sinh (2 Quan sát + 8 Đại quả + 5 Quả sắc giới + 4 Quả vô sắc) dẫn về 30 cõi hữu tâm, cùng 1 lối tục sinh bằng sắc về cõi Vô tưởng.', rows,
     'Bậc quả thiền chia hạ/trung/thượng quyết định sinh về cõi thấp/giữa/cao của mỗi tầng thiền (theo "Tử Sinh Luân Hồi Trong 31 Cõi").');
+}
+
+// ===== Trang đầu (Home) =====
+function renderHomePage(){
+  const extra = document.getElementById('extra-content');
+  extra.innerHTML = `
+    <div style="min-height:56vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px 16px">
+      <img src="icon-192.png" alt="Abhidhamma" style="width:132px;height:132px;border-radius:30px;box-shadow:0 10px 34px rgba(0,0,0,.22)">
+      <div>
+        <div style="font-size:calc(34px * var(--fontscale));font-weight:800;letter-spacing:.5px">Abhidhamma</div>
+        <div style="font-size:calc(15px * var(--fontscale));color:var(--ink-soft);margin-top:6px">Thắng Pháp — Vi Diệu Pháp</div>
+      </div>
+      <div style="font-size:calc(13px * var(--fontscale));color:var(--ink-soft)">Bấm <b>☰ Chức năng</b> phía trên để chọn trang</div>
+    </div>`;
 }
