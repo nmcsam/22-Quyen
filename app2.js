@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v47'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v48'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -2013,7 +2013,7 @@ function abUpdateSyncBtn(){
   b.classList.remove('on','warn');
   if(abConflict){ b.classList.add('warn'); b.textContent='⚠️ Đám mây'; b.title='Có khác biệt dữ liệu — chạm để xử lý'; }
   else if(abSyncCode&&abDb){ b.classList.add('on'); b.textContent='☁️ Đang bật'; b.title='Đang đồng bộ — mã: '+abSyncCode; }
-  else { b.textContent='☁️'; b.title='Đồng bộ đám mây (chưa bật)'; }
+  else { b.textContent='☁️ Đám mây'; b.title='Đồng bộ đám mây (chưa bật)'; }
 }
 function abGenCode(){
   const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c='';
