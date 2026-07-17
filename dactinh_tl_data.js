@@ -233,3 +233,64 @@ const DUYENHE_TOMLUOC = [
 {ten:"Ly Khứ Duyên", so:"42", phu:[]},
 {ten:"Bất Ly Duyên", so:"", phu:[["Câu Sinh Bất Ly Duyên","43"],["Vật Tiền Sinh Bất Ly Duyên","44"],["Cảnh Tiền Sinh Bất Ly Duyên","45"],["Hậu Sinh Bất Ly Duyên","46"],["Vật Thực Bất Ly Duyên","47"],["Quyền Bất Ly Duyên","48"]]}
 ];
+
+// ============================================================
+// 40 ĐỀ MỤC THIỀN CHỈ (KAMMAṬṬHĀNA) — phân theo thiền & tánh nết
+// Nguồn: Abhidhammatthasaṅgaha ch. IX (Nghiệp Xứ, tr. 545);
+// phần ấn tướng theo Thanh Tịnh Đạo Giảng Giải (Pháp Triều), đv. 117
+// nimitta: 'pt' = có tợ tướng · 'tt' = cảnh là pháp thực tính · 'kx' = không xếp loại
+// ============================================================
+const DEMUC_THIEN = [
+{ten:"10 Đề mục Hoàn tịnh (Kasiṇa)", cls:"circle-sac", items:[
+{ten:"Đề mục đất", pali:"Pathavī-kasiṇa", muc:"1-5", tanh:"Phổ cập các tánh", nimitta:"pt"},
+{ten:"Đề mục nước", pali:"Āpo-kasiṇa", muc:"1-5", tanh:"Phổ cập các tánh", nimitta:"pt"},
+{ten:"Đề mục lửa", pali:"Tejo-kasiṇa", muc:"1-5", tanh:"Phổ cập các tánh", nimitta:"pt"},
+{ten:"Đề mục gió", pali:"Vāyo-kasiṇa", muc:"1-5", tanh:"Phổ cập các tánh", nimitta:"pt"},
+{ten:"Đề mục màu xanh", pali:"Nīla-kasiṇa", muc:"1-5", tanh:"Tánh sân", nimitta:"pt"},
+{ten:"Đề mục màu vàng", pali:"Pīta-kasiṇa", muc:"1-5", tanh:"Tánh sân", nimitta:"pt"},
+{ten:"Đề mục màu đỏ", pali:"Lohita-kasiṇa", muc:"1-5", tanh:"Tánh sân", nimitta:"pt"},
+{ten:"Đề mục màu trắng", pali:"Odāta-kasiṇa", muc:"1-5", tanh:"Tánh sân", nimitta:"pt"},
+{ten:"Đề mục hư không", pali:"Ākāsa-kasiṇa", muc:"1-5", tanh:"Phổ cập các tánh", nimitta:"pt"},
+{ten:"Đề mục ánh sáng", pali:"Āloka-kasiṇa", muc:"1-5", tanh:"Phổ cập các tánh", nimitta:"pt"}
+]},
+{ten:"10 Đề mục Tử thi (Asubha)", cls:"circle-bt", items:[
+{ten:"Đề mục tử thi sình", pali:"Uddhumātaka", muc:"1", tanh:"Tánh ái tình", nimitta:"pt"},
+{ten:"Đề mục tử thi biến sắc", pali:"Vinīlaka", muc:"1", tanh:"Tánh ái tình", nimitta:"pt"},
+{ten:"Đề mục tử thi chảy nước vàng", pali:"Vipubbaka", muc:"1", tanh:"Tánh ái tình", nimitta:"pt"},
+{ten:"Đề mục tử thi bể nứt nở", pali:"Vicchiddaka", muc:"1", tanh:"Tánh ái tình", nimitta:"pt"},
+{ten:"Đề mục tử thi bị thú ăn", pali:"Vikkhāyitaka", muc:"1", tanh:"Tánh ái tình", nimitta:"pt"},
+{ten:"Đề mục tử thi rã hai", pali:"Vikkhittaka", muc:"1", tanh:"Tánh ái tình", nimitta:"pt"},
+{ten:"Đề mục tử thi rã từng miếng", pali:"Hatavikkhittaka", muc:"1", tanh:"Tánh ái tình", nimitta:"pt"},
+{ten:"Đề mục tử thi máu đọng nhẩm", pali:"Lohitaka", muc:"1", tanh:"Tánh ái tình", nimitta:"pt"},
+{ten:"Đề mục tử thi hóa giòi tửa", pali:"Puḷavaka", muc:"1", tanh:"Tánh ái tình", nimitta:"pt"},
+{ten:"Đề mục xương tử thi rải rác", pali:"Aṭṭhika", muc:"1", tanh:"Tánh ái tình", nimitta:"pt"}
+]},
+{ten:"10 Đề mục Tùy niệm (Anussati)", cls:"circle-tt", items:[
+{ten:"Đề mục niệm số tức quan (niệm hơi thở)", pali:"Ānāpānassati", muc:"1-5", tanh:"Tánh tầm và si", nimitta:"pt"},
+{ten:"Đề mục phụ niệm thân (thân hành niệm)", pali:"Kāyagatāsati", muc:"1", tanh:"Tánh ái tình", nimitta:"pt"},
+{ten:"Đề mục niệm Phật", pali:"Buddhānussati", muc:"0", tanh:"Tánh đức tin", nimitta:"tt"},
+{ten:"Đề mục niệm Pháp", pali:"Dhammānussati", muc:"0", tanh:"Tánh đức tin", nimitta:"tt"},
+{ten:"Đề mục niệm Tăng", pali:"Saṅghānussati", muc:"0", tanh:"Tánh đức tin", nimitta:"tt"},
+{ten:"Đề mục niệm Giới", pali:"Sīlānussati", muc:"0", tanh:"Tánh đức tin", nimitta:"tt"},
+{ten:"Đề mục niệm Thí", pali:"Cāgānussati", muc:"0", tanh:"Tánh đức tin", nimitta:"tt"},
+{ten:"Đề mục niệm Thiên", pali:"Devatānussati", muc:"0", tanh:"Tánh đức tin", nimitta:"tt"},
+{ten:"Đề mục niệm Níp-bàn (niệm tịch tịnh)", pali:"Upasamānussati", muc:"0", tanh:"Tánh giác", nimitta:"tt"},
+{ten:"Đề mục niệm tử", pali:"Maraṇānussati", muc:"0", tanh:"Tánh giác", nimitta:"tt"}
+]},
+{ten:"4 Đề mục Vô lượng tâm (Appamaññā)", cls:"circle-th", items:[
+{ten:"Đề mục từ", pali:"Mettā", muc:"1-4", tanh:"Tánh sân", nimitta:"kx"},
+{ten:"Đề mục bi", pali:"Karuṇā", muc:"1-4", tanh:"Tánh sân", nimitta:"kx"},
+{ten:"Đề mục hỷ", pali:"Muditā", muc:"1-4", tanh:"Tánh sân", nimitta:"kx"},
+{ten:"Đề mục xả", pali:"Upekkhā", muc:"5", tanh:"Tánh sân", nimitta:"kx"}
+]},
+{ten:"1 Phân biệt · 1 Tưởng", cls:"circle-tho", items:[
+{ten:"Đề mục quán 4 giới (đất, nước, lửa, gió)", pali:"Catudhātuvavatthāna", muc:"0", tanh:"Tánh giác", nimitta:"tt"},
+{ten:"Đề mục vật thực bất tịnh tưởng", pali:"Āhāre paṭikūlasaññā", muc:"0", tanh:"Tánh giác", nimitta:"tt"}
+]},
+{ten:"4 Đề mục Vô sắc (Arūpa)", cls:"circle-vt", items:[
+{ten:"Đề mục Không vô biên xứ", pali:"Ākāsānañcāyatana", muc:"vs1", tanh:"Phổ cập các tánh · Tánh giác", nimitta:"kx"},
+{ten:"Đề mục Thức vô biên xứ", pali:"Viññāṇañcāyatana", muc:"vs2", tanh:"Phổ cập các tánh · Tánh giác", nimitta:"tt"},
+{ten:"Đề mục Vô sở hữu xứ", pali:"Ākiñcaññāyatana", muc:"vs3", tanh:"Phổ cập các tánh · Tánh giác", nimitta:"kx"},
+{ten:"Đề mục Phi tưởng phi phi tưởng xứ", pali:"Nevasaññānāsaññāyatana", muc:"vs4", tanh:"Phổ cập các tánh · Tánh giác", nimitta:"tt"}
+]}
+];

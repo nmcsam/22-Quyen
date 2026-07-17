@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v38'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v39'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -9,7 +9,7 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['tamso','Tâm ↔ Tâm sở'],['quyen22','22 Quyền'],['dactinh','Pháp thực tính'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi'],['duyenhe','24 Duyên hệ'],['xugioi','12 Xứ · 18 Giới']];
+  const sections = [['tamso','Tâm ↔ Tâm sở'],['quyen22','22 Quyền'],['dactinh','Pháp thực tính'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi'],['duyenhe','24 Duyên hệ'],['xugioi','12 Xứ · 18 Giới'],['demucthien','Đề mục thiền']];
   document.getElementById('section-switch').innerHTML = sections.map(([k,label])=>
     `<button class="${k===currentSection?'active':''}" onclick="switchSection('${k}')">${label}</button>`
   ).join('');
@@ -82,6 +82,12 @@ function switchSection(s){
     legend.style.display='none';
     document.getElementById('nav').innerHTML = '';
     renderXuGioiPage();
+  } else if(s==='demucthien'){
+    document.getElementById('page-subtitle').textContent = '40 Đề mục thiền chỉ (Kammaṭṭhāna) · chạm để xem mức định, ấn tướng, tánh nết';
+    grid.style.display='none';
+    legend.style.display='none';
+    document.getElementById('nav').innerHTML = '';
+    renderDeMucThienPage();
   }
   document.getElementById('main').scrollTop = 0;
 }
@@ -1305,6 +1311,7 @@ function exportAppData(){
     duyenkhoi_4phan: typeof DK_QUARTER!=='undefined'?DK_QUARTER:undefined,
     duyenhe24: typeof DUYENHE_DATA!=='undefined'?DUYENHE_DATA:undefined,
     duyenhe_tomluoc_48: typeof DUYENHE_TOMLUOC!=='undefined'?DUYENHE_TOMLUOC:undefined,
+    demucthien_40: typeof DEMUC_THIEN!=='undefined'?DEMUC_THIEN:undefined,
     xu12: typeof XU_DATA!=='undefined'?XU_DATA:undefined,
     gioi18: typeof GIOI_DATA!=='undefined'?GIOI_DATA:undefined,
     aniyata: typeof ANIYATA_INFO!=='undefined'?ANIYATA_INFO:undefined,
@@ -1328,6 +1335,86 @@ function exportAppData(){
 }
 
 
+
+
+// ===== 40 Đề mục thiền chỉ (Kammaṭṭhāna) =====
+const DMT_MUC_LABEL = {
+  '0':  'Chỉ đạt <b>Cận định</b> (Upacāra-samādhi) — không lên an chỉ định',
+  '1':  'Cận định → An chỉ định: đắc <b>Sơ thiền</b>',
+  '1-4':'Cận định → An chỉ định: đắc <b>Sơ thiền đến Tứ thiền</b> (4 tầng đầu, hệ 5 bậc)',
+  '5':  'Cận định → An chỉ định: chỉ đắc <b>Ngũ thiền</b>',
+  '1-5':'Cận định → An chỉ định: đắc đủ <b>Sơ, Nhị, Tam, Tứ, Ngũ thiền</b>',
+  'vs1':'Cận định → An chỉ định: đắc thiền Vô sắc thứ nhất — <b>Không vô biên xứ</b>',
+  'vs2':'Cận định → An chỉ định: đắc thiền Vô sắc thứ hai — <b>Thức vô biên xứ</b>',
+  'vs3':'Cận định → An chỉ định: đắc thiền Vô sắc thứ ba — <b>Vô sở hữu xứ</b>',
+  'vs4':'Cận định → An chỉ định: đắc thiền Vô sắc thứ tư — <b>Phi tưởng phi phi tưởng xứ</b>'
+};
+const DMT_NIMITTA_LABEL = {
+  'pt': '<b>CÓ tợ tướng</b> (paṭibhāganimitta — quang tướng). Đề mục có đủ 3 ấn tướng: chuẩn bị tướng (parikammanimitta) → học tướng (uggahanimitta) → tợ tướng (paṭibhāganimitta); hành giả an trú trên tợ tướng để đắc định.',
+  'tt': '<b>KHÔNG có tợ tướng</b> — đề mục lấy <b>pháp có thực tính riêng</b> (sabhāvadhamma) làm cảnh (Thanh Tịnh Đạo, đv. 117).',
+  'kx': '<b>KHÔNG có tợ tướng</b> — cảnh của đề mục không xếp vào loại có quang tướng hay pháp thực tính (Thanh Tịnh Đạo, đv. 117).'
+};
+function renderDeMucThienPage(){
+  const extra = document.getElementById('extra-content');
+  let n = 0;
+  const groupsHtml = DEMUC_THIEN.map((g, gi)=>{
+    const first = n + 1;
+    const circles = g.items.map((it, ii)=>{
+      n++;
+      const label = it.ten.replace(/^Đề mục /,'');
+      return `<div class="circle ${g.cls}" onclick="openDeMucThien(${gi},${ii})"><div class="cn">${n}. ${label}</div><div class="cp">${it.pali}</div></div>`;
+    }).join('');
+    return `<div class="group-head">${first}–${n} · ${g.ten}</div><div class="circle-grid">${circles}</div>`;
+  }).join('');
+
+  const all = [].concat(...DEMUC_THIEN.map(g=>g.items));
+  const names = f => all.filter(f).map(x=>x.ten.replace(/^Đề mục /,'')).join(', ');
+  const cnt = f => all.filter(f).length;
+  const li = (label, f) => `<div style="padding:5px 0;border-top:1px dashed rgba(128,128,128,.3)"><b>${label}: ${cnt(f)} đề mục</b> — ${names(f)}.</div>`;
+
+  extra.innerHTML = `
+    <p class="info-note" style="margin-bottom:12px"><b>40 đề mục thiền chỉ (Samatha-kammaṭṭhāna)</b> phân theo mức thiền chứng đắc và tánh nết phù hợp — theo Abhidhammatthasaṅgaha chương IX: Kammaṭṭhāna (Nghiệp Xứ). Phần ấn tướng (nimitta) theo Thanh Tịnh Đạo Giảng Giải — Giới và Định (Sayadaw U Sīlānanda, Pháp Triều dịch), đoạn văn 117. Chạm vào từng đề mục để xem chi tiết.</p>
+    ${groupsHtml}
+    <div class="group-head" style="margin-top:18px">Tổng kết</div>
+    <div style="background:var(--card);border:1px solid rgba(128,128,128,.25);border-radius:12px;padding:10px 12px;font-size:calc(14.5px * var(--fontscale));line-height:1.55">
+      <div style="font-weight:800;margin-bottom:2px">① Theo mức định chứng đắc</div>
+      ${li('Chỉ đạt Cận định (không lên an chỉ)', x=>x.muc==='0')}
+      ${li('Đắc đến Sơ thiền', x=>x.muc==='1')}
+      ${li('Đắc Sơ thiền đến Tứ thiền', x=>x.muc==='1-4')}
+      ${li('Chỉ đắc Ngũ thiền', x=>x.muc==='5')}
+      ${li('Đắc đủ 5 tầng thiền (Sơ → Ngũ)', x=>x.muc==='1-5')}
+      ${li('Đắc thiền Vô sắc', x=>x.muc.startsWith('vs'))}
+      <div style="font-weight:800;margin:12px 0 2px">② Theo ấn tướng (Nimitta)</div>
+      ${li('CÓ tợ tướng (paṭibhāganimitta)', x=>x.nimitta==='pt')}
+      ${li('KHÔNG có tợ tướng — cảnh là pháp thực tính', x=>x.nimitta==='tt')}
+      ${li('KHÔNG có tợ tướng — cảnh không xếp loại như vậy', x=>x.nimitta==='kx')}
+      <div style="padding:5px 0;border-top:1px dashed rgba(128,128,128,.3)">→ Cộng: <b>22 đề mục có tợ tướng · 18 đề mục không có tợ tướng</b>.</div>
+      <div style="font-weight:800;margin:12px 0 2px">③ Theo tánh nết phù hợp</div>
+      ${li('Phổ cập các tánh', x=>x.tanh.startsWith('Phổ cập'))}
+      ${li('Tánh ái tình (tham)', x=>x.tanh==='Tánh ái tình')}
+      ${li('Tánh sân', x=>x.tanh==='Tánh sân')}
+      ${li('Tánh tầm và si', x=>x.tanh==='Tánh tầm và si')}
+      ${li('Tánh đức tin', x=>x.tanh==='Tánh đức tin')}
+      ${li('Tánh giác', x=>x.tanh==='Tánh giác')}
+      <div style="padding:5px 0;border-top:1px dashed rgba(128,128,128,.3)">Ghi chú: 4 đề mục Vô sắc trong bảng gốc được đánh dấu cả "Phổ cập các tánh" lẫn "Tánh giác" (ở đây xếp vào Phổ cập).</div>
+    </div>
+    <p class="info-note" style="margin-top:10px">Nguồn: bảng "40 đề mục thiền chỉ phân theo thiền và tánh nết" — Abhidhammatthasaṅgaha ch. IX (tr. 545); "Thanh Tịnh Đạo Giảng Giải — Giới và Định" đv. 117 (22 đề mục có quang tướng: 10 hoàn tịnh, 10 bất mỹ, niệm hơi thở, thân hành niệm; 12 đề mục lấy pháp thực tính làm cảnh; 6 đề mục còn lại cảnh không xếp loại như vậy).</p>
+  `;
+}
+function openDeMucThien(gi, ii){
+  const g = DEMUC_THIEN[gi], it = g.items[ii];
+  let stt = 0;
+  for(let i=0;i<gi;i++) stt += DEMUC_THIEN[i].items.length;
+  stt += ii + 1;
+  showAttrSheet(`
+    <div class="sheet-head"><h2>${stt}. ${it.ten}</h2></div>
+    <p class="sheet-pali">${it.pali}</p>
+    <div class="sec"><div class="sec-label">Nhóm đề mục</div><div class="sec-body">${g.ten}</div></div>
+    <div class="sec"><div class="sec-label">Mức định chứng đắc</div><div class="sec-body">${DMT_MUC_LABEL[it.muc]}.</div></div>
+    <div class="sec"><div class="sec-label">Ấn tướng (Nimitta)</div><div class="sec-body">${DMT_NIMITTA_LABEL[it.nimitta]}</div></div>
+    <div class="sec"><div class="sec-label">Tánh nết phù hợp</div><div class="sec-body">${it.tanh}.</div></div>
+  `);
+}
 
 
 // ===== Chỉnh sửa nội dung (bảng chi tiết + trang) =====
