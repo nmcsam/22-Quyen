@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v50'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v51'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -10,10 +10,32 @@ const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng'
 
 function renderSectionSwitch(){
   const sections = [['tamso','Tâm ↔ Tâm sở'],['quyen22','22 Quyền'],['dactinh','Pháp thực tính'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi'],['duyenhe','24 Duyên hệ'],['xugioi','12 Xứ · 18 Giới'],['demucthien','Đề mục thiền']];
-  document.getElementById('section-switch').innerHTML = sections.map(([k,label])=>
-    `<button class="${k===currentSection?'active':''}" onclick="switchSection('${k}')">${label}</button>`
-  ).join('');
+  const cur = sections.find(x=>x[0]===currentSection);
+  document.getElementById('section-switch').innerHTML = `
+    <div class="ddwrap">
+      <button class="ddbtn" onclick="toggleDD('dd-pages',event)">☰ Chức năng <span class="caret">▾</span></button>
+      <div class="ddmenu" id="dd-pages">
+        ${sections.map(([k,label])=>`<button class="dditem ${k===currentSection?'on':''}" onclick="closeAllDD();switchSection('${k}')">${label}</button>`).join('')}
+      </div>
+    </div>
+    <span class="cur-page">${cur?cur[1]:''}</span>`;
 }
+
+// ===== Trình đơn sổ xuống dùng chung =====
+function toggleDD(id, ev){
+  if(ev) ev.stopPropagation();
+  const m = document.getElementById(id);
+  if(!m) return;
+  const wasOpen = m.classList.contains('open');
+  closeAllDD();
+  if(!wasOpen) m.classList.add('open');
+}
+function closeAllDD(){
+  document.querySelectorAll('.ddmenu.open').forEach(function(m){ m.classList.remove('open'); });
+}
+document.addEventListener('click', function(e){
+  if(!e.target.closest || !e.target.closest('.ddwrap')) closeAllDD();
+});
 
 const PAGE_ACTIONS = {
   quyen22: `<button class="qbtn" onclick="openQuyenDanhSac()">Danh · Sắc quyền</button>
