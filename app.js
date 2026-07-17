@@ -36,7 +36,7 @@ function renderQuyenGrid(){
   legend.innerHTML = v.legend.map(([c,,label])=>
     `<div class="legend-item"><span class="dot cat-${c}"></span>${label}</div>`
   ).join('');
-  document.getElementById('extra-content').innerHTML = '';
+  document.getElementById('extra-content').innerHTML = (typeof tkQuyen==='function' ? tkQuyen() : '');
 }
 
 function openQuyenSheet(id){

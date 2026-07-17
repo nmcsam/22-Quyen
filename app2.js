@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v41'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v42'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -236,6 +236,7 @@ function renderTamSoPage(){
     </div>
     <div class="poster-col-title" style="margin-top:14px">PHÁP CHẾ ĐỊNH (13) — 7 Nghĩa (trái) · 6 Danh (phải)</div>
     ${pannattiHtml}
+    ${tkTamSo()}
   `;
 }
 
@@ -437,7 +438,8 @@ function renderDacTinhPage(){
     <p class="info-note" style="margin-bottom:12px"><b>Bốn khía cạnh thực tính (Sabhāvadhamma) của các pháp chân đế (Paramattha)</b> — trình bày đầy đủ theo tài liệu (tr. 531–551): mỗi pháp có <b>Đặc tính (Lakkhaṇā)</b>, <b>Chức năng (Rasā)</b>, <b>Sự thể hiện (Paccupaṭṭhānā)</b> và <b>Nhân gần (Padaṭṭhānā)</b> riêng — tổng cộng <b>135 mục</b>: Tâm, Ngũ Uẩn, Ngũ Song Thức – Ý Giới – Ý Thức Giới – 2 Tâm Tố vô nhân, 52 Tâm sở (Thọ chia 5, 6 cặp thân·tâm), 28 Sắc pháp, 12 chi Duyên khởi cùng Sầu·Bi·Khổ·Ưu·Não, ba loại Khổ, Tứ Đế, Tứ Vô Lượng Tâm, Thập Độ và Níp-bàn. Chạm vào từng pháp để xem 4 khía cạnh kèm Pāli.</p>
     ${groupsHtml}
     ${renderDacTinhGroup('Phụ lục · 14 chức năng của Tâm (Đường Vào Thắng Pháp — TK Chánh Minh)', [CHUCNANG_TAM_14.map((c,i)=>`<div class="circle circle-vt" onclick="openChucNangTam(${i})"><div class="cn">${i+1}. ${c.ten}</div><div class="cp">${c.pali}</div></div>`).join('')])}
-    <p class="info-note">Nguồn: bảng "Bốn khía cạnh thực tính (Sabhāvadhamma) của các pháp chân đế (Paramattha)" theo <i>Milindapañhā, Visuddhimagga</i> và <i>Aṭṭhasālinī</i>; riêng phần giải thích về Thập Độ trích từ <i>Sīlakkhandhaṭīkā</i> và <i>Cariyapiṭaka-Aṭṭhakathā</i> (tài liệu tr. 531–551). Ô Nhân gần của Gió: tài liệu in "Nước, Lửa, Gió", đã sửa thành "Đất, Nước, Lửa" cho đúng ba Đại còn lại. Toàn bộ thuật ngữ Pāli và các ô đặc tính – phận sự – thành tựu – nhân gần đã được đối chiếu và hiệu đính theo <i>Visuddhimagga</i> (XIV, XVI) và <i>Aṭṭhasālinī</i> bản VRI (v41).</p>
+    <p class="info-note">Nguồn: bảng "Bốn khía cạnh thực tính (Sabhāvadhamma) của các pháp chân đế (Paramattha)" theo <i>Milindapañhā, Visuddhimagga</i> và <i>Aṭṭhasālinī</i>; riêng phần giải thích về Thập Độ trích từ <i>Sīlakkhandhaṭīkā</i> và <i>Cariyapiṭaka-Aṭṭhakathā</i> (tài liệu tr. 531–551). Ô Nhân gần của Gió: tài liệu in "Nước, Lửa, Gió", đã sửa thành "Đất, Nước, Lửa" cho đúng ba Đại còn lại. Toàn bộ thuật ngữ Pāli và các ô đặc tính – phận sự – thành tựu – nhân gần đã được đối chiếu và hiệu đính theo <i>Visuddhimagga</i> (XIV, XVI) và <i>Aṭṭhasālinī</i> bản VRI.</p>
+    ${tkDacTinh()}
   `;
 }
 
@@ -535,9 +537,10 @@ function renderCanhPage(){
   const extra = document.getElementById('extra-content');
   const circles = CANH_DATA.map((c,i)=> plainCircleHTML(c.id, `${i+1}. ${c.ten}`, c.pali, 'openCanhSheet', 'circle-canh'));
   extra.innerHTML = `
-    <p class="info-note" style="margin-bottom:12px">21 cách phân loại đối tượng (cảnh) mà Tâm có thể biết. Một số mục (7, 21) là cách gọi gộp chung các cảnh khác, không phải cảnh độc lập riêng biệt. Chạm vào từng cảnh để xem những tâm nào biết được nó, và những tâm nào biết cảnh ấy một cách "cố định" (không biết cảnh nào khác ngoài cảnh này).</p>
+    <p class="info-note" style="margin-bottom:12px">21 cách phân loại đối tượng (cảnh) mà Tâm có thể biết. Một số mục (6, 21) là cách gọi gộp chung các cảnh khác, không phải cảnh độc lập riêng biệt. Chạm vào từng cảnh để xem những tâm nào biết được nó, và những tâm nào biết cảnh ấy một cách "cố định" (không biết cảnh nào khác ngoài cảnh này).</p>
     <div class="circle-grid">${circles.join('')}</div>
-    <p class="info-note" style="margin-top:14px">Nguồn: tổng hợp theo bài giảng Thắng Pháp Abhidhamma — chuaphapluan.com (Bài 69).</p>
+    <p class="info-note" style="margin-top:14px">Nguồn: tổng hợp theo bài giảng Thắng Pháp Abhidhamma — chuaphapluan.com (Bài 69); đối chiếu tài liệu "6 Cảnh · 21 Cảnh · 7 Nhóm Tâm Biết Cảnh".</p>
+    ${tkCanh()}
   `;
 }
 
@@ -704,6 +707,7 @@ function renderDuyenKhoiPage(){
       <button class="qbtn" style="border-color:#6b4fa0;color:#4b3380" onclick="openDKQuarterSheet(4)">P4 · 5 quả vị lai</button>
     </div>
     <p class="info-note" style="margin-top:4px"><b>Màu 4 phần:</b> <span style="color:#b34a32">■</span> Nhân quá khứ (Vô minh, Hành) · <span style="color:#4c7a3a">■</span> Quả hiện tại (Thức → Thọ) · <span style="color:#b07a1f">■</span> Nhân hiện tại (Ái, Thủ, Hữu) · <span style="color:#6b4fa0">■</span> Quả vị lai (Sanh, Già chết).<br>Chi pháp theo Đường Vào Thắng Pháp (TK Chánh Minh); giảng giải theo tài liệu truyền thống Mogok.</p>
+    ${tkDuyenKhoi()}
   `;
 }
 
@@ -1051,6 +1055,119 @@ function renderDuyenHeTomLuoc(){
   `;
 }
 
+// ===== Bảng "Tổng kết" dùng chung cho các trang (kiểu như bản tóm lược 24 duyên) =====
+let tkScale = (function(){ try{ const v=parseFloat(localStorage.getItem('quyen22-tk-scale')); return (v>=0.6&&v<=2.0)?v:1; }catch(e){ return 1; } })();
+function adjustTkScale(d){
+  tkScale = Math.round(Math.min(2.0, Math.max(0.6, tkScale + d))*10)/10;
+  try{ localStorage.setItem('quyen22-tk-scale', String(tkScale)); }catch(e){}
+  const w = document.getElementById('tk-wrap'); if(w) w.style.setProperty('--tkscale', tkScale);
+  const p = document.getElementById('tk-pct'); if(p) p.textContent = Math.round(tkScale*100) + '%';
+}
+function tkRow(stt, ten, pali, badge, desc){
+  return `<div style="padding:7px 10px;border-top:1px solid rgba(128,128,128,.22)">
+    <div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap">
+      <span style="font-weight:800;min-width:26px">${stt}</span>
+      <span style="flex:1;min-width:150px"><b>${ten}</b>${pali?` <span style="font-style:italic;color:#1c5b9e;font-size:.92em">${pali}</span>`:''}</span>
+      ${badge!==''&&badge!=null?`<span style="font-weight:700;background:rgba(192,140,34,.15);border-radius:6px;padding:1px 8px;white-space:nowrap">${badge}</span>`:''}
+    </div>
+    ${desc?`<div style="padding:2px 0 1px 34px;opacity:.92;font-size:.95em">${desc}</div>`:''}
+  </div>`;
+}
+function tkBlock(title, intro, rowsHtml, note){
+  const zbtn = 'height:28px;min-width:32px;padding:0 7px;border-radius:8px;border:1px solid rgba(128,128,128,.35);background:var(--card);color:var(--ink);font-size:13px;font-weight:700;font-family:inherit';
+  return `
+    <div class="group-head" style="margin-top:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="flex:1;min-width:140px">${title}</span>
+      <span style="display:inline-flex;gap:4px;align-items:center;font-weight:600">
+        <button style="${zbtn}" onclick="adjustTkScale(-0.1)" aria-label="Thu nhỏ bảng tổng kết">A−</button>
+        <span id="tk-pct" style="font-size:12px;color:var(--ink-soft);min-width:38px;text-align:center">${Math.round(tkScale*100)}%</span>
+        <button style="${zbtn}" onclick="adjustTkScale(0.1)" aria-label="Phóng to bảng tổng kết">A+</button>
+      </span>
+    </div>
+    <div id="tk-wrap" style="--tkscale:${tkScale}">
+      ${intro?`<p class="info-note" style="margin-bottom:8px;font-size:calc(14px * var(--tkscale));line-height:1.5">${intro}</p>`:''}
+      <div style="background:var(--card);border:1px solid rgba(128,128,128,.25);border-radius:12px;overflow:hidden;font-size:calc(14.5px * var(--tkscale));line-height:1.45">${rowsHtml}</div>
+      ${note?`<p class="info-note" style="margin-top:8px;font-size:calc(13px * var(--tkscale));line-height:1.5">${note}</p>`:''}
+    </div>`;
+}
+
+// ---- Tổng kết 21 Cảnh: số tâm biết mỗi cảnh + 7 nhóm tâm biết cảnh ----
+function tkCanh(){
+  const SO = {canh_sac:[48,2],canh_thinh:[48,2],canh_khi:[48,2],canh_vi:[48,2],canh_xuc:[48,2],canh_ngu:[56,3],canh_phap:[108,67],canh_chonde:[102,71],canh_thithiet:[50,21],canh_ducgioi:[56,25],canh_daodai:[37,6],canh_nietban:[51,40],canh_danhphap:[89,46],canh_sacphap:[56,13],canh_quakhu:[49,6],canh_hientai:[56,13],canh_vilai:[43,0],canh_ngoaithoi:[90,46],canh_noiphan:[62,6],canh_ngoaiphan:[112,58]};
+  const rows = CANH_DATA.map((c,i)=>{
+    const so = SO[c.id];
+    const badge = so ? `${so[0]} · ${so[1]}` : '— gộp —';
+    return tkRow(i+1, c.ten, c.pali, badge, '');
+  }).join('');
+  const NHOM7 = [
+    ['25 tâm chỉ biết cảnh Dục giới','23 tâm quả Dục giới (10 Ngũ song thức + 2 Tiếp thâu + 3 Quan sát + 8 Đại quả) + tâm Khai ngũ môn + tâm Tiếu sinh.'],
+    ['20 tâm biết cảnh Dục giới, Đáo đại, Chế định — không biết cảnh Siêu thế','12 tâm Bất thiện + 4 Đại thiện ly trí + 4 Đại tố ly trí.'],
+    ['5 tâm biết mọi cảnh — trừ Đạo và Quả A-la-hán','4 Đại thiện hợp trí + tâm Diệu trí thiện (thông thiện).'],
+    ['6 tâm biết tất cả 21 cảnh','4 Đại tố hợp trí + tâm Diệu trí tố (thông tố) + tâm Khai ý môn.'],
+    ['6 tâm chỉ biết cảnh Đáo đại','3 tâm Thức vô biên xứ + 3 tâm Phi tưởng phi phi tưởng xứ.'],
+    ['21 tâm chỉ biết cảnh Chế định','15 tâm Sắc giới + 3 tâm Không vô biên xứ + 3 tâm Vô sở hữu xứ.'],
+    ['8 (40) tâm chỉ biết cảnh Níp-bàn','Toàn bộ tâm Siêu thế (4 Đạo + 4 Quả; kể theo 5 tầng thiền thành 40).']
+  ];
+  const rows2 = NHOM7.map((n,i)=>tkRow(i+1, n[0], '', '', n[1])).join('');
+  return tkBlock('Tổng kết', 'Cột số bên phải: <b>số tâm biết được cảnh</b> · <b>số tâm biết cảnh ấy cố định</b> (nhất định — không biết cảnh nào khác). Kể tâm theo 121; hai tâm Diệu trí (Abhiññā) đếm riêng với 15 tâm Sắc giới.', rows,
+    '')
+  + tkBlock('7 nhóm tâm biết cảnh', 'Gom 121 tâm (cùng 2 tâm Diệu trí kể riêng) theo phạm vi cảnh sở tri — theo tài liệu "6 Cảnh · 21 Cảnh · 7 Nhóm Tâm Biết Cảnh" và Abhidhammatthasaṅgaha (Ārammaṇasaṅgaha).', rows2,
+    'Kệ tổng kết trong Saṅgaha: <i>Pañcavīsa parittamhi, cha cittāni mahaggate; ekavīsati vohāre, aṭṭha nibbānagocarā. Vīsānuttaramuttamhi, aggamaggaphalujjhite; pañca sabbattha chacceti, sattadhā tattha saṅgaho.</i>');
+}
+
+// ---- Tổng kết 22 Quyền ----
+function tkQuyen(){
+  if(typeof QUYEN_DATA==='undefined') return '';
+  const rows = QUYEN_DATA.map(d=>tkRow(d.id, d.ten, d.pali.split(' ')[0], d.sacdanh==='sac'?'Sắc':(d.sacdanh==='danh'?'Danh':'Sắc·Danh'), d.chiphap)).join('');
+  return tkBlock('Tổng kết 22 Quyền', 'Mỗi quyền kèm <b>chi pháp</b> và phân loại <b>Sắc quyền – Danh quyền</b>. 22 quyền quy nạp về <b>16 chi pháp chân đế</b>: 5 sắc thần kinh, 2 sắc tính, sắc mạng quyền + tâm sở Mạng quyền, Tâm (121), tâm sở Thọ (5 thọ quyền), Tín, Cần, Niệm, Nhất hành, Trí tuệ (4 quyền tuệ).', rows,
+    'Phân cõi và vai trò Quyền duyên: xem 4 bảng tổng quát ở các nút phía trên. Nguồn: Visuddhimagga XVI (Indriyasaccaniddesa) — đã đối chiếu bản VRI.');
+}
+
+// ---- Tổng kết Tâm – Tâm sở ----
+function tkTamSo(){
+  const rows = [
+    tkRow(1,'Tâm','Citta','121 (89)','12 Bất thiện (8 Tham · 2 Sân · 2 Si) + 18 Vô nhân (7 quả bất thiện · 8 quả thiện · 3 duy tác) + 24 Dục giới tịnh hảo (8 Thiện · 8 Quả · 8 Duy tác) + 15 Sắc giới (5·5·5) + 12 Vô sắc giới (4·4·4) + 8 Siêu thế (4 Đạo · 4 Quả — kể theo 5 tầng thiền thành 40, ra tổng 121).'),
+    tkRow(2,'Tâm sở','Cetasika','52','13 Tợ tha (7 Biến hành + 6 Biệt cảnh) + 14 Bất thiện (4 Si phần · 3 Tham phần · 4 Sân phần · 2 Hôn phần · 1 Hoài nghi) + 25 Tịnh hảo (19 Biến hành tịnh hảo + 3 Giới phần + 2 Vô lượng phần + 1 Tuệ quyền).'),
+    tkRow(3,'Sắc pháp','Rūpa','28','4 Sắc đại hiển (Đất · Nước · Lửa · Gió) + 24 sắc y sinh. Chia cách khác: 12 sắc thô + 16 sắc tế.'),
+    tkRow(4,'Níp-bàn','Nibbāna','1','Pháp vô vi — đối tượng của tâm Siêu thế.'),
+    tkRow(5,'Pháp chế định','Paññatti','13','7 Nghĩa chế định (attha-paññatti) + 6 Danh chế định (nāma-paññatti) — pháp mượn gọi, không phải chân đế.')
+  ].join('');
+  return tkBlock('Tổng kết', '<b>4 pháp chân đế</b> (Paramattha): Tâm · Tâm sở · Sắc pháp · Níp-bàn = 121 + 52 + 28 + 1; Pháp chế định (13) là pháp giả lập để trình bày, không thuộc chân đế.', rows, '');
+}
+
+// ---- Tổng kết Pháp thực tính ----
+function tkDacTinh(){
+  if(typeof DACTINH_TL==='undefined') return '';
+  let tong=0;
+  const rows = DACTINH_TL.map((g,i)=>{ tong+=g.items.length; return tkRow(i+1, g.ten, '', `${g.items.length} mục`, ''); }).join('');
+  return tkBlock('Tổng kết', `<b>${tong} mục</b> pháp thực tính, mỗi mục trình bày đủ 4 khía cạnh: Đặc tính (Lakkhaṇā) · Chức năng (Rasā) · Sự thể hiện (Paccupaṭṭhānā) · Nhân gần (Padaṭṭhānā), kèm Pāli đã hiệu đính theo Visuddhimagga &amp; Aṭṭhasālinī (VRI).`, rows, '');
+}
+
+// ---- Tổng kết Duyên khởi ----
+function tkDuyenKhoi(){
+  const rows = DUYENKHOI_DATA.map((d,i)=>tkRow(i+1, d.ten, d.pali, '', d.chiphap)).join('');
+  const CS = [
+    ['12 Chi phần','aṅga','Vô minh → Già chết.'],
+    ['3 Thời','addhā','Quá khứ: Vô minh, Hành · Hiện tại: Thức → Hữu · Vị lai: Sanh, Già chết.'],
+    ['4 Gom (yếu lược)','saṅgaha','Nhân quá khứ · Quả hiện tại · Nhân hiện tại · Quả vị lai.'],
+    ['20 Hành tướng','ākāra','5 nhân quá khứ (Vô minh, Hành, Ái, Thủ, Nghiệp hữu) + 5 quả hiện tại (Thức, Danh sắc, Lục nhập, Xúc, Thọ) + 5 nhân hiện tại (Ái, Thủ, Nghiệp hữu, Vô minh, Hành) + 5 quả vị lai (Thức, Danh sắc, Lục nhập, Xúc, Thọ).'],
+    ['3 Mối nối','sandhi','Hành – Thức (nhân QK ↔ quả HT) · Thọ – Ái (quả HT ↔ nhân HT) · Hữu – Sanh (nhân HT ↔ quả VL).'],
+    ['3 Luân chuyển','vaṭṭa','Phiền não luân (Vô minh, Ái, Thủ) · Nghiệp luân (Hành, Nghiệp hữu) · Quả luân (Thức, Danh sắc, Lục nhập, Xúc, Thọ, Sanh hữu, Sanh, Già chết).'],
+    ['2 Gốc rễ','mūla','Vô minh (từ quá khứ vươn tới Thọ) · Ái (từ hiện tại vươn tới Già chết).'],
+    ['2 Đế chi phối','sacca','Tập Đế (các chi thuộc nhân) · Khổ Đế (các chi thuộc quả).']
+  ];
+  const rows2 = CS.map((c,i)=>tkRow(i+1, c[0], c[1], '', c[2])).join('');
+  return tkBlock('Tổng kết chi pháp 12 chi', 'Chi pháp chân đế của từng chi phần theo bảng "Chi pháp pháp duyên khởi" (Đường Vào Thắng Pháp — TK Chánh Minh).', rows,'')
+  + tkBlock('Các con số của giáo lý Duyên khởi', 'Theo cách tổng kết truyền thống trong Visuddhimagga XVII (Paññābhūminiddesa).', rows2,'');
+}
+
+// ---- Tổng kết 18 Giới ----
+function tkXuGioi(){
+  const SO = [1,1,2,1,1,2,1,1,2,1,1,2,1,3,2,3,69,76];
+  const rows = GIOI_DATA.map((d,i)=>tkRow(i+1, d.ten, d.pali, `${SO[i]} pháp`, d.chiphap)).join('');
+  return tkBlock('Tổng kết 18 Giới', 'Số pháp chân đế của từng giới. Cộng toàn bộ: <b>12 sắc thô</b> (5 căn + 7 cảnh, trong đó Xúc giới = 3 pháp) + <b>89 tâm</b> (10 Ngũ song thức + 3 Ý giới + 76 Ý thức giới) + <b>69 pháp thuộc Pháp giới</b> (52 tâm sở + 16 sắc tế + Níp-bàn) — trọn vẹn 28 sắc + 89 tâm + 52 tâm sở + Níp-bàn.', rows, '');
+}
+
 function openDuyenHeSheet(i){
   const d = DUYENHE_DATA[i];
   let html = `
@@ -1194,6 +1311,7 @@ function renderXuGioiPage(){
     <p class="info-note" style="margin:4px 0 8px">Cấu trúc: 5 nhóm <b>Căn – Cảnh – Thức</b> (giới 1–15, mỗi căn 3 giới) + <b>Ý giới</b> (16) + <b>Pháp giới</b> (17) + <b>Ý thức giới</b> (18). Màu: <span style="color:#3f7cb8">■</span> căn (tịnh sắc) · <span style="color:#2f8d7c">■</span> cảnh · <span style="color:#8258b8">■</span> thức (tâm).</p>
     <div class="circle-grid">${gioi}</div>
     <p class="info-note" style="margin-top:10px">Nguồn: Abhidhammattha Saṅgaha — chương Āyatana-saṅgaha, Dhātu-saṅgaha (tài liệu "12 Xứ & 18 Giới").</p>
+    ${tkXuGioi()}
   `;
 }
 
