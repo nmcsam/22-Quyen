@@ -416,62 +416,27 @@ const DT_PAIRS = [
 function renderDacTinhPage(){
   const extra = document.getElementById('extra-content');
   let n = 0;
-  const num = ()=>{ n++; return n; };
-  const circ = (id, ten, pali, opener, cls)=> plainCircleHTML(id, `${num()}. ${ten}`, pali, opener, cls);
-
-  // 1. Tâm
-  const tamCircle = circ('vt_vinnana', 'Tâm', 'Citta', 'openDacTinhVaitro', 'circle-vt');
-
-  // 2–18: 17 Tợ tha (Thọ tách thành 5)
-  const toithaHtml = [
-    circ('xuc','Xúc','Phassa','openDacTinhCetasika','circle-tt'),
-    circ('tho_kho','Thọ khổ','Dukkha','openDacTinhTho','circle-tt'),
-    circ('tho_lac','Thọ lạc','Sukha','openDacTinhTho','circle-tt'),
-    circ('tho_hy','Thọ hỷ','Somanassa','openDacTinhTho','circle-tt'),
-    circ('tho_uu','Thọ ưu','Domanassa','openDacTinhTho','circle-tt'),
-    circ('tho_xa','Thọ xả','Upekkhā','openDacTinhTho','circle-tt'),
-    ...['tuong','tu','nhattam','mangquyen','tacy','tam','tu2','thangiai','can','hy','duc'].map(id=>{
-      const c = CETASIKA_DATA.find(x=>x.id===id);
-      return circ(id, c.ten, c.pali, 'openDacTinhCetasika', 'circle-tt');
-    })
-  ].join('');
-
-  // 19–32: 14 Bất thiện
-  const batthienIds = ["si","votam","voquy","phongdat","tham","takien","man","san","tat","lan","hoi","hontram","thuymien","hoainghi"];
-  const batthienHtml = batthienIds.map(id=>{
-    const c = CETASIKA_DATA.find(x=>x.id===id);
-    return circ(id, c.ten, c.pali, 'openDacTinhCetasika', 'circle-bt');
+  const groupsHtml = DACTINH_TL.map((g, gi)=>{
+    const first = n + 1;
+    const circles = g.items.map((it, ii)=>{
+      n++;
+      return `<div class="circle ${g.cls||'circle-plain'}" onclick="openDacTinhTL(${gi},${ii})"><div class="cn">${n}. ${it.ten}</div><div class="cp">${it.pali}</div></div>`;
+    }).join('');
+    const range = first===n ? `${first}.` : `${first}–${n} ·`;
+    return `<div class="group-head">${range} ${g.ten}</div><div class="circle-grid">${circles}</div>`;
   }).join('');
-
-  // 33–51: 19 Tịnh hảo (6 cặp thân–tâm kể chung)
-  const th1 = ["tin","niem","hiri","ottapa","votham","vosan","hanhxa"].map(id=>{
-    const c = CETASIKA_DATA.find(x=>x.id===id);
-    return circ(id, c.ten, c.pali, 'openDacTinhCetasika', 'circle-th');
-  }).join('');
-  const thPairs = DT_PAIRS.map((p,i)=> circ('pair'+i, p.ten, p.pali.split(' · ')[0].replace('Kāya','K./C.'), 'openDacTinhPairByIdx', 'circle-th')).join('');
-  const th2 = ["chanhngu","chanhnghiep","chanhmang","bi","tuyhy","tue"].map(id=>{
-    const c = CETASIKA_DATA.find(x=>x.id===id);
-    return circ(id, c.ten, c.pali, 'openDacTinhCetasika', 'circle-th');
-  }).join('');
-
-  // 52–79: 28 Sắc pháp
-  const rupaHtml = RUPA_DATA.map(r=> circ(r.id, r.ten, r.pali, 'openDacTinhRupa', 'circle-sac')).join('');
-
-  // 80. Níp-bàn
-  const nbCircle = circ('nipban', 'Níp-bàn', 'Nibbāna', 'openDacTinhNipban', 'circle-tho');
 
   extra.innerHTML = `
-    <p class="info-note" style="margin-bottom:12px"><b>Pháp thực tính (Sabhāvadhamma)</b> là pháp có bản thể thật: mỗi pháp có <b>Trạng thái / Đặc tính (Lakkhaṇā)</b> riêng, <b>Phận sự / Chức năng (Rasā)</b> riêng, có <b>Sự hiện bày / Sự thể hiện (Paccupaṭṭhānā)</b> và <b>Nhân cần thiết / Nhân gần (Padaṭṭhānā)</b>.<br>
-    Pháp thực tính có <b>80 pháp</b> = 1 Tâm + 50 tâm sở + 28 sắc pháp + 1 Níp-bàn. (Tâm 121 thứ kể là 1; tâm sở 52 thứ kể 50 pháp vì Thọ tách thành 5 loại còn 6 cặp "thân – tâm" mỗi cặp kể chung 1 pháp.)</p>
-    ${renderDacTinhGroup('1. Tâm (Citta)', [tamCircle])}
-    ${renderDacTinhGroup('2–18 · Tâm sở Tợ tha (17)', [toithaHtml])}
-    ${renderDacTinhGroup('19–32 · Tâm sở Bất thiện (14)', [batthienHtml])}
-    ${renderDacTinhGroup('33–51 · Tâm sở Tịnh hảo (19)', [th1+thPairs+th2])}
-    ${renderDacTinhGroup('52–79 · Sắc pháp (28)', [rupaHtml])}
-    ${renderDacTinhGroup('80. Níp-bàn (Nibbāna)', [nbCircle])}
+    <p class="info-note" style="margin-bottom:12px"><b>Bốn khía cạnh thực tính (Sabhāvadhamma) của các pháp chân đế (Paramattha)</b> — trình bày đầy đủ theo tài liệu (tr. 531–551): mỗi pháp có <b>Đặc tính (Lakkhaṇā)</b>, <b>Chức năng (Rasā)</b>, <b>Sự thể hiện (Paccupaṭṭhānā)</b> và <b>Nhân gần (Padaṭṭhānā)</b> riêng — tổng cộng <b>135 mục</b>: Tâm, Ngũ Uẩn, Ngũ Song Thức – Ý Giới – Ý Thức Giới – 2 Tâm Tố vô nhân, 52 Tâm sở (Thọ chia 5, 6 cặp thân·tâm), 28 Sắc pháp, 12 chi Duyên khởi cùng Sầu·Bi·Khổ·Ưu·Não, ba loại Khổ, Tứ Đế, Tứ Vô Lượng Tâm, Thập Độ và Níp-bàn. Chạm vào từng pháp để xem 4 khía cạnh kèm Pāli.</p>
+    ${groupsHtml}
     ${renderDacTinhGroup('Phụ lục · 14 vai trò của Tâm theo phận sự', [VAITRO_TAM_DATA.filter(v=>v.id!=='vt_vinnana').map(v=> plainCircleHTML(v.id, v.ten, v.pali, 'openDacTinhVaitro', 'circle-vt')).join('')])}
-    <p class="info-note">Nguồn 4 khía cạnh: bảng "Bốn khía cạnh thực tính của các pháp chân đế" theo Milindapañhā, Visuddhimagga và Aṭṭhasālinī (Toát Yếu Vô Tỷ Pháp — Mehm Tin Mon); cách kể 80 pháp theo Vi Diệu Pháp Sơ Cấp (Sư Giác Giới).</p>
+    <p class="info-note">Nguồn: bảng "Bốn khía cạnh thực tính (Sabhāvadhamma) của các pháp chân đế (Paramattha)" theo <i>Milindapañhā, Visuddhimagga</i> và <i>Aṭṭhasālinī</i>; riêng phần giải thích về Thập Độ trích từ <i>Sīlakkhandhaṭīkā</i> và <i>Cariyapiṭaka-Aṭṭhakathā</i> (tài liệu tr. 531–551). Ô Nhân gần của Gió: tài liệu in "Nước, Lửa, Gió", đã sửa thành "Đất, Nước, Lửa" cho đúng ba Đại còn lại.</p>
   `;
+}
+
+function openDacTinhTL(gi, ii){
+  const it = DACTINH_TL[gi].items[ii];
+  showAttrSheet(attrSheetHTML(it.ten, it.pali, it));
 }
 
 function openDacTinhPairByIdx(key){
@@ -1254,6 +1219,7 @@ function exportAppData(){
     citta: typeof CITTA_DATA!=='undefined'?CITTA_DATA:undefined,
     cetasika: typeof CETASIKA_DATA!=='undefined'?CETASIKA_DATA:undefined,
     dactinh_4khiacanh: typeof DACTINH_DATA!=='undefined'?DACTINH_DATA:undefined,
+    dactinh_tailieu_135phap: typeof DACTINH_TL!=='undefined'?DACTINH_TL:undefined,
     sacphap: typeof RUPA_DATA!=='undefined'?RUPA_DATA:undefined,
     tho_chitiet: typeof THO_CHITIET_DATA!=='undefined'?THO_CHITIET_DATA:undefined,
     vaitro_tam: typeof VAITRO_TAM_DATA!=='undefined'?VAITRO_TAM_DATA:undefined,

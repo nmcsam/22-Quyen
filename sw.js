@@ -1,9 +1,10 @@
-const CACHE_NAME = "quyen22-cache-v31";
+const CACHE_NAME = "quyen22-cache-v32";
 const ASSETS = [
   "./",
   "./index.html",
   "./data.js",
   "./citta_cetasika_data.js",
+  "./dactinh_tl_data.js",
   "./app.js",
   "./app2.js",
   "./manifest.json",
