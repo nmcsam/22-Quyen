@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v52'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v53'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -9,7 +9,7 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['tamso','Tâm ↔ Tâm sở'],['quyen22','22 Quyền'],['dactinh','Pháp thực tính'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi'],['duyenhe','24 Duyên hệ'],['xugioi','12 Xứ · 18 Giới'],['demucthien','Đề mục thiền']];
+  const sections = [['tamso','Tâm ↔ Tâm sở'],['quyen22','22 Quyền'],['dactinh','Pháp thực tính'],['canh','21 Cảnh'],['duyenkhoi','Duyên khởi'],['duyenhe','24 Duyên hệ'],['xugioi','12 Xứ · 18 Giới'],['coi31','31 Cõi'],['demucthien','Đề mục thiền']];
   const cur = sections.find(x=>x[0]===currentSection);
   const pct = Math.round(((typeof fontScales!=='undefined' && fontScales[currentSection])||1)*100) + '%';
   document.getElementById('section-switch').innerHTML = `
@@ -121,6 +121,12 @@ function switchSection(s){
     legend.style.display='none';
     document.getElementById('nav').innerHTML = '';
     renderXuGioiPage();
+  } else if(s==='coi31'){
+    document.getElementById('page-subtitle').textContent = '31 Cõi (Bhūmi) · chạm vào một cõi để xem tục sinh và hạng người';
+    grid.style.display='none';
+    legend.style.display='none';
+    document.getElementById('nav').innerHTML = '';
+    renderCoi31Page();
   } else if(s==='demucthien'){
     document.getElementById('page-subtitle').textContent = '40 Đề mục thiền chỉ (Kammaṭṭhāna) · chạm để xem mức định, ấn tướng, tánh nết';
     grid.style.display='none';
@@ -2202,3 +2208,213 @@ function abBkRestore(day){
   }).catch(function(e){ abToast('Lỗi: '+(e&&e.message||e)); });
 }
 setTimeout(abBkCheckAuto, 4500);
+
+// ===== Trang "31 Cõi" (Bhūmi) =====
+// Nguồn: "31 Cõi.pdf" + "Tử Sinh Luân Hồi Trong 31 Cõi" + "Ma trận 12 hạng người & cõi giới" (Google Drive)
+// Đối chiếu Vīthimuttasaṅgaha — Abhidhammatthasaṅgaha chương V.
+const C31_HANG = {
+  kho:  {so:1,  ds:'Người Khổ (duggatyahetukapuggala).'},
+  vui11:{so:11, ds:'Người Lạc vô nhân, người Nhị nhân, người Tam nhân; 4 người Đạo (Sơ đạo, Nhị đạo, Tam đạo, Tứ đạo); 4 người Quả (Sơ quả, Nhị quả, Tam quả, Tứ quả).'},
+  vui10:{so:10, ds:'Người Nhị nhân, người Tam nhân; 4 người Đạo; 4 người Quả. (Không có người Lạc vô nhân — hạng này chỉ có ở cõi Người, Tứ Thiên Vương và Vô tưởng.)'},
+  sac9: {so:9,  ds:'Người Tam nhân; 4 người Đạo; 4 người Quả.'},
+  votuong:{so:1,ds:'Người Lạc vô nhân (sugatyahetukapuggala) — chúng sinh chỉ có Sắc, không có Danh.'},
+  tinhcu:{so:3, ds:'Người Tứ đạo, người Tam quả (Bất lai), người Tứ quả (A-la-hán).'},
+  vosac8:{so:8, ds:'Người Tam nhân; người Nhị đạo, Tam đạo, Tứ đạo; 4 người Quả. (Không có người Sơ đạo — vì Sơ đạo phải nương nghe pháp, không sinh khởi lần đầu ở cõi Vô sắc.)'}
+};
+const C31_NHAN_KHO = 'Ác nghiệp trong 11 tâm bất thiện (trừ tâm Si hợp phóng dật) cho quả tái tục 4 cõi khổ. ';
+const C31_NHAN_VUI = 'Đại thiện nghiệp trong 8 tâm Đại thiện dục giới (bố thí, trì giới, tu tiến…). Thiện nghiệp bậc thấp/ly trí → tục sinh người Lạc vô nhân hoặc Nhị nhân; thiện nghiệp hợp trí (tam tư đầy đủ) → tục sinh người Tam nhân.';
+const C31_TS_VUI9 = '1 trong 9 tâm: Quan sát thọ xả quả thiện (→ người Lạc vô nhân) hoặc 8 tâm Đại quả — 4 ly trí (→ người Nhị nhân), 4 hợp trí (→ người Tam nhân).';
+const C31_TS_VUI8 = '1 trong 8 tâm Đại quả dục giới: 4 ly trí (→ người Nhị nhân), 4 hợp trí (→ người Tam nhân).';
+const C31_GHICHU_APAYA = 'Theo tài liệu "31 Cõi": trừ chúng sinh địa ngục (chỉ sống ở địa ngục), 3 loài đọa xứ còn lại (bàng sanh, ngạ quỷ, a-tu-la) có mặt khắp 3 cõi: Tứ Thiên Vương, Nhân loại và Địa ngục.';
+
+const COI31_DATA = [
+ // ---- 4 CÕI KHỔ ----
+ {ten:'Địa ngục', pali:'Niraya', nhom:'kho',
+  gioi:'Dục giới — Khổ cảnh (Apāyabhūmi), cõi thứ 1 trong 4 cõi khổ.',
+  tucsinh:'Tâm Quan sát thọ xả quả bất thiện (santīraṇa akusalavipāka upekkhāsahagata) — chỉ 1 tâm.',
+  nhan:C31_NHAN_KHO+'Theo TK Hộ Pháp ("Tìm hiểu kiếp kế tiếp"): ác nghiệp trong 2 tâm Sân có khuynh hướng cho quả hóa sinh vào cõi Địa ngục.',
+  hang:'kho', ghichu:C31_GHICHU_APAYA},
+ {ten:'Bàng sanh', pali:'Tiracchānayoni', nhom:'kho',
+  gioi:'Dục giới — Khổ cảnh (Apāyabhūmi), cõi thứ 2 trong 4 cõi khổ.',
+  tucsinh:'Tâm Quan sát thọ xả quả bất thiện — chỉ 1 tâm.',
+  nhan:C31_NHAN_KHO+'Theo TK Hộ Pháp: ác nghiệp trong tâm Si hợp hoài nghi có khuynh hướng cho quả sinh làm loài bàng sanh (súc sinh).',
+  hang:'kho', ghichu:C31_GHICHU_APAYA},
+ {ten:'Ngạ quỷ', pali:'Pettivisaya', nhom:'kho',
+  gioi:'Dục giới — Khổ cảnh (Apāyabhūmi), cõi thứ 3 trong 4 cõi khổ.',
+  tucsinh:'Tâm Quan sát thọ xả quả bất thiện — chỉ 1 tâm.',
+  nhan:C31_NHAN_KHO+'Theo TK Hộ Pháp: ác nghiệp trong 8 tâm Tham có khuynh hướng cho quả hóa sinh vào cõi Ngạ quỷ.',
+  hang:'kho', ghichu:C31_GHICHU_APAYA},
+ {ten:'A-tu-la', pali:'Asurakāya', nhom:'kho',
+  gioi:'Dục giới — Khổ cảnh (Apāyabhūmi), cõi thứ 4 trong 4 cõi khổ.',
+  tucsinh:'Tâm Quan sát thọ xả quả bất thiện — chỉ 1 tâm.',
+  nhan:C31_NHAN_KHO+'Theo TK Hộ Pháp: ác nghiệp trong 8 tâm Tham có khuynh hướng cho quả hóa sinh vào cõi A-tu-la.',
+  hang:'kho', ghichu:C31_GHICHU_APAYA},
+ // ---- 7 CÕI VUI DỤC GIỚI ----
+ {ten:'Nhân loại', pali:'Manussa', nhom:'vui',
+  gioi:'Dục giới — Thiện thú (Kāmasugatibhūmi), cõi thứ 1 trong 7 cõi vui Dục giới.',
+  tucsinh:C31_TS_VUI9, nhan:C31_NHAN_VUI, hang:'vui11',
+  ghichu:'Người Lạc vô nhân ở cõi người là người tục sinh bằng quả thiện vô nhân (đui, điếc, khuyết tật bẩm sinh…).'},
+ {ten:'Tứ Thiên Vương', pali:'Cātummahārājikā', nhom:'vui',
+  gioi:'Dục giới — Thiện thú, cõi trời thứ 1 trong 6 cõi trời Dục giới.',
+  tucsinh:C31_TS_VUI9, nhan:C31_NHAN_VUI, hang:'vui11',
+  ghichu:'Cùng với cõi Người, đây là cõi trời duy nhất có người Lạc vô nhân (chư thiên địa cư bậc thấp).'},
+ {ten:'Đao Lợi', pali:'Tāvatiṃsā', nhom:'vui',
+  gioi:'Dục giới — Thiện thú, cõi trời thứ 2 trong 6 cõi trời Dục giới.',
+  tucsinh:C31_TS_VUI8, nhan:C31_NHAN_VUI, hang:'vui10', ghichu:''},
+ {ten:'Dạ Ma', pali:'Yāmā', nhom:'vui',
+  gioi:'Dục giới — Thiện thú, cõi trời thứ 3 trong 6 cõi trời Dục giới.',
+  tucsinh:C31_TS_VUI8, nhan:C31_NHAN_VUI, hang:'vui10', ghichu:''},
+ {ten:'Đâu Suất', pali:'Tusitā', nhom:'vui',
+  gioi:'Dục giới — Thiện thú, cõi trời thứ 4 trong 6 cõi trời Dục giới.',
+  tucsinh:C31_TS_VUI8, nhan:C31_NHAN_VUI, hang:'vui10', ghichu:''},
+ {ten:'Hóa Lạc thiên', pali:'Nimmānarati', nhom:'vui',
+  gioi:'Dục giới — Thiện thú, cõi trời thứ 5 trong 6 cõi trời Dục giới.',
+  tucsinh:C31_TS_VUI8, nhan:C31_NHAN_VUI, hang:'vui10', ghichu:''},
+ {ten:'Tha Hóa Tự Tại', pali:'Paranimmitavasavattī', nhom:'vui',
+  gioi:'Dục giới — Thiện thú, cõi trời thứ 6 (cao nhất) trong 6 cõi trời Dục giới.',
+  tucsinh:C31_TS_VUI8, nhan:C31_NHAN_VUI, hang:'vui10', ghichu:''},
+ // ---- 16 CÕI SẮC GIỚI ----
+ {ten:'Phạm Chúng thiên', pali:'Brahmapārisajjā', nhom:'sac',
+  gioi:'Sắc giới (Rūpāvacarabhūmi) — tầng Sơ thiền, cõi thứ 1 trong 3 cõi Sơ thiền.',
+  tucsinh:'Tâm Quả Sơ thiền sắc giới — bậc hạ.',
+  nhan:'Đắc Sơ thiền sắc giới bậc hạ (parittā).', hang:'sac9', ghichu:''},
+ {ten:'Phạm Phụ thiên', pali:'Brahmapurohitā', nhom:'sac',
+  gioi:'Sắc giới — tầng Sơ thiền, cõi thứ 2 trong 3 cõi Sơ thiền.',
+  tucsinh:'Tâm Quả Sơ thiền sắc giới — bậc trung.',
+  nhan:'Đắc Sơ thiền sắc giới bậc trung (majjhimā).', hang:'sac9', ghichu:''},
+ {ten:'Đại Phạm thiên', pali:'Mahābrahmā', nhom:'sac',
+  gioi:'Sắc giới — tầng Sơ thiền, cõi thứ 3 trong 3 cõi Sơ thiền.',
+  tucsinh:'Tâm Quả Sơ thiền sắc giới — bậc thượng.',
+  nhan:'Đắc Sơ thiền sắc giới bậc thượng (paṇītā).', hang:'sac9', ghichu:''},
+ {ten:'Thiểu Quang thiên', pali:'Parittābhā', nhom:'sac',
+  gioi:'Sắc giới — tầng Nhị thiền, cõi thứ 1 trong 3 cõi Nhị thiền.',
+  tucsinh:'Tâm Quả Nhị thiền hoặc Quả Tam thiền sắc giới — bậc hạ (hai thiện nghiệp Nhị thiền và Tam thiền hợp chung cho quả về tầng này).',
+  nhan:'Đắc Nhị thiền hoặc Tam thiền sắc giới bậc hạ.', hang:'sac9', ghichu:''},
+ {ten:'Vô Lượng Quang thiên', pali:'Appamāṇābhā', nhom:'sac',
+  gioi:'Sắc giới — tầng Nhị thiền, cõi thứ 2 trong 3 cõi Nhị thiền.',
+  tucsinh:'Tâm Quả Nhị thiền hoặc Quả Tam thiền sắc giới — bậc trung.',
+  nhan:'Đắc Nhị thiền hoặc Tam thiền sắc giới bậc trung.', hang:'sac9', ghichu:''},
+ {ten:'Quang Âm thiên', pali:'Ābhassarā', nhom:'sac',
+  gioi:'Sắc giới — tầng Nhị thiền, cõi thứ 3 trong 3 cõi Nhị thiền.',
+  tucsinh:'Tâm Quả Nhị thiền hoặc Quả Tam thiền sắc giới — bậc thượng.',
+  nhan:'Đắc Nhị thiền hoặc Tam thiền sắc giới bậc thượng.', hang:'sac9', ghichu:''},
+ {ten:'Thiểu Tịnh thiên', pali:'Parittasubhā', nhom:'sac',
+  gioi:'Sắc giới — tầng Tam thiền, cõi thứ 1 trong 3 cõi Tam thiền.',
+  tucsinh:'Tâm Quả Tứ thiền sắc giới — bậc hạ (theo hệ 5 bậc thiền).',
+  nhan:'Đắc Tứ thiền sắc giới bậc hạ.', hang:'sac9', ghichu:''},
+ {ten:'Vô Lượng Tịnh thiên', pali:'Appamāṇasubhā', nhom:'sac',
+  gioi:'Sắc giới — tầng Tam thiền, cõi thứ 2 trong 3 cõi Tam thiền.',
+  tucsinh:'Tâm Quả Tứ thiền sắc giới — bậc trung.',
+  nhan:'Đắc Tứ thiền sắc giới bậc trung.', hang:'sac9', ghichu:''},
+ {ten:'Biến Tịnh thiên', pali:'Subhakiṇhā', nhom:'sac',
+  gioi:'Sắc giới — tầng Tam thiền, cõi thứ 3 trong 3 cõi Tam thiền.',
+  tucsinh:'Tâm Quả Tứ thiền sắc giới — bậc thượng.',
+  nhan:'Đắc Tứ thiền sắc giới bậc thượng.', hang:'sac9', ghichu:''},
+ {ten:'Quảng Quả thiên', pali:'Vehapphalā', nhom:'sac',
+  gioi:'Sắc giới — tầng Tứ thiền, 1 trong 7 cõi thuộc tầng Tứ thiền.',
+  tucsinh:'Tâm Quả Ngũ thiền sắc giới (theo hệ 5 bậc thiền).',
+  nhan:'Đắc Ngũ thiền sắc giới.', hang:'sac9', ghichu:''},
+ {ten:'Vô Tưởng thiên', pali:'Asaññasattā', nhom:'sac',
+  gioi:'Sắc giới — tầng Tứ thiền, 1 trong 7 cõi thuộc tầng Tứ thiền.',
+  tucsinh:'KHÔNG có tâm tục sinh — tục sinh bằng sắc pháp (bọn sắc mạng quyền chín pháp, jīvitanavakakalāpa). Cõi này chỉ có Sắc, không có Danh.',
+  nhan:'Đắc Ngũ thiền sắc giới rồi tu tập ly tham đối với tưởng — nhàm chán danh pháp (saññāvirāgabhāvanā), nguyện đời sống không còn tâm.',
+  hang:'votuong', ghichu:'Hết tuổi thọ, tưởng khởi lên trở lại thì mệnh chung, tái tục xuống cõi Dục giới.'},
+ {ten:'Vô Phiền', pali:'Avihā', nhom:'sac',
+  gioi:'Sắc giới — tầng Tứ thiền, cõi thứ 1 trong 5 cõi Tịnh cư (Suddhāvāsa).',
+  tucsinh:'Tâm Quả Ngũ thiền sắc giới (của bậc Thánh Bất lai).',
+  nhan:'Bậc Thánh Bất lai (Tam quả) đắc Ngũ thiền, có Tín quyền (saddhindriya) trội hơn cả → sinh về cõi Vô Phiền.',
+  hang:'tinhcu', ghichu:'Ngũ Tịnh cư là chỗ sinh riêng của bậc Bất lai; đã sinh vào đây không còn trở lui cõi thấp, tuần tự viên tịch tại đây.'},
+ {ten:'Vô Nhiệt', pali:'Atappā', nhom:'sac',
+  gioi:'Sắc giới — tầng Tứ thiền, cõi thứ 2 trong 5 cõi Tịnh cư.',
+  tucsinh:'Tâm Quả Ngũ thiền sắc giới (của bậc Thánh Bất lai).',
+  nhan:'Bậc Bất lai đắc Ngũ thiền, có Tấn quyền (vīriyindriya) trội hơn cả → sinh về cõi Vô Nhiệt.',
+  hang:'tinhcu', ghichu:''},
+ {ten:'Thiện Hiện', pali:'Sudassā', nhom:'sac',
+  gioi:'Sắc giới — tầng Tứ thiền, cõi thứ 3 trong 5 cõi Tịnh cư.',
+  tucsinh:'Tâm Quả Ngũ thiền sắc giới (của bậc Thánh Bất lai).',
+  nhan:'Bậc Bất lai đắc Ngũ thiền, có Niệm quyền (satindriya) trội hơn cả → sinh về cõi Thiện Hiện.',
+  hang:'tinhcu', ghichu:''},
+ {ten:'Thiện Kiến', pali:'Sudassī', nhom:'sac',
+  gioi:'Sắc giới — tầng Tứ thiền, cõi thứ 4 trong 5 cõi Tịnh cư.',
+  tucsinh:'Tâm Quả Ngũ thiền sắc giới (của bậc Thánh Bất lai).',
+  nhan:'Bậc Bất lai đắc Ngũ thiền, có Định quyền (samādhindriya) trội hơn cả → sinh về cõi Thiện Kiến.',
+  hang:'tinhcu', ghichu:''},
+ {ten:'Sắc Cứu Cánh', pali:'Akaniṭṭhā', nhom:'sac',
+  gioi:'Sắc giới — tầng Tứ thiền, cõi thứ 5 (cao nhất) trong 5 cõi Tịnh cư.',
+  tucsinh:'Tâm Quả Ngũ thiền sắc giới (của bậc Thánh Bất lai).',
+  nhan:'Bậc Bất lai đắc Ngũ thiền, có Tuệ quyền (paññindriya) trội hơn cả → sinh về cõi Sắc Cứu Cánh.',
+  hang:'tinhcu', ghichu:''},
+ // ---- 4 CÕI VÔ SẮC ----
+ {ten:'Không Vô Biên Xứ', pali:'Ākāsānañcāyatana', nhom:'vosac',
+  gioi:'Vô sắc giới (Arūpāvacarabhūmi), cõi thứ 1 trong 4 cõi Vô sắc.',
+  tucsinh:'Tâm Quả Không vô biên xứ (1 trong 4 tâm Quả vô sắc).',
+  nhan:'Đắc Ngũ thiền sắc giới, nhàm chán sắc pháp, tu đề mục vô sắc và đắc thiền Không vô biên xứ.',
+  hang:'vosac8', ghichu:''},
+ {ten:'Thức Vô Biên Xứ', pali:'Viññāṇañcāyatana', nhom:'vosac',
+  gioi:'Vô sắc giới, cõi thứ 2 trong 4 cõi Vô sắc.',
+  tucsinh:'Tâm Quả Thức vô biên xứ.',
+  nhan:'Đắc thiền Thức vô biên xứ (sau khi vượt qua Không vô biên xứ).',
+  hang:'vosac8', ghichu:''},
+ {ten:'Vô Sở Hữu Xứ', pali:'Ākiñcaññāyatana', nhom:'vosac',
+  gioi:'Vô sắc giới, cõi thứ 3 trong 4 cõi Vô sắc.',
+  tucsinh:'Tâm Quả Vô sở hữu xứ.',
+  nhan:'Đắc thiền Vô sở hữu xứ.',
+  hang:'vosac8', ghichu:''},
+ {ten:'Phi Tưởng Phi Phi Tưởng Xứ', pali:'Nevasaññānāsaññāyatana', nhom:'vosac',
+  gioi:'Vô sắc giới, cõi thứ 4 (cao nhất trong 31 cõi) trong 4 cõi Vô sắc.',
+  tucsinh:'Tâm Quả Phi tưởng phi phi tưởng xứ.',
+  nhan:'Đắc thiền Phi tưởng phi phi tưởng xứ.',
+  hang:'vosac8', ghichu:''}
+];
+
+function renderCoi31Page(){
+  const extra = document.getElementById('extra-content');
+  const CLS = {kho:'circle-bt', vui:'circle-tt', sac:'circle-sac', vosac:'circle-vt'};
+  const circle = (d,i)=>`<div class="circle ${CLS[d.nhom]}" onclick="openCoi31Sheet(${i})">
+    <div class="cp" style="font-weight:800">${i+1}</div><div class="cn">${d.ten}</div><div class="cp">${d.pali}</div></div>`;
+  const group = (title, from, to)=>`
+    <div class="group-head">${title}</div>
+    <div class="circle-grid">${COI31_DATA.slice(from,to).map((d,k)=>circle(d,from+k)).join('')}</div>`;
+  extra.innerHTML = `
+    <p class="info-note" style="margin-bottom:12px">31 cõi (bhūmi) chia theo 3 giới: 11 cõi Dục giới (4 khổ cảnh + 7 thiện thú), 16 cõi Sắc giới (theo tầng thiền) và 4 cõi Vô sắc giới. Chạm vào từng cõi để xem: thuộc cõi giới nào · tâm tục sinh · nguyên nhân tái tục · những hạng người có mặt (trong 12 hạng người).</p>
+    ${group('4 Cõi Khổ — Apāyabhūmi (Dục giới)', 0, 4)}
+    ${group('7 Cõi Vui Dục Giới — Kāmasugatibhūmi', 4, 11)}
+    ${group('16 Cõi Sắc Giới — Rūpāvacarabhūmi · Sơ thiền (1–3), Nhị thiền (4–6), Tam thiền (7–9), Tứ thiền (10–16)', 11, 27)}
+    ${group('4 Cõi Vô Sắc Giới — Arūpāvacarabhūmi', 27, 31)}
+    <p class="info-note" style="margin-top:14px">Nguồn: tổng hợp theo tài liệu "31 Cõi", "Tử Sinh Luân Hồi Trong 31 Cõi" và "Ma trận 12 hạng người &amp; cõi giới" (tư liệu cá nhân); đối chiếu Vīthimuttasaṅgaha — Abhidhammatthasaṅgaha chương V.</p>
+    ${tkCoi31()}
+  `;
+}
+
+function openCoi31Sheet(i){
+  const d = COI31_DATA[i];
+  const h = C31_HANG[d.hang];
+  const html = `
+    <div class="sheet-head"><h2>${i+1}. ${d.ten}</h2></div>
+    <p class="sheet-pali">${d.pali}</p>
+    <div class="sec"><div class="sec-label">Thuộc cõi giới nào</div><div class="sec-body">${d.gioi}</div></div>
+    <div class="sec"><div class="sec-label">Tâm tục sinh (Paṭisandhicitta)</div><div class="sec-body">${d.tucsinh}</div></div>
+    <div class="sec"><div class="sec-label">Nguyên nhân tái tục về cõi này</div><div class="sec-body">${d.nhan}</div></div>
+    <div class="sec"><div class="sec-label">Hạng người — có ${h.so}/12 hạng</div><div class="sec-body">${h.ds}</div></div>
+    ${d.ghichu ? `<div class="info-note"><b>Ghi chú:</b> ${d.ghichu}</div>` : ''}
+  `;
+  document.getElementById('sheet-content').innerHTML = html;
+  document.getElementById('sheet').classList.add('show');
+  document.getElementById('sheet-backdrop').classList.add('show');
+}
+
+function tkCoi31(){
+  const rows =
+    tkRow('1','4 cõi Khổ','Apāya — Dục giới','1 tâm','Tục sinh: Quan sát thọ xả quả bất thiện. Nhân: ác nghiệp trong 11 tâm bất thiện. Hạng người: 1 (Người Khổ).')+
+    tkRow('2','Người · Tứ Thiên Vương','Kāmasugati','9 tâm','Tục sinh: Quan sát thọ xả quả thiện + 8 Đại quả. Nhân: 8 đại thiện nghiệp dục giới. Hạng người: 11 (trừ Người Khổ).')+
+    tkRow('3','5 cõi trời Dục còn lại','Đao Lợi → Tha Hóa Tự Tại','8 tâm','Tục sinh: 8 Đại quả. Nhân: 8 đại thiện nghiệp dục giới. Hạng người: 10 (trừ Người Khổ, Lạc vô nhân).')+
+    tkRow('4','3 cõi Sơ thiền','Pathamajjhānabhūmi','1 tâm','Tục sinh: Quả Sơ thiền (bậc hạ/trung/thượng → 3 cõi). Nhân: đắc Sơ thiền. Hạng người: 9 (Tam nhân + 8 Thánh).')+
+    tkRow('5','3 cõi Nhị thiền','Dutiyajjhānabhūmi','2 tâm','Tục sinh: Quả Nhị thiền &amp; Quả Tam thiền (bậc hạ/trung/thượng). Nhân: đắc Nhị hoặc Tam thiền. Hạng người: 9.')+
+    tkRow('6','3 cõi Tam thiền','Tatiyajjhānabhūmi','1 tâm','Tục sinh: Quả Tứ thiền (bậc hạ/trung/thượng). Nhân: đắc Tứ thiền. Hạng người: 9.')+
+    tkRow('7','Quảng Quả','Vehapphalā','1 tâm','Tục sinh: Quả Ngũ thiền. Nhân: đắc Ngũ thiền. Hạng người: 9.')+
+    tkRow('8','Vô Tưởng','Asaññasattā','0 tâm','Tục sinh bằng SẮC (bọn sắc mạng quyền), không có tâm. Nhân: Ngũ thiền + ly tham tưởng. Hạng người: 1 (Lạc vô nhân).')+
+    tkRow('9','5 cõi Tịnh Cư','Suddhāvāsa','1 tâm','Tục sinh: Quả Ngũ thiền của bậc Bất lai; chia 5 cõi theo quyền trội (Tín·Tấn·Niệm·Định·Tuệ). Hạng người: 3 (Tứ đạo, Tam quả, Tứ quả).')+
+    tkRow('10','4 cõi Vô sắc','Arūpāvacarabhūmi','4 tâm','Tục sinh: 4 tâm Quả vô sắc tương ứng từng cõi. Nhân: đắc thiền Vô sắc tương ứng. Hạng người: 8 (Tam nhân + 7 Thánh, trừ Sơ đạo).');
+  return tkBlock('Tổng kết — 31 Cõi', 'Tổng cộng 19 tâm tục sinh (2 Quan sát + 8 Đại quả + 5 Quả sắc giới + 4 Quả vô sắc) dẫn về 30 cõi hữu tâm, cùng 1 lối tục sinh bằng sắc về cõi Vô tưởng.', rows,
+    'Bậc quả thiền chia hạ/trung/thượng quyết định sinh về cõi thấp/giữa/cao của mỗi tầng thiền (theo "Tử Sinh Luân Hồi Trong 31 Cõi").');
+}
