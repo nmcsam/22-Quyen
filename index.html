@@ -165,6 +165,14 @@
   body.lang-pali .card .p{font-size:12px;font-weight:700;color:var(--ink)}
   #sheet{--fontscale:var(--sheetscale,1)}
   #sheet-fontctrl{position:absolute;top:10px;right:56px;display:flex;gap:4px;z-index:3}
+  #sheet-editctrl{position:absolute;top:10px;left:12px;display:flex;gap:4px;z-index:3}
+  #sheet-editctrl button,#page-editctrl button{height:30px;min-width:34px;padding:0 8px;border-radius:8px;border:1px solid rgba(128,128,128,.35);background:var(--card);color:var(--ink);font-size:13px;font-weight:700;font-family:inherit}
+  #page-editctrl{display:inline-flex;gap:4px;margin-right:6px}
+  .save-btn{background:#2e7d32 !important;color:#fff !important;border-color:#2e7d32 !important}
+  .cancel-btn{background:#b3392b !important;color:#fff !important;border-color:#b3392b !important}
+  .editing-content{outline:2px dashed #c08c22;outline-offset:4px;border-radius:10px;caret-color:#c08c22}
+  .edited-dot{position:relative}
+  .edited-dot::after{content:"";position:absolute;top:2px;right:2px;width:7px;height:7px;border-radius:50%;background:#c08c22}
   #sheet-fontctrl button{width:34px;height:30px;border-radius:8px;border:1px solid rgba(128,128,128,.35);background:var(--card);color:var(--ink);font-size:13px;font-weight:700;font-family:inherit}
   .setopt{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
   .setopt .qbtn.on{background:#b06a28;color:#fff;border-color:#b06a28}
@@ -224,6 +232,12 @@
     <div id="toolbar">
       <div id="page-actions"></div>
       <div id="fontctrl">
+        <span id="page-editctrl">
+          <button id="page-edit-btn" onclick="startEdit('page')" aria-label="Sửa nội dung trang" title="Sửa nội dung trang">✎</button>
+          <button id="page-restore-btn" onclick="restoreEdit('page')" style="display:none" title="Khôi phục nội dung gốc">↺</button>
+          <button id="page-save-btn" class="save-btn" onclick="saveEdit()" style="display:none">✔ Lưu</button>
+          <button id="page-cancel-btn" class="cancel-btn" onclick="cancelEdit()" style="display:none">✕ Hủy</button>
+        </span>
         <button onclick="adjustFontScale(-0.1)" aria-label="Chữ nhỏ hơn">A−</button>
         <span class="pct" id="fontscale-pct">100%</span>
         <button onclick="adjustFontScale(0.1)" aria-label="Chữ lớn hơn">A+</button>
@@ -241,6 +255,12 @@
 
 <div id="sheet-backdrop" onclick="closeSheet()"></div>
 <div id="sheet" role="dialog" aria-modal="true">
+  <div id="sheet-editctrl">
+    <button id="sheet-edit-btn" onclick="startEdit('sheet')" aria-label="Sửa nội dung" title="Sửa nội dung bảng này">✎</button>
+    <button id="sheet-restore-btn" onclick="restoreEdit('sheet')" style="display:none" title="Khôi phục nội dung gốc">↺</button>
+    <button id="sheet-save-btn" class="save-btn" onclick="saveEdit()" style="display:none">✔ Lưu</button>
+    <button id="sheet-cancel-btn" class="cancel-btn" onclick="cancelEdit()" style="display:none">✕ Hủy</button>
+  </div>
   <div id="sheet-fontctrl">
     <button onclick="adjustSheetScale(-0.1)" aria-label="Chữ nhỏ hơn">A−</button>
     <button onclick="adjustSheetScale(0.1)" aria-label="Chữ lớn hơn">A+</button>

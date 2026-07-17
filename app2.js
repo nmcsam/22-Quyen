@@ -1219,7 +1219,13 @@ function openSettingsSheet(){
         <button class="qbtn" onclick="document.getElementById('import-file').click()">⬆ Nhập dữ liệu (JSON)</button>
         <input type="file" id="import-file" accept=".json,application/json" style="display:none" onchange="importAppData(this)">
       </div>
-      <div class="sec-body" style="margin-top:8px;font-size:calc(14px * var(--fontscale));color:var(--ink-soft)"><b>Xuất:</b> tải về tệp JSON gồm toàn bộ dữ liệu các trang + cài đặt của bạn (ngôn ngữ, cỡ chữ từng trang, cỡ chữ bảng chi tiết).<br><b>Nhập:</b> chọn tệp JSON đã xuất trước đó để khôi phục các cài đặt.</div>
+      <div class="sec-body" style="margin-top:8px;font-size:calc(14px * var(--fontscale));color:var(--ink-soft)"><b>Xuất:</b> tải về tệp JSON gồm toàn bộ dữ liệu các trang + cài đặt và các nội dung bạn đã sửa.<br><b>Nhập:</b> chọn tệp JSON đã xuất trước đó để khôi phục cài đặt và các nội dung đã sửa.</div>
+    </div>
+    <div class="sec" style="margin-top:14px"><div class="sec-label">Chỉnh sửa nội dung</div>
+      <div class="sec-body" style="font-size:calc(14px * var(--fontscale))">Nhấn nút <b>✎</b> (góc trên trái bảng chi tiết, hoặc trên thanh công cụ để sửa cả trang) → sửa chữ trực tiếp → <b>✔ Lưu</b>. Nút <b>↺</b> khôi phục nội dung gốc. Đang có <b>${Object.keys(contentEdits).length}</b> mục đã sửa.</div>
+      <div class="setopt" style="margin-top:8px">
+        <button class="qbtn" onclick="clearAllEdits()">🗑 Xóa tất cả chỉnh sửa (${Object.keys(contentEdits).length})</button>
+      </div>
     </div>
   `;
   document.getElementById('sheet').classList.add('show');
@@ -1254,7 +1260,8 @@ function exportAppData(){
       co_chu_tung_trang: (typeof fontScales!=='undefined')?fontScales:{},
       co_chu_bang_chi_tiet: (typeof sheetScale!=='undefined')?sheetScale:1,
       trang_hien_tai: currentSection
-    }
+    },
+    noi_dung_da_sua: contentEdits
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json;charset=utf-8'});
   const url = URL.createObjectURL(blob);
@@ -1266,6 +1273,163 @@ function exportAppData(){
   setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 500);
 }
 
+
+
+
+// ===== Chỉnh sửa nội dung (bảng chi tiết + trang) =====
+let contentEdits = (function(){ try{ return JSON.parse(localStorage.getItem('quyen22-edits')||'{}'); }catch(e){ return {}; } })();
+function saveEditsStore(){ try{ localStorage.setItem('quyen22-edits', JSON.stringify(contentEdits)); }catch(e){ alert('Không lưu được chỉnh sửa (bộ nhớ trình duyệt có thể đã đầy).'); } }
+let editingTarget = null;      // 'sheet' | 'page' | null
+let editBackupHTML = '';
+let sheetOriginalHTML = '';    // HTML gốc của bảng chi tiết đang mở (trước khi áp bản sửa)
+let pageOriginalHTML = '';     // HTML gốc của trang hiện tại (trước khi áp bản sửa)
+let applyingOverride = false;
+
+function editTargetEl(t){ return t==='sheet' ? document.getElementById('sheet-content') : document.getElementById('extra-content'); }
+function sheetEditKey(){
+  const sc = document.getElementById('sheet-content');
+  const h2 = sc.querySelector('h2');
+  const t = h2 ? h2.textContent.trim() : sc.textContent.trim().slice(0,60);
+  return 'sheet:' + currentSection + ':' + t;
+}
+function pageEditKey(){ return 'page:' + currentSection; }
+function currentEditKey(t){ return t==='sheet' ? sheetEditKey() : pageEditKey(); }
+
+function updateEditCtrls(){
+  const cfg = [
+    ['sheet', document.getElementById('sheet-content')],
+    ['page', document.getElementById('extra-content')]
+  ];
+  cfg.forEach(([t, el])=>{
+    const ed = document.getElementById(t+'-edit-btn');
+    const rs = document.getElementById(t+'-restore-btn');
+    const sv = document.getElementById(t+'-save-btn');
+    const cc = document.getElementById(t+'-cancel-btn');
+    if(!ed) return;
+    const editing = editingTarget===t;
+    ed.style.display = editing ? 'none' : '';
+    sv.style.display = editing ? '' : 'none';
+    cc.style.display = editing ? '' : 'none';
+    const hasOverride = !editing && el && el.innerHTML.trim() && contentEdits[currentEditKey(t)]!==undefined;
+    rs.style.display = hasOverride ? '' : 'none';
+    ed.classList.toggle('edited-dot', !!hasOverride);
+  });
+}
+
+function startEdit(t){
+  if(editingTarget) return;
+  const el = editTargetEl(t);
+  if(!el || !el.innerHTML.trim()){ alert('Trang này không có nội dung văn bản để sửa trực tiếp.'); return; }
+  editingTarget = t;
+  editBackupHTML = el.innerHTML;
+  el.setAttribute('contenteditable','true');
+  el.classList.add('editing-content');
+  el.focus();
+  updateEditCtrls();
+}
+function finishEditUI(el){
+  el.removeAttribute('contenteditable');
+  el.classList.remove('editing-content');
+  editingTarget = null;
+  updateEditCtrls();
+}
+function saveEdit(){
+  if(!editingTarget) return;
+  const t = editingTarget, el = editTargetEl(t);
+  const k = currentEditKey(t);
+  if(el.innerHTML === (t==='sheet' ? sheetOriginalHTML : pageOriginalHTML) && contentEdits[k]===undefined){
+    finishEditUI(el); return; // không đổi gì
+  }
+  contentEdits[k] = el.innerHTML;
+  saveEditsStore();
+  finishEditUI(el);
+}
+function cancelEdit(){
+  if(!editingTarget) return;
+  const el = editTargetEl(editingTarget);
+  el.innerHTML = editBackupHTML;
+  finishEditUI(el);
+}
+function restoreEdit(t){
+  const k = currentEditKey(t);
+  if(contentEdits[k]===undefined) return;
+  if(!confirm('Khôi phục nội dung gốc của ' + (t==='sheet'?'bảng này':'trang này') + '? Bản sửa sẽ bị xóa.')) return;
+  delete contentEdits[k];
+  saveEditsStore();
+  const el = editTargetEl(t);
+  const orig = t==='sheet' ? sheetOriginalHTML : pageOriginalHTML;
+  if(orig){ applyingOverride = true; el.innerHTML = orig; applyingOverride = false; }
+  updateEditCtrls();
+}
+
+// Áp bản sửa cho bảng chi tiết mỗi khi nội dung mới được đổ vào
+(function(){
+  const sc = document.getElementById('sheet-content');
+  new MutationObserver(()=>{
+    if(applyingOverride || editingTarget==='sheet') return;
+    const k = sheetEditKey();
+    if(contentEdits[k]!==undefined && sc.innerHTML===contentEdits[k]){ updateEditCtrls(); return; }
+    sheetOriginalHTML = sc.innerHTML;
+    if(contentEdits[k]!==undefined){
+      applyingOverride = true;
+      sc.innerHTML = contentEdits[k];
+      applyingOverride = false;
+    }
+    updateEditCtrls();
+  }).observe(sc, {childList:true});
+})();
+
+// Áp bản sửa cho trang (gọi sau mỗi lần render trang)
+function applyPageOverride(){
+  const el = document.getElementById('extra-content');
+  if(!el) return;
+  if(editingTarget==='page') return;
+  pageOriginalHTML = el.innerHTML;
+  const k = pageEditKey();
+  if(el.innerHTML.trim() && contentEdits[k]!==undefined && el.innerHTML!==contentEdits[k]){
+    applyingOverride = true;
+    el.innerHTML = contentEdits[k];
+    applyingOverride = false;
+  }
+  updateEditCtrls();
+}
+
+// Khi đang sửa: chặn các thao tác chạm (mở bảng, nút bấm) bên trong vùng sửa
+document.addEventListener('click', function(e){
+  if(!editingTarget) return;
+  const container = editTargetEl(editingTarget);
+  if(container && container.contains(e.target) && e.target.closest('[onclick]')){
+    e.preventDefault(); e.stopPropagation();
+  }
+}, true);
+
+// Đóng bảng khi đang sửa → hỏi trước
+const _origCloseSheet = closeSheet;
+closeSheet = function(){
+  if(editingTarget==='sheet'){
+    if(!confirm('Đang sửa nội dung — đóng và bỏ thay đổi chưa lưu?')) return;
+    cancelEdit();
+  }
+  _origCloseSheet();
+};
+
+function clearAllEdits(){
+  const n = Object.keys(contentEdits).length;
+  if(!n){ alert('Chưa có mục nào được sửa.'); return; }
+  if(!confirm('Xóa tất cả ' + n + ' mục đã sửa và trở về nội dung gốc?')) return;
+  contentEdits = {};
+  saveEditsStore();
+  switchSection(currentSection);
+  alert('Đã xóa toàn bộ chỉnh sửa.');
+}
+
+
+// Bọc switchSection để áp bản sửa trang sau mỗi lần render
+const _origSwitchSection = switchSection;
+switchSection = function(s){
+  _origSwitchSection(s);
+  if(typeof applyPageOverride==='function') applyPageOverride();
+};
 
 // ===== Khởi tạo app (đặt cuối file để mọi const dữ liệu đã sẵn sàng) =====
 renderSectionSwitch();
@@ -1331,6 +1495,12 @@ function importAppData(input){
       }
       if(cd.trang_hien_tai){
         try{ localStorage.setItem('quyen22-section', cd.trang_hien_tai); }catch(e){}
+      }
+      if(data.noi_dung_da_sua && typeof data.noi_dung_da_sua==='object'){
+        Object.assign(contentEdits, data.noi_dung_da_sua);
+        saveEditsStore();
+        applyPageOverride();
+        applied.push('các nội dung đã sửa (' + Object.keys(data.noi_dung_da_sua).length + ' mục)');
       }
       alert(applied.length ? ('Đã nhập và khôi phục: ' + applied.join(', ') + '.')
         : 'Tệp hợp lệ nhưng không có phần cài đặt để khôi phục (dữ liệu giáo pháp của app là bản dựng sẵn, không bị ghi đè).');
