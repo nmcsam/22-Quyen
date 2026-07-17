@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v45'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v46'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -1381,19 +1381,19 @@ function openSettingsSheet(){
   document.getElementById('sheet-content').innerHTML = `
     <div class="sheet-head"><h2>Cài đặt</h2></div>
     <p class="sheet-pali">Thắng Pháp — Abhidhamma · phiên bản ${APP_VERSION}</p>
-    <div class="sec"><div class="sec-label">Ngôn ngữ hiển thị (tên trên các ô)</div>
-      <div class="setopt">
-        ${btn('vi','Tiếng Việt')}
-        ${btn('both','Việt – Pāli')}
-        ${btn('pali','Pāli')}
-      </div>
-      <div class="sec-body" style="margin-top:8px;font-size:calc(14px * var(--fontscale));color:var(--ink-soft)">Áp dụng cho các ô tròn/thẻ trên các trang. Trong bảng chi tiết luôn hiển thị đầy đủ cả Việt lẫn Pāli.</div>
-    </div>
-    <div class="sec" style="margin-top:14px"><div class="sec-label">Đồng bộ nhiều thiết bị</div>
+    <div class="sec"><div class="sec-label">Đồng bộ nhiều thiết bị</div>
       <div class="setopt">
         <button class="qbtn" onclick="openSyncSheet()">☁️ ${abSyncCode ? 'Đang đồng bộ — mã: '+abSyncCode : 'Bật đồng bộ đám mây'}</button>
       </div>
       <div class="sec-body" style="margin-top:8px;font-size:calc(14px * var(--fontscale));color:var(--ink-soft)">Đồng bộ các mục đã chỉnh sửa và cài đặt hiển thị giữa điện thoại – máy tính, kèm bản lưu dự phòng trên đám mây.</div>
+    </div>
+    <div class="sec" style="margin-top:14px"><div class="sec-label">Dữ liệu</div>
+      <div class="setopt">
+        <button class="qbtn" onclick="exportAppData()">⬇ Xuất dữ liệu (JSON)</button>
+        <button class="qbtn" onclick="document.getElementById('import-file').click()">⬆ Nhập dữ liệu (JSON)</button>
+        <input type="file" id="import-file" accept=".json,application/json" style="display:none" onchange="importAppData(this)">
+      </div>
+      <div class="sec-body" style="margin-top:8px;font-size:calc(14px * var(--fontscale));color:var(--ink-soft)"><b>Xuất:</b> tải về tệp JSON gồm toàn bộ dữ liệu các trang + cài đặt và các nội dung bạn đã sửa.<br><b>Nhập:</b> chọn tệp JSON đã xuất trước đó để khôi phục cài đặt và các nội dung đã sửa.</div>
     </div>
     <div class="sec" style="margin-top:14px"><div class="sec-label">Sao lưu định kỳ lên đám mây</div>
       <div class="setopt">
@@ -1410,13 +1410,13 @@ function openSettingsSheet(){
       <div id="ab-bk-list" style="margin-top:8px;font-size:calc(13.5px * var(--fontscale))"></div>
       <div class="sec-body" style="margin-top:8px;font-size:calc(13px * var(--fontscale));color:var(--ink-soft)">Tự động lưu một bản chụp (các mục đã sửa + cài đặt) lên đám mây theo chu kỳ, giữ 4 bản gần nhất. Cần đang bật Đồng bộ.</div>
     </div>
-    <div class="sec" style="margin-top:14px"><div class="sec-label">Dữ liệu</div>
+    <div class="sec" style="margin-top:14px"><div class="sec-label">Ngôn ngữ hiển thị (tên trên các ô)</div>
       <div class="setopt">
-        <button class="qbtn" onclick="exportAppData()">⬇ Xuất dữ liệu (JSON)</button>
-        <button class="qbtn" onclick="document.getElementById('import-file').click()">⬆ Nhập dữ liệu (JSON)</button>
-        <input type="file" id="import-file" accept=".json,application/json" style="display:none" onchange="importAppData(this)">
+        ${btn('vi','Tiếng Việt')}
+        ${btn('both','Việt – Pāli')}
+        ${btn('pali','Pāli')}
       </div>
-      <div class="sec-body" style="margin-top:8px;font-size:calc(14px * var(--fontscale));color:var(--ink-soft)"><b>Xuất:</b> tải về tệp JSON gồm toàn bộ dữ liệu các trang + cài đặt và các nội dung bạn đã sửa.<br><b>Nhập:</b> chọn tệp JSON đã xuất trước đó để khôi phục cài đặt và các nội dung đã sửa.</div>
+      <div class="sec-body" style="margin-top:8px;font-size:calc(14px * var(--fontscale));color:var(--ink-soft)">Áp dụng cho các ô tròn/thẻ trên các trang. Trong bảng chi tiết luôn hiển thị đầy đủ cả Việt lẫn Pāli.</div>
     </div>
     <div class="sec" style="margin-top:14px"><div class="sec-label">Chỉnh sửa nội dung</div>
       <div class="sec-body" style="font-size:calc(14px * var(--fontscale))">Nhấn nút <b>✎</b> (góc trên trái bảng chi tiết, hoặc trên thanh công cụ để sửa cả trang) → sửa chữ trực tiếp → <b>✔ Lưu</b>. Nút <b>↺</b> khôi phục nội dung gốc. Đang có <b>${Object.keys(contentEdits).length}</b> mục đã sửa.</div>
@@ -1924,6 +1924,7 @@ function queueCloudSave(){
   abTimer = setTimeout(abPush, 900);
 }
 function abAttach(ref){
+  abUpdateSyncBtn();
   abUnsub = ref.onSnapshot(function(doc){
     if(!doc.exists || abConflict) return;
     if(abEcho){ abEcho=false; return; }
@@ -1934,6 +1935,7 @@ function abAttach(ref){
     const l=abSummary(JSON.parse(abPackState())), r=abSummary(remoteST);
     if(r.count===0 && l.count>0){
       abConflict={remoteST:remoteST, ref:ref};
+      abUpdateSyncBtn();
       abToast('⚠️ Đám mây báo không có mục chỉnh sửa nào — đã CHẶN để bảo vệ dữ liệu máy này. Mở phần Đồng bộ để xử lý.');
       return;
     }
@@ -1970,6 +1972,7 @@ function abConnect(code, silent){
       if(!silent){ abToast('✓ Đã kết nối'); openSyncSheet(); }
     }else{
       abConflict={remoteST:remoteST, ref:ref};
+      abUpdateSyncBtn();
       openSyncSheet();
     }
   }).catch(function(err){
@@ -1999,10 +2002,17 @@ function abKeepRemote(){
 }
 function abDisconnect(){
   if(abUnsub){ abUnsub(); abUnsub=null; }
+  setTimeout(abUpdateSyncBtn,0);
   abSyncCode=''; abConflict=null;
   try{ localStorage.removeItem('quyen22-sync-code'); }catch(e){}
   abToast('Đã ngắt đồng bộ — dữ liệu trên đám mây vẫn còn');
   openSyncSheet();
+}
+function abUpdateSyncBtn(){
+  const b=document.getElementById('ab-sync-btn'); if(!b)return;
+  if(abConflict){ b.style.background='#c0503e'; b.style.color='#fff'; b.title='Có khác biệt dữ liệu — chạm để xử lý'; }
+  else if(abSyncCode&&abDb){ b.style.background='#4c7a3a'; b.style.color='#fff'; b.title='Đang đồng bộ — mã: '+abSyncCode; }
+  else { b.style.background=''; b.style.color=''; b.title='Đồng bộ đám mây (chưa bật)'; }
 }
 function abGenCode(){
   const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c='';
@@ -2060,6 +2070,7 @@ function abInitSync(){ if(abSyncCode && abInitFirebase()) abConnect(abSyncCode, 
 })();
 abRequestPersist();
 setTimeout(abInitSync, 400);
+setTimeout(abUpdateSyncBtn, 600);
 
 // ===== SAO LƯU ĐỊNH KỲ LÊN ĐÁM MÂY =====
 function abBkFreq(){ try{ return localStorage.getItem('quyen22-bk-freq')||'off'; }catch(e){ return 'off'; } }
