@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v37'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v38'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -995,6 +995,16 @@ function renderDuyenHePage(){
   `;
 }
 
+let tomluocScale = (function(){ try{ const v=parseFloat(localStorage.getItem('quyen22-tomluoc-scale')); return (v>=0.6&&v<=2.0)?v:1; }catch(e){ return 1; } })();
+function adjustTomLuocScale(d){
+  tomluocScale = Math.round(Math.min(2.0, Math.max(0.6, tomluocScale + d))*10)/10;
+  try{ localStorage.setItem('quyen22-tomluoc-scale', String(tomluocScale)); }catch(e){}
+  const w = document.getElementById('tomluoc-wrap');
+  if(w) w.style.setProperty('--tlscale', tomluocScale);
+  const p = document.getElementById('tomluoc-pct');
+  if(p) p.textContent = Math.round(tomluocScale*100) + '%';
+}
+
 function renderDuyenHeTomLuoc(){
   const rows = DUYENHE_TOMLUOC.map((d,i)=>{
     const pali = (DUYENHE_DATA[i] && DUYENHE_DATA[i].pali) ? DUYENHE_DATA[i].pali : '';
@@ -1017,11 +1027,21 @@ function renderDuyenHeTomLuoc(){
   }).join('');
   const tongPhu = DUYENHE_TOMLUOC.reduce((s,d)=>s+d.phu.length,0);
   const soPhanRong = DUYENHE_TOMLUOC.filter(d=>d.phu.length).length;
+  const zbtn = 'height:28px;min-width:32px;padding:0 7px;border-radius:8px;border:1px solid rgba(128,128,128,.35);background:var(--card);color:var(--ink);font-size:13px;font-weight:700;font-family:inherit';
   return `
-    <div class="group-head" style="margin-top:18px">Bản tóm lược 24 duyên chính trong Đại Phát Thú</div>
-    <p class="info-note" style="margin-bottom:8px"><b>24 duyên chính</b>, trong đó <b>${soPhanRong} duyên phân rộng</b> thành <b>${tongPhu} duyên phụ</b> (ghi thụt vào ↳ dưới duyên chính sinh ra nó). Số bên phải là <b>số kể 01–48</b> theo bảng: duyên không phân rộng mang một số; duyên phân rộng thì các duyên phụ mang số. Riêng <b>Đẳng Vô Gián Duyên</b> nghĩa lý đồng với Vô Gián Duyên nên kể chung số <b>06*</b>.</p>
-    <div style="background:var(--card);border:1px solid rgba(128,128,128,.25);border-radius:12px;overflow:hidden;font-size:calc(14.5px * var(--fontscale));line-height:1.45">${rows}</div>
-    <p class="info-note" style="margin-top:8px">Tên gọi theo "Bản tóm lược 24 duyên chính trong Đại Phát Thú"; tên khác trên các ô tròn phía trên được ghi kèm sau dấu "=".</p>
+    <div class="group-head" style="margin-top:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="flex:1;min-width:200px">Bản tóm lược 24 duyên chính trong Đại Phát Thú</span>
+      <span style="display:inline-flex;gap:4px;align-items:center;font-weight:600">
+        <button style="${zbtn}" onclick="adjustTomLuocScale(-0.1)" aria-label="Thu nhỏ bản tóm lược">A−</button>
+        <span id="tomluoc-pct" style="font-size:12px;color:var(--ink-soft);min-width:38px;text-align:center">${Math.round(tomluocScale*100)}%</span>
+        <button style="${zbtn}" onclick="adjustTomLuocScale(0.1)" aria-label="Phóng to bản tóm lược">A+</button>
+      </span>
+    </div>
+    <div id="tomluoc-wrap" style="--tlscale:${tomluocScale}">
+      <p class="info-note" style="margin-bottom:8px;font-size:calc(14px * var(--tlscale));line-height:1.5"><b>24 duyên chính</b>, trong đó <b>${soPhanRong} duyên phân rộng</b> thành <b>${tongPhu} duyên phụ</b> (ghi thụt vào ↳ dưới duyên chính sinh ra nó). Số bên phải là <b>số kể 01–48</b> theo bảng: duyên không phân rộng mang một số; duyên phân rộng thì các duyên phụ mang số. Riêng <b>Đẳng Vô Gián Duyên</b> nghĩa lý đồng với Vô Gián Duyên nên kể chung số <b>06*</b>.</p>
+      <div style="background:var(--card);border:1px solid rgba(128,128,128,.25);border-radius:12px;overflow:hidden;font-size:calc(14.5px * var(--tlscale));line-height:1.45">${rows}</div>
+      <p class="info-note" style="margin-top:8px;font-size:calc(13px * var(--tlscale));line-height:1.5">Tên gọi theo "Bản tóm lược 24 duyên chính trong Đại Phát Thú"; tên khác trên các ô tròn phía trên được ghi kèm sau dấu "=".</p>
+    </div>
   `;
 }
 
@@ -1292,6 +1312,7 @@ function exportAppData(){
       ngon_ngu: getLangMode(),
       co_chu_tung_trang: (typeof fontScales!=='undefined')?fontScales:{},
       co_chu_bang_chi_tiet: (typeof sheetScale!=='undefined')?sheetScale:1,
+      co_chu_tom_luoc_duyen: (typeof tomluocScale!=='undefined')?tomluocScale:1,
       trang_hien_tai: currentSection
     },
     noi_dung_da_sua: contentEdits
@@ -1525,6 +1546,11 @@ function importAppData(input){
       }
       if(cd.co_chu_bang_chi_tiet && typeof sheetScale!=='undefined'){
         sheetScale = cd.co_chu_bang_chi_tiet; applySheetScale(); applied.push('cỡ chữ bảng chi tiết');
+      }
+      if(cd.co_chu_tom_luoc_duyen && typeof tomluocScale!=='undefined'){
+        tomluocScale = cd.co_chu_tom_luoc_duyen;
+        try{ localStorage.setItem('quyen22-tomluoc-scale', String(tomluocScale)); }catch(e){}
+        applied.push('cỡ chữ bản tóm lược duyên');
       }
       if(cd.trang_hien_tai){
         try{ localStorage.setItem('quyen22-section', cd.trang_hien_tai); }catch(e){}
