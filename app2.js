@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v54'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v55'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -1471,9 +1471,6 @@ function openSettingsSheet(){
     </div>
     <div class="sec" style="margin-top:14px"><div class="sec-label">Chỉnh sửa nội dung</div>
       <div class="sec-body" style="font-size:calc(14px * var(--fontscale))">Nhấn nút <b>✎</b> (góc trên trái bảng chi tiết, hoặc trên thanh công cụ để sửa cả trang) → sửa chữ trực tiếp → <b>✔ Lưu</b>. Nút <b>↺</b> khôi phục nội dung gốc. Đang có <b>${Object.keys(contentEdits).length}</b> mục đã sửa.</div>
-      <div class="setopt" style="margin-top:8px">
-        <button class="qbtn" onclick="clearAllEdits()">🗑 Xóa tất cả chỉnh sửa (${Object.keys(contentEdits).length})</button>
-      </div>
     </div>
   `;
   document.getElementById('sheet').classList.add('show');
