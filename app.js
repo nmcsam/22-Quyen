@@ -173,9 +173,22 @@ function applyFontScale(){
   document.documentElement.style.setProperty('--fontscale', sc.toFixed(2));
   const p = document.getElementById('fontscale-pct');
   if(p) p.textContent = Math.round(sc*100) + '%';
+  const z = document.getElementById('zf-pct');
+  if(z) z.textContent = Math.round(sc*100) + '%';
   localStorage.setItem('quyen22-fontscales', JSON.stringify(fontScales));
 }
 
+function openZoomFloat(delta){
+  try{ closeSheet(); }catch(e){}
+  const f=document.getElementById('zoom-float');
+  if(f) f.style.display='flex';
+  adjustFontScale(delta||0);
+}
+function zfAdjust(delta){ adjustFontScale(delta); }
+function closeZoomFloat(){
+  const f=document.getElementById('zoom-float');
+  if(f) f.style.display='none';
+}
 function adjustFontScale(delta){
   const sc = fontScales[currentSection] || 1;
   fontScales[currentSection] = Math.min(1.6, Math.max(0.5, sc + delta));
