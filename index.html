@@ -92,7 +92,7 @@
   #section-switch .ddmenu .dditem:active, #fontctrl .ddmenu .dditem:active{background:rgba(201,118,46,.18)}
   #fontctrl .ddrow{display:flex;align-items:center;gap:6px;padding:8px 10px;font-size:13px;font-weight:600;color:var(--ink-soft);white-space:nowrap}
   #fontctrl .ddrow span.lbl{flex:1}
-  #section-switch .ddbtn{background:linear-gradient(180deg,#d98f42 0%,#c9762e 45%,#ad5f1c 100%);color:#fff;border:1px solid #96521a;font-size:12.5px;padding:7px 14px;box-shadow:0 3px 7px rgba(122,66,14,.38),0 1px 0 rgba(255,255,255,.35) inset,0 -2px 5px rgba(0,0,0,.22) inset;text-shadow:0 1px 1px rgba(0,0,0,.28);transition:transform .08s,box-shadow .08s}
+  #section-switch .ddbtn{background:linear-gradient(180deg,rgba(255,255,255,.65) 0%,rgba(255,255,255,.22) 18%,rgba(255,255,255,0) 45%),linear-gradient(180deg,#e09a4a 0%,#c9762e 50%,#9c5314 100%);color:#fff;border:1px solid #8a4a12;font-size:12.5px;padding:8px 15px;box-shadow:0 5px 10px rgba(110,58,10,.45),0 2px 0 rgba(255,255,255,.5) inset,0 -4px 7px rgba(70,35,5,.4) inset;text-shadow:0 1px 2px rgba(0,0,0,.4);transition:transform .08s,box-shadow .08s}
 .ddbtn:active{transform:translateY(1.5px);box-shadow:0 1px 3px rgba(122,66,14,.35),0 1px 0 rgba(255,255,255,.25) inset,0 2px 5px rgba(0,0,0,.22) inset}
   #section-switch .cur-page{align-self:center;font-size:12px;color:var(--ink-soft);font-weight:600}
 
@@ -104,8 +104,10 @@
   .group-head:first-child{margin-top:2px}
 
   .circle-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;margin-bottom:4px}
-  .circle{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;cursor:pointer;border-width:1.5px;border-style:solid;padding:4px;user-select:none;transition:transform .1s,box-shadow .1s;box-shadow:0 5px 12px rgba(60,40,10,.20),0 2px 0 rgba(255,255,255,.55) inset,0 -5px 10px rgba(60,40,10,.13) inset}
-  .circle:active{transform:scale(.94);box-shadow:0 2px 4px rgba(60,40,10,.18),0 3px 8px rgba(60,40,10,.16) inset}
+  .circle{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;cursor:pointer;border-width:1.5px;border-style:solid;padding:4px;user-select:none;transition:transform .1s,box-shadow .1s;position:relative;overflow:hidden;box-shadow:0 9px 16px rgba(55,35,8,.35),0 3px 0 rgba(255,255,255,.65) inset,0 -9px 14px rgba(55,35,8,.28) inset}
+.circle::before{content:'';position:absolute;top:5%;left:14%;width:58%;height:36%;border-radius:50%;background:radial-gradient(ellipse at 50% 40%,rgba(255,255,255,.9) 0%,rgba(255,255,255,.35) 55%,rgba(255,255,255,0) 75%);pointer-events:none;z-index:0}
+.circle>*{position:relative;z-index:1}
+  .circle:active{transform:scale(.93);box-shadow:0 2px 5px rgba(55,35,8,.3),0 5px 10px rgba(55,35,8,.25) inset}
   .circle .cn{font-size:calc(12px * var(--fontscale));font-weight:700;line-height:1.2;overflow:hidden}
   .circle .cp{font-size:calc(9.5px * var(--fontscale));font-style:italic;opacity:.8;margin-top:1px;overflow:hidden}
 
@@ -168,7 +170,7 @@
   }
   /* Nút tổng quát (trang 22 Quyền) */
   .qbtn-row{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px;justify-content:center}
-  .qbtn{padding:6px 11px;border-radius:16px;border:1.5px solid #a86524;background:linear-gradient(180deg,#fffdf7 0%,#f8efdd 55%,#eddcbd 100%);color:#4a3608;font-weight:700;font-family:inherit;font-size:12.5px;box-shadow:0 3px 6px rgba(122,66,14,.24),0 1px 0 rgba(255,255,255,.85) inset,0 -2px 4px rgba(176,106,40,.18) inset;transition:transform .08s,box-shadow .08s}
+  .qbtn{padding:7px 12px;border-radius:16px;border:1.5px solid #a86524;background:linear-gradient(180deg,rgba(255,255,255,.95) 0%,rgba(255,255,255,.3) 25%,rgba(255,255,255,0) 55%),linear-gradient(180deg,#fffdf6 0%,#f3e6cb 55%,#e0c99d 100%);color:#4a3608;font-weight:700;font-family:inherit;font-size:12.5px;box-shadow:0 5px 9px rgba(115,62,12,.32),0 2px 0 rgba(255,255,255,.95) inset,0 -4px 6px rgba(165,100,36,.3) inset;transition:transform .08s,box-shadow .08s}
   .qbtn:active{background:linear-gradient(180deg,#f3cba4,#e8b985);transform:translateY(1.5px);box-shadow:0 1px 2px rgba(122,66,14,.22),0 2px 4px rgba(140,85,30,.25) inset}
   /* Chế độ ngôn ngữ: lang-vi = chỉ Việt, lang-pali = chỉ Pāli (mặc định: cả hai) */
   body.lang-vi .circle .cn ~ .cp{display:none}
@@ -236,7 +238,7 @@
   #fontctrl .pct{font-size:11.5px;color:var(--ink-soft);min-width:38px;text-align:center}
   #fontctrl{flex-wrap:wrap;justify-content:flex-end;row-gap:5px;max-width:100%}
   #page-edit-btn{display:none !important}
-  #section-switch .ddbtn2{background:linear-gradient(180deg,#ffffff 0%,#faf4e8 55%,#eee2cc 100%);color:var(--ink);border:1px solid #c3ab84;font-size:12.5px;padding:7px 14px;border-radius:16px;font-weight:700;box-shadow:0 3px 7px rgba(110,85,40,.25),0 1px 0 rgba(255,255,255,.9) inset,0 -2px 4px rgba(150,120,70,.16) inset;transition:transform .08s,box-shadow .08s}
+  #section-switch .ddbtn2{background:linear-gradient(180deg,rgba(255,255,255,.95) 0%,rgba(255,255,255,.35) 22%,rgba(255,255,255,0) 50%),linear-gradient(180deg,#fffef9 0%,#f2e7d0 55%,#dcc9a3 100%);color:var(--ink);border:1px solid #b39a6d;font-size:12.5px;padding:8px 15px;border-radius:16px;font-weight:700;box-shadow:0 5px 10px rgba(105,80,38,.35),0 2px 0 rgba(255,255,255,1) inset,0 -4px 7px rgba(140,110,60,.28) inset;transition:transform .08s,box-shadow .08s}
 .ddbtn2:active{transform:translateY(1.5px);box-shadow:0 1px 3px rgba(110,85,40,.22),0 2px 4px rgba(150,120,70,.18) inset}
   #section-switch .ddrow{display:flex;align-items:center;gap:6px;padding:8px 10px;font-size:13px;font-weight:600;color:var(--ink-soft);white-space:nowrap}
   #section-switch .ddrow .lbl{flex:1}
