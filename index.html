@@ -105,7 +105,7 @@
   .group-head:first-child{margin-top:2px}
 
   .circle-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(calc(72px * var(--fontscale, 1)),1fr));gap:calc(8px * var(--fontscale, 1));margin-bottom:4px}
-  .circle{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;cursor:pointer;padding:9%;user-select:none;transition:transform .12s ease,box-shadow .12s ease,filter .12s;position:relative;overflow:hidden;contain:size;perspective:230px;
+  .circle{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;cursor:pointer;padding:9%;user-select:none;transition:transform .12s ease,box-shadow .12s ease,filter .12s;position:relative;overflow:hidden;contain:size;
   --c:#d8c6a0;color:#2c2620;border:none;
   background:radial-gradient(circle at 32% 26%,var(--cl) 0%,var(--c) 46%,var(--cd) 78%,var(--cdd) 100%);
   --cl:#f6efdc;--cd:#b3a279;--cdd:#8f7f5c;
@@ -115,10 +115,8 @@
 .circle>*{position:relative;z-index:1}
   .circle:active,.circle.pressed{transform:translateY(3px) scale(.93);filter:brightness(.95) saturate(1.08);box-shadow:0 5px 10px -4px rgba(40,26,6,.45),0 1px 3px rgba(40,26,6,.16)}
 .circle.pressed{box-shadow:0 5px 10px -4px rgba(40,26,6,.45),0 1px 3px rgba(40,26,6,.16),0 0 0 2.5px rgba(255,255,255,.55) inset}
-  .circle .cn{font-size:min(calc(12px * var(--fontscale)), 15px);font-weight:800;line-height:1.2;overflow:hidden;max-width:92%;overflow-wrap:break-word;transform:translateZ(10px);text-shadow:0 -1.5px 1px rgba(0,0,0,.55),0 1.5px 1px rgba(255,255,255,.6),0 0 3px rgba(0,0,0,.18);opacity:.92}
-.circle>.cp:first-child{transform:rotateX(38deg);transform-origin:50% 130%}
-.circle>.cp:last-child{transform:rotateX(-36deg);transform-origin:50% -30%}
-  .circle .cp{font-size:min(calc(9.5px * var(--fontscale)), 12px);font-style:italic;opacity:.85;margin-top:1px;overflow:hidden;max-width:92%;overflow-wrap:break-word;font-weight:600;text-shadow:0 -1px 1px rgba(0,0,0,.5),0 1px 1px rgba(255,255,255,.5)}
+  .circle .cn{font-size:min(calc(12px * var(--fontscale)), 15px);font-weight:800;line-height:1.2;overflow:hidden;max-width:94%;overflow-wrap:break-word;text-shadow:0 1px 0 rgba(255,255,255,.55);text-rendering:geometricPrecision}
+  .circle .cp{font-size:min(calc(9.5px * var(--fontscale)), 12px);font-style:italic;margin-top:1px;overflow:hidden;max-width:94%;overflow-wrap:break-word;font-weight:700;text-shadow:0 1px 0 rgba(255,255,255,.45);text-rendering:geometricPrecision}
 
   .combo-list{display:flex;flex-direction:column;gap:8px;margin-top:6px}
   .combo-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:10px;background:rgba(128,128,128,.07)}
