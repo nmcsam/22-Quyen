@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v66'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v68'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -41,6 +41,22 @@ function closeAllDD(){
 document.addEventListener('click', function(e){
   if(!e.target.closest || !e.target.closest('.ddwrap')) closeAllDD();
 });
+
+// ===== Ô vuông: ấn lần 1 lún xuống, ấn lần 2 mới mở nội dung =====
+document.addEventListener('click', function(e){
+  const c = e.target.closest && e.target.closest('.circle');
+  if(!c) return;
+  if(!c.classList.contains('pressed')){
+    e.stopPropagation();
+    e.preventDefault();
+    document.querySelectorAll('.circle.pressed').forEach(function(x){ x.classList.remove('pressed'); });
+    c.classList.add('pressed');
+    try{ closeAllDD(); }catch(err){}
+  }else{
+    c.classList.remove('pressed');
+    // không chặn — sự kiện đi tiếp tới onclick của ô để mở nội dung
+  }
+}, true);
 
 const PAGE_ACTIONS = {
   quyen22: `<button class="qbtn" onclick="openQuyenDanhSac()">Danh · Sắc quyền</button>
