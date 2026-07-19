@@ -1,4 +1,4 @@
-const CACHE_NAME = "quyen22-cache-v60";
+const CACHE_NAME = "quyen22-cache-v62";
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,8 +8,9 @@ const ASSETS = [
   "./app.js",
   "./app2.js",
   "./manifest.json",
-  "./icon-192.png",
-  "./icon-512.png"
+  "./icon-buddha-192.png",
+  "./icon-buddha-512.png",
+  "./home-buddha2.jpg"
 ];
 
 self.addEventListener("install", (event) => {

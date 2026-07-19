@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v60'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v62'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -2447,7 +2447,10 @@ function renderHomePage(){
   const extra = document.getElementById('extra-content');
   extra.innerHTML = `
     <div style="min-height:56vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px 16px">
-      <img src="icon-192.png" alt="Abhidhamma" style="width:132px;height:132px;border-radius:30px;box-shadow:0 10px 34px rgba(0,0,0,.22)">
+      <div style="position:relative;width:210px;height:210px;border-radius:50%;overflow:hidden;border:2.5px solid rgba(176,106,40,.6);box-shadow:0 18px 34px rgba(60,40,10,.4),0 4px 12px rgba(255,255,255,.5) inset">
+        <img src="home-buddha2.jpg" alt="Abhidhamma" style="width:100%;height:100%;object-fit:cover;display:block">
+        <div style="position:absolute;inset:0;border-radius:50%;pointer-events:none;background:radial-gradient(ellipse 62% 40% at 38% 16%,rgba(255,255,255,.85) 0%,rgba(255,255,255,.35) 42%,rgba(255,255,255,0) 68%),radial-gradient(circle 9% at 25% 13%,rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%),radial-gradient(ellipse 68% 24% at 50% 100%,rgba(255,255,255,.5) 0%,rgba(255,255,255,.16) 45%,rgba(255,255,255,0) 68%),radial-gradient(circle at 50% 34%,rgba(0,0,0,0) 52%,rgba(50,32,8,.22) 82%,rgba(30,18,4,.5) 100%)"></div>
+      </div>
       <div>
         <div style="font-size:calc(34px * var(--fontscale));font-weight:800;letter-spacing:.5px">Abhidhamma</div>
         <div style="font-size:calc(15px * var(--fontscale));color:var(--ink-soft);margin-top:6px">Thắng Pháp — Vi Diệu Pháp</div>
