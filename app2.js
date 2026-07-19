@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v68'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v69'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -1473,13 +1473,13 @@ function openSettingsSheet(){
       </div>
       <div class="sec-body" style="margin-top:8px;font-size:calc(14px * var(--fontscale));color:var(--ink-soft)">Áp dụng cho các ô tròn/thẻ trên các trang. Trong bảng chi tiết luôn hiển thị đầy đủ cả Việt lẫn Pāli.</div>
     </div>
-    <div class="sec" style="margin-top:14px"><div class="sec-label">Cỡ chữ của trang</div>
+    <div class="sec" style="margin-top:14px"><div class="sec-label">Phóng to / thu nhỏ trang (các ô &amp; chữ)</div>
       <div class="setopt" style="display:flex;align-items:center;gap:10px">
         <button class="qbtn" onclick="adjustFontScale(-0.1);const p=document.getElementById('fontscale-pct');if(p)p.textContent=Math.round((fontScales[currentSection]||1)*100)+'%'">A−</button>
         <span id="fontscale-pct" style="font-weight:700;min-width:48px;text-align:center">${Math.round(((typeof fontScales!=='undefined' && fontScales[currentSection])||1)*100)}%</span>
         <button class="qbtn" onclick="adjustFontScale(0.1);const p=document.getElementById('fontscale-pct');if(p)p.textContent=Math.round((fontScales[currentSection]||1)*100)+'%'">A+</button>
       </div>
-      <div class="sec-body" style="font-size:calc(13px * var(--fontscale));color:var(--ink-soft)">Phóng to/thu nhỏ chữ của trang đang xem (mỗi trang nhớ cỡ riêng).</div>
+      <div class="sec-body" style="font-size:calc(13px * var(--fontscale));color:var(--ink-soft)">Các ô vuông và chữ của trang đang xem sẽ to/nhỏ theo (mỗi trang nhớ mức riêng). Nút A−/A+ ở góc trên các bảng cũng điều khiển mức zoom này.</div>
     </div>
     <div class="sec" style="margin-top:14px"><div class="sec-label">Chỉnh sửa nội dung</div>
       <div class="setopt"><button class="qbtn" onclick="closeSheet();startEdit('page')">✎ Sửa nội dung trang hiện tại</button></div>

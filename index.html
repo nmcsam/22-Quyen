@@ -104,7 +104,7 @@
   .group-head{font-size:calc(18px * var(--fontscale));font-weight:800;color:var(--ink);margin:14px 2px 6px;letter-spacing:.02em}
   .group-head:first-child{margin-top:2px}
 
-  .circle-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;margin-bottom:4px}
+  .circle-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(calc(72px * var(--fontscale, 1)),1fr));gap:calc(8px * var(--fontscale, 1));margin-bottom:4px}
   .circle{aspect-ratio:1;border-radius:12%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;cursor:pointer;padding:4px;user-select:none;transition:transform .07s,box-shadow .07s;position:relative;
   --face:#e6d7b4;--face2:#f0e4c8;--bt:#f6efdc;--bl:#ecdfc0;--br:#b9ac90;--bb:#867c68;--glow:#f6efdc;--edge:#68604e;color:#2c2620;
   border:8px solid transparent;
@@ -296,8 +296,8 @@
     <button id="sheet-cancel-btn" class="cancel-btn" onclick="cancelEdit()" style="display:none">✕ Hủy</button>
   </div>
   <div id="sheet-fontctrl">
-    <button onclick="adjustSheetScale(-0.1)" aria-label="Chữ nhỏ hơn">A−</button>
-    <button onclick="adjustSheetScale(0.1)" aria-label="Chữ lớn hơn">A+</button>
+    <button onclick="adjustFontScale(-0.1)" aria-label="Thu nhỏ các ô và chữ của trang">A−</button>
+    <button onclick="adjustFontScale(0.1)" aria-label="Phóng to các ô và chữ của trang">A+</button>
   </div>
   <button class="close-x" onclick="closeSheet()" aria-label="Đóng">✕</button>
   <div class="sheet-handle"></div>
