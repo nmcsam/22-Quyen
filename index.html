@@ -295,8 +295,8 @@
     <button id="sheet-cancel-btn" class="cancel-btn" onclick="cancelEdit()" style="display:none">✕ Hủy</button>
   </div>
   <div id="sheet-fontctrl">
-    <button onclick="openZoomFloat(-0.1)" aria-label="Thu nhỏ các ô và chữ của trang">A−</button>
-    <button onclick="openZoomFloat(0.1)" aria-label="Phóng to các ô và chữ của trang">A+</button>
+    <button onclick="openZoomFloat(-0.05)" aria-label="Thu nhỏ các ô và chữ của trang">A−</button>
+    <button onclick="openZoomFloat(0.05)" aria-label="Phóng to các ô và chữ của trang">A+</button>
   </div>
   <button class="close-x" onclick="closeSheet()" aria-label="Đóng">✕</button>
   <div class="sheet-handle"></div>
@@ -312,9 +312,9 @@
 <script src="app2.js"></script>
 <div id="zoom-float" style="display:none;position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:400;background:linear-gradient(180deg,rgba(255,255,255,.95) 0%,rgba(255,255,255,.4) 30%,rgba(255,255,255,0) 60%),linear-gradient(180deg,#fffdf6 0%,#f0e5cb 100%);border:1.5px solid #a86524;border-radius:18px;box-shadow:0 10px 24px rgba(60,40,10,.4),0 1px 0 rgba(255,255,255,.9) inset;padding:10px 14px;align-items:center;gap:12px">
   <span style="font-size:12.5px;font-weight:700;color:#4a3608">Cỡ các ô</span>
-  <button class="qbtn" onclick="zfAdjust(-0.1)" style="font-size:15px;padding:8px 14px">A−</button>
+  <button class="qbtn" onclick="zfAdjust(-0.05)" style="font-size:15px;padding:8px 14px">A−</button>
   <span id="zf-pct" style="font-weight:800;min-width:52px;text-align:center;font-size:15px;color:#4a3608">100%</span>
-  <button class="qbtn" onclick="zfAdjust(0.1)" style="font-size:15px;padding:8px 14px">A+</button>
+  <button class="qbtn" onclick="zfAdjust(0.05)" style="font-size:15px;padding:8px 14px">A+</button>
   <button class="qbtn" onclick="closeZoomFloat()" style="font-size:13px;padding:8px 12px">✕ Xong</button>
 </div>
 </body>
