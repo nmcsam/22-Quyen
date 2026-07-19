@@ -183,8 +183,14 @@ function openZoomFloat(delta){
   const f=document.getElementById('zoom-float');
   if(f) f.style.display='flex';
   adjustFontScale(delta||0);
+  applySheetScale();
 }
-function zfAdjust(delta){ adjustFontScale(delta); }
+function zfAdjust(delta){ try{ closeSheet(); }catch(e){} adjustFontScale(delta); }
+function zfSheetAdjust(delta){
+  const sh=document.getElementById('sheet'); if(sh) sh.classList.add('show');
+  const bd=document.getElementById('sheet-backdrop'); if(bd) bd.classList.add('show');
+  adjustSheetScale(delta);
+}
 function closeZoomFloat(){
   const f=document.getElementById('zoom-float');
   if(f) f.style.display='none';
@@ -204,6 +210,8 @@ try{ sheetScale = parseFloat(localStorage.getItem('quyen22-sheetscale')) || 1; }
 function applySheetScale(){
   document.documentElement.style.setProperty('--sheetscale', sheetScale.toFixed(2));
   try{ localStorage.setItem('quyen22-sheetscale', sheetScale.toFixed(2)); }catch(e){}
+  const z = document.getElementById('zf-sheet-pct');
+  if(z) z.textContent = Math.round(sheetScale*100) + '%';
 }
 function adjustSheetScale(delta){
   sheetScale = Math.min(1.7, Math.max(0.9, sheetScale + delta));
