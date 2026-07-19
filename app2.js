@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v64'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v65'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -22,19 +22,7 @@ function renderSectionSwitch(){
       </div>
       <span class="cur-page">${cur?cur[1]:''}</span>
     </div>
-    <div class="ddwrap">
-      <button class="ddbtn2" onclick="toggleDD('dd-settings',event)" aria-label="Cài đặt">⚙ Cài đặt<span id="ab-sync-dot"></span> <span class="caret">▾</span></button>
-      <div class="ddmenu right" id="dd-settings">
-        <div class="ddrow"><span class="lbl">Cỡ chữ (zoom)</span>
-          <button onclick="adjustFontScale(-0.1);event.stopPropagation()" aria-label="Chữ nhỏ hơn">A−</button>
-          <span class="pct" id="fontscale-pct">${pct}</span>
-          <button onclick="adjustFontScale(0.1);event.stopPropagation()" aria-label="Chữ lớn hơn">A+</button>
-        </div>
-        <button class="dditem" onclick="closeAllDD();startEdit('page')">✎ Sửa nội dung trang</button>
-        <button class="dditem" id="ab-sync-item" onclick="closeAllDD();openSyncSheet()">☁️ Đồng bộ đám mây</button>
-        <button class="dditem" onclick="closeAllDD();openSettingsSheet()">⚙ Cài đặt</button>
-      </div>
-    </div>`;
+    <button class="ddbtn2" onclick="openSettingsSheet()" aria-label="Cài đặt">⚙ Cài đặt<span id="ab-sync-dot"></span></button>`;
   try{ abUpdateSyncBtn(); }catch(e){} // module đồng bộ nằm cuối file — lần vẽ đầu tiên lúc khởi động sẽ bỏ qua, abInitSync sẽ cập nhật lại sau
 }
 
@@ -1469,8 +1457,17 @@ function openSettingsSheet(){
       </div>
       <div class="sec-body" style="margin-top:8px;font-size:calc(14px * var(--fontscale));color:var(--ink-soft)">Áp dụng cho các ô tròn/thẻ trên các trang. Trong bảng chi tiết luôn hiển thị đầy đủ cả Việt lẫn Pāli.</div>
     </div>
+    <div class="sec" style="margin-top:14px"><div class="sec-label">Cỡ chữ của trang</div>
+      <div class="setopt" style="display:flex;align-items:center;gap:10px">
+        <button class="qbtn" onclick="adjustFontScale(-0.1);const p=document.getElementById('fontscale-pct');if(p)p.textContent=Math.round((fontScales[currentSection]||1)*100)+'%'">A−</button>
+        <span id="fontscale-pct" style="font-weight:700;min-width:48px;text-align:center">${Math.round(((typeof fontScales!=='undefined' && fontScales[currentSection])||1)*100)}%</span>
+        <button class="qbtn" onclick="adjustFontScale(0.1);const p=document.getElementById('fontscale-pct');if(p)p.textContent=Math.round((fontScales[currentSection]||1)*100)+'%'">A+</button>
+      </div>
+      <div class="sec-body" style="font-size:calc(13px * var(--fontscale));color:var(--ink-soft)">Phóng to/thu nhỏ chữ của trang đang xem (mỗi trang nhớ cỡ riêng).</div>
+    </div>
     <div class="sec" style="margin-top:14px"><div class="sec-label">Chỉnh sửa nội dung</div>
-      <div class="sec-body" style="font-size:calc(14px * var(--fontscale))">Nhấn nút <b>✎</b> (góc trên trái bảng chi tiết, hoặc trên thanh công cụ để sửa cả trang) → sửa chữ trực tiếp → <b>✔ Lưu</b>. Nút <b>↺</b> khôi phục nội dung gốc. Đang có <b>${Object.keys(contentEdits).length}</b> mục đã sửa.</div>
+      <div class="setopt"><button class="qbtn" onclick="closeSheet();startEdit('page')">✎ Sửa nội dung trang hiện tại</button></div>
+      <div class="sec-body" style="font-size:calc(14px * var(--fontscale))">Hoặc nhấn nút <b>✎</b> ở góc trên trái bảng chi tiết để sửa riêng bảng đó → sửa chữ trực tiếp → <b>✔ Lưu</b>. Nút <b>↺</b> khôi phục nội dung gốc. Đang có <b>${Object.keys(contentEdits).length}</b> mục đã sửa.</div>
     </div>
   `;
   document.getElementById('sheet').classList.add('show');
