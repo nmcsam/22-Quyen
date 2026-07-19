@@ -104,8 +104,9 @@
   .group-head:first-child{margin-top:2px}
 
   .circle-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;margin-bottom:4px}
-  .circle{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;cursor:pointer;border-width:1.5px;border-style:solid;padding:4px;user-select:none;transition:transform .1s,box-shadow .1s;position:relative;overflow:hidden;box-shadow:0 9px 16px rgba(55,35,8,.35),0 3px 0 rgba(255,255,255,.65) inset,0 -9px 14px rgba(55,35,8,.28) inset}
-.circle::before{content:'';position:absolute;top:5%;left:14%;width:58%;height:36%;border-radius:50%;background:radial-gradient(ellipse at 50% 40%,rgba(255,255,255,.9) 0%,rgba(255,255,255,.35) 55%,rgba(255,255,255,0) 75%);pointer-events:none;z-index:0}
+  .circle{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;cursor:pointer;border-width:1.5px;border-style:solid;padding:4px;user-select:none;transition:transform .1s,box-shadow .1s;position:relative;overflow:hidden;box-shadow:0 12px 20px rgba(50,32,8,.38),0 4px 8px rgba(255,255,255,.55) inset}
+.circle::before{content:'';position:absolute;top:3%;left:12%;width:62%;height:40%;border-radius:50%;background:radial-gradient(ellipse 100% 100% at 50% 35%,rgba(255,255,255,.95) 0%,rgba(255,255,255,.5) 45%,rgba(255,255,255,0) 72%),radial-gradient(circle 9% at 26% 24%,rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%);pointer-events:none;z-index:2;filter:blur(.4px)}
+.circle::after{content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:0;background:radial-gradient(ellipse 74% 34% at 50% 97%,rgba(255,255,255,.65) 0%,rgba(255,255,255,.22) 45%,rgba(255,255,255,0) 68%),radial-gradient(circle at 50% 40%,rgba(255,255,255,0) 46%,rgba(255,255,255,.06) 60%,rgba(110,65,18,.16) 84%,rgba(70,40,10,.38) 100%)}
 .circle>*{position:relative;z-index:1}
   .circle:active{transform:scale(.93);box-shadow:0 2px 5px rgba(55,35,8,.3),0 5px 10px rgba(55,35,8,.25) inset}
   .circle .cn{font-size:calc(12px * var(--fontscale));font-weight:700;line-height:1.2;overflow:hidden}
