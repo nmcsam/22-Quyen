@@ -9,7 +9,7 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['home','Trang đầu'],['xugioi','12 Xứ · 18 Giới'],['canh','21 Cảnh'],['quyen22','22 Quyền'],['duyenhe','24 Duyên hệ'],['coi31','31 Cõi'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Pháp thực tính'],['duyenkhoi','Duyên khởi'],['demucthien','Đề mục thiền']];
+  const sections = [['home','Trang đầu'],['xugioi','12 Xứ · 18 Giới'],['canh','21 Cảnh'],['quyen22','22 Quyền'],['duyenhe','24 Duyên hệ'],['coi31','31 Cõi'],['trodao','37 Trợ đạo'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Pháp thực tính'],['duyenkhoi','Duyên khởi'],['demucthien','Đề mục thiền']];
   const cur = sections.find(x=>x[0]===currentSection);
   const pct = Math.round(((typeof fontScales!=='undefined' && fontScales[currentSection])||1)*100) + '%';
   document.getElementById('section-switch').innerHTML = `
@@ -64,7 +64,10 @@ const PAGE_ACTIONS = {
     <button class="qbtn" onclick="openQuyenChiPhap16()">16 chi pháp chân đế</button>
     <button class="qbtn" onclick="openQuyenDuyenTQ()">Quyền duyên</button>`,
   xugioi: `<button class="qbtn" onclick="openXGDoiChieu()">Đối chiếu Xứ ↔ Giới</button>
-    <button class="qbtn" onclick="openXGTomTat()">Tóm tắt số pháp</button>`
+    <button class="qbtn" onclick="openXGTomTat()">Tóm tắt số pháp</button>`,
+  trodao: `<button class="qbtn" onclick="openTDChiPhap14()">Chi pháp: 14 tâm sở</button>
+    <button class="qbtn" onclick="openTD7TT()">7 Thanh tịnh</button>
+    <button class="qbtn" onclick="openTDMinhHanh()">Minh · Hạnh · 4 hạng người</button>`
 };
 
 function switchSection(s){
@@ -131,6 +134,12 @@ function switchSection(s){
     legend.style.display='none';
     document.getElementById('nav').innerHTML = '';
     renderXuGioiPage();
+  } else if(s==='trodao'){
+    document.getElementById('page-subtitle').textContent = '37 Phẩm Trợ Đạo (Bodhipakkhiyadhamma) · chạm một phẩm để xem chi tiết';
+    grid.style.display='none';
+    legend.style.display='none';
+    document.getElementById('nav').innerHTML = '';
+    renderTroDaoPage();
   } else if(s==='coi31'){
     document.getElementById('page-subtitle').textContent = '31 Cõi (Bhūmi) · chạm vào một cõi để xem tục sinh và hạng người';
     grid.style.display='none';
@@ -2470,4 +2479,216 @@ function renderHomePage(){
       </div>
       <div style="font-size:calc(13px * var(--fontscale));color:var(--ink-soft)">Bấm <b>☰ Chức năng</b> phía trên để chọn trang</div>
     </div>`;
+}
+
+// ===== Trang "37 Phẩm Trợ Đạo" (Bodhipakkhiyadhamma) =====
+// Nguồn: Bodhipakkhiya Dīpanī — Ngài Ledi Sayadaw (Phạm Kim Khánh dịch, "37 Phẩm Trợ Đạo");
+// quy nạp chi pháp theo Abhidhammattha Saṅgaha (chương VII).
+
+const TD_GROUPS = [
+ {ten:'Tứ Niệm Xứ', pali:'Satipaṭṭhāna', cls:'circle-sac', range:'1–4',
+  body:`<b>Định nghĩa:</b> <i>"Bhusaṃ tiṭṭhatī'ti paṭṭhānaṃ; sati eva paṭṭhānaṃ satipaṭṭhānaṃ"</i> — cái gì được kiên cố thiết lập, vững chắc áp đặt vào (đề mục), đó là niệm xứ. "Vững chắc" nghĩa là muốn an trú tâm vào hơi thở một giờ, hai giờ thì giữ được trọn thời gian ấy.<br><br>
+  <b>Bốn ví dụ trứ danh:</b><br>
+  • <b>Người mất trí</b>: ăn năm sáu miếng rồi bỏ đi, nói đầu quên đuôi — như người ngồi thiền mà tâm phóng dật, tụng "Iti'pi so" mãi không hết bài.<br>
+  • <b>Người lái thuyền không biết lèo lái</b>: thuyền trôi qua bao bến đậu mà không cặp được, cuối cùng trôi ra biển khơi — như chúng sanh trôi qua nhiều thời kỳ có Phật Pháp mà không dừng lại được.<br>
+  • <b>Luyện bò tơ</b>: nhập bầy, vào chuồng = Giới tịnh; xỏ vàm, cột vào trụ = Niệm thân; gác ách kéo cày = samatha–vipassanā.<br>
+  • <b>Luyện voi rừng</b>: rừng = dục lạc; bãi luyện = Giáo Pháp; hàng rào = Giới tịnh; trụ cột = thân/hơi thở; dây cột = Niệm thân.<br><br>
+  <i>"Amataṃ tesaṃ paribhuttaṃ, yesaṃ kāyagatā sati paribhuttā"</i> — ai thọ hưởng pháp Niệm thân là thọ hưởng trạng thái Bất Diệt. Chỉ khi tâm tán loạn lắng xuống, ta mới lần đầu nhận ra "sức nóng" của cái tâm khuấy động — như con sâu trong trái ớt không biết ớt cay.<br><br>
+  <b>Thời gian:</b> có thể cần 7 ngày, 15 ngày, một tháng… cho đến 2–4 năm, tùy mức tinh tấn. Người thuần quán (sukkhavipassaka), sau khi vững Niệm thân, có thể vào thẳng minh sát.`},
+ {ten:'Tứ Chánh Cần', pali:'Sammappadhāna', cls:'circle-bt', range:'5–8',
+  body:`Chánh cần là nỗ lực mang bốn đặc tính, diễn tả bằng lời nguyện trứ danh:<br><i>"Hãy để cho da, gân và xương, thịt còn lại, máu trong thân tôi khô cạn dần, tôi sẽ không chấm dứt chuyên cần tinh tấn cho đến khi thành đạt những gì mà khả năng, tánh chuyên cần và sự cố gắng của con người có thể thành đạt."</i><br>
+  Đó là mức tinh tấn của Đại đức Soṇa (không nằm suốt ba tháng an cư), Đại đức Cakkhupāla, Đại đức Phussadeva (25 năm), Đại đức Mahāsiva (30 năm). Lập luận của Ngài: ba mươi năm khổ nhọc tu tập không bằng ba giờ trong địa ngục — vậy tại sao lại tính toán, trì hoãn?<br><br>
+  <b>Nghiệp "đã sanh" và "chưa sanh":</b> <i>uppanna akusala kamma</i> là kho nghiệp bất thiện tích tụ từ quá khứ vô thủy đang chờ trổ quả; <i>anuppanna akusala kamma</i> là vô lượng nghiệp bất thiện sẽ tạo trong tương lai. Chúng sanh bị kẹp giữa hai ngọn lửa — cả hai đều bắt nguồn từ <b>Thân kiến (sakkāya-diṭṭhi)</b>. Nhổ tận gốc Thân kiến thì cả hai đồng thời tắt hẳn — vĩnh viễn không còn tái sanh khổ cảnh, dầu chỉ trong giấc mộng.<br><br>
+  <b>Ba tầng lớp của phiền não — ví dụ hộp diêm:</b><br>
+  • <b>Vītikkama</b> (thô, vượt ra thân – khẩu) — như lửa lan sang vật khác → đối trị bằng <b>Giới</b>.<br>
+  • <b>Pariyuṭṭhāna</b> (trung, quấy nhiễu trong ý) — như lửa cháy trên cây diêm → đối trị bằng <b>Định</b>.<br>
+  • <b>Anusaya</b> (tế, ngủ ngầm trong luồng nghiệp) — như lửa ngủ trong hộp diêm → chỉ <b>Tuệ</b> quán vô ngã mới cắt đứt.<br><br>
+  <b>Niyāma – Aniyāma:</b> Giới của bậc Thánh là ổn định (bậc Nhập Lưu không còn vi phạm ājīvaṭṭhamaka-sīla dầu trong giấc mơ); giới – định – tuệ của phàm nhân là bất ổn định. Mục tiêu của toàn tác phẩm: chuyển cái "bất ổn định" thành "ổn định" ngay trong thời kỳ còn Giáo Pháp.`},
+ {ten:'Tứ Như Ý Túc', pali:'Iddhipāda', cls:'circle-tho', range:'9–12',
+  body:`Trong Giáo Pháp có năm <i>iddhi</i> (thành tựu): thắng tri danh–sắc; liễu tri Khổ đế; đoạn trừ Tập đế; chứng ngộ Diệt đế; tu tập Đạo đế. <b>Iddhipāda là nền tảng để đạt các thành tựu ấy.</b><br><br>
+  Ví dụ: người không có Như Ý Túc nào giống như con của hạng caṇḍāla — không có "căn bản" để mong làm hoàng đế; người có Như Ý Túc giống như con của hoàng đế — luôn có cơ sở để hy vọng.<br><br>
+  Ai chỉ nói "tôi không làm được" là người chưa từng có một Như Ý Túc nào; <b>thuốc chữa</b> là học hỏi kinh sách để khơi dậy ước muốn (chanda) và nương tựa một vị thầy có thể khích lệ mình.`},
+ {ten:'Ngũ Căn', pali:'Indriya', cls:'circle-th', range:'13–17',
+  body:`Mỗi căn có hai tầng: <b>pakati</b> (thông thường, chưa qua tu tập) và <b>bhāvanā</b> (được trau giồi qua thiền tập). Đức tin thông thường chỉ đủ đưa đến bố thí, trì giới, bắt đầu tập thiền; chỉ đức tin được trau giồi mới đủ sức kiểm soát tâm trong pháp hành — cả năm căn đều như vậy.<br><br>
+  <b>Kinh dạy tìm mỗi căn ở đâu:</b><br>
+  • Tín căn → bốn chi phần của bậc Nhập Lưu (bất động tín nơi Phật – Pháp – Tăng và viên mãn Giới tịnh).<br>
+  • Tấn căn → Tứ Chánh Cần.<br>
+  • Niệm căn → Tứ Niệm Xứ.<br>
+  • Định căn → Tứ Thiền.<br>
+  • Tuệ căn → Tứ Diệu Đế.<br><br>
+  Người không tu tập Ngũ Căn giống như một quốc gia không vua, một rừng hoang không luật lệ, kẻ yếu làm mồi cho kẻ mạnh; nghe bàn về tri túc hay pháp hành thì lập tức tìm cớ chê bai — như người bị ma nhập không chịu nổi lời kinh.`},
+ {ten:'Ngũ Lực', pali:'Bala', cls:'circle-dh', range:'18–22',
+  body:`Năm lực và <b>năm pháp đối nghịch</b> mà mỗi lực phải khắc chế:<br>
+  • <b>Tín lực</b> khắc chế <i>taṇhā</i> (tham ái) — đưa về "bốn Thánh Chủng" (ariya-vaṃsa): tri túc với thực, y, trú xứ và hoan hỷ trong thiền tập.<br>
+  • <b>Tấn lực</b> khắc chế <i>kosajja</i> (lười biếng) — sống viễn ly, khất thực, đầu đà, niệm thân.<br>
+  • <b>Niệm lực</b> khắc chế <i>muṭṭhasacca</i> (thất niệm).<br>
+  • <b>Định lực</b> khắc chế <i>vikkhepa</i> (loạn động).<br>
+  • <b>Tuệ lực</b> khắc chế <i>sammoha</i> (si mê) — thông suốt cả Tam Tạng vẫn chưa đủ, phải là tuệ do thiền tập.<br><br>
+  Hễ một lực yếu thì không vượt được pháp đối nghịch tương ứng. Riêng <b>Tấn và Tuệ</b> đồng thời cũng là Như Ý Túc, nên nếu hai lực này dũng mãnh và quân bình thì không có chuyện thất bại.<br><br>
+  <b>Ví dụ con bò usabha:</b> giống bò quý gấp ngàn lần bò thường, nhưng nếu chủ không biết giá trị mà cứ bắt kéo cày như bò thường thì nó sống chết y hệt bò thường. Hạng neyya là người chủ; Ngũ Lực là con bò usabha; các bộ Vibhaṅga và Saṃyutta tương ứng là sách hướng dẫn nuôi dưỡng.`},
+ {ten:'Thất Giác Chi', pali:'Bojjhaṅga', cls:'circle-vt', range:'23–29',
+  body:`<b>Ví dụ con chim:</b> sanh lần đầu là quả trứng; sanh lần hai khi trứng nở; đủ lông cánh thì bay đi tự tại. Hành giả cũng vậy — (1) vững Niệm thân / thành tựu samatha thì thoát tâm loạn động; (2) đắc minh sát về danh–sắc–uẩn thì thoát vô minh thô; (3) <b>Thất Giác Chi thuần thục thì thoát phàm tánh, đạt Đạo Tuệ siêu thế</b>.<br><br>
+  Về việc tụng kinh Bojjhaṅga chữa bệnh: chỉ hiệu nghiệm khi người nghe hiểu rõ ý nghĩa các giác chi và do đó phát sanh đức tin rộng lớn, rõ ràng nơi lời kinh.`},
+ {ten:'Bát Chánh Đạo', pali:'Maggaṅga', cls:'circle-canh', range:'30–37',
+  body:`Ba nhóm: <b>Tuệ</b> (Chánh kiến, Chánh tư duy) — <b>Giới</b> (Chánh ngữ, Chánh nghiệp, Chánh mạng) — <b>Định</b> (Chánh tinh tấn, Chánh niệm, Chánh định). Cả tám chi chỉ đồng thời có mặt ở <b>Tri Kiến Tịnh siêu thế</b>; ở các giai đoạn trước, ba chi Giới chỉ có trong Giới tịnh.<br><br>
+  Phân biệt Giới <i>vaṭṭa-nissita</i> (hướng về phước báu trong luân hồi) và Giới <i>vivaṭṭa-nissita</i> (hướng về chấm dứt luân hồi) — chỉ loại sau mới thật sự là ādibrahmacariyaka-sīla, thuộc hàng trợ đạo.<br><br>
+  <b>Vì sao gọi là Nhập Lưu?</b> Như nước năm con sông lớn và năm trăm dòng sông nhỏ từ Hi-mã-lạp-sơn không bao giờ chảy ngược về nguồn, bậc Thánh không bao giờ rơi trở lại phàm tánh. <i>"Sotaṃ ādito pajjiṃsu pāpuṇiṃsū'ti sotāpannā."</i><br><br>
+  <b>Chuỗi nhân quả tiếp nối</b> (Magga Saṃyutta): nơi người có Chánh kiến, Chánh tư duy tăng trưởng; từ Chánh tư duy sanh Chánh ngữ; rồi Chánh nghiệp, Chánh mạng, Chánh tinh tấn, Chánh niệm, Chánh định — mỗi chi kiên cố hơn qua từng kiếp, cho đến Vô Dư Niết Bàn. (Truyền thống Miến gọi hạng Nhập Lưu tiến dần qua nhiều kiếp cao thượng liên tục đến A-La-Hán là "Bon-sin-san".)`}
+];
+
+const TRODAO_DATA = [
+ // 1–4 Tứ Niệm Xứ
+ {ten:'Niệm thân', pali:'Kāyānupassanā-satipaṭṭhāna', g:0, chiphap:'Tâm sở <b>Niệm</b> (Sati)', dn:'Niệm vững chắc an trú trên thân: hơi thở (ānāpāna), bốn oai nghi, tỉnh giác các động tác, 32 thể trược (hoặc "nhóm năm phần da"), niệm xương. Ngài Ledi Sayadaw xem Niệm thân là cửa ngõ hoàn tất Tâm tịnh — cột chặt con voi tâm vào trụ cột đề mục.'},
+ {ten:'Niệm thọ', pali:'Vedanānupassanā-satipaṭṭhāna', g:0, chiphap:'Tâm sở <b>Niệm</b> (Sati)', dn:'Niệm vững chắc an trú trên các cảm thọ: lạc, khổ, hỷ, ưu, xả — thấy thọ chỉ là thọ, không phải "tôi cảm nhận".'},
+ {ten:'Niệm tâm', pali:'Cittānupassanā-satipaṭṭhāna', g:0, chiphap:'Tâm sở <b>Niệm</b> (Sati)', dn:'Niệm vững chắc an trú trên tâm: tâm có tham biết có tham, tâm không sân biết không sân… — thấy tâm chỉ là dòng sanh diệt.'},
+ {ten:'Niệm pháp', pali:'Dhammānupassanā-satipaṭṭhāna', g:0, chiphap:'Tâm sở <b>Niệm</b> (Sati)', dn:'Niệm vững chắc an trú trên các pháp: triền cái, ngũ uẩn, xứ, giác chi, Tứ đế — nền tảng đưa thẳng vào minh sát.'},
+ // 5–8 Tứ Chánh Cần
+ {ten:'Tinh tấn diệt ác đã sanh', pali:'Uppannānaṃ pahānāya vāyāma', g:1, chiphap:'Tâm sở <b>Cần</b> (Viriya)', dn:'Nỗ lực đoạn trừ các bất thiện pháp đã sanh — kho nghiệp bất thiện tích tụ từ quá khứ vô thủy (uppanna akusala) chỉ thật sự "tắt" khi nhổ tận gốc Thân kiến.'},
+ {ten:'Tinh tấn ngăn ác chưa sanh', pali:'Anuppannānaṃ anuppādāya vāyāma', g:1, chiphap:'Tâm sở <b>Cần</b> (Viriya)', dn:'Nỗ lực ngăn không cho các bất thiện pháp chưa sanh được sanh khởi — chận đứng vô lượng nghiệp bất thiện lẽ ra sẽ tạo trong tương lai (anuppanna akusala).'},
+ {ten:'Tinh tấn sanh thiện chưa sanh', pali:'Anuppannānaṃ uppādāya vāyāma', g:1, chiphap:'Tâm sở <b>Cần</b> (Viriya)', dn:'Nỗ lực làm sanh khởi các thiện pháp chưa từng sanh — đặc biệt là Giới tịnh, Niệm thân, thiền định và tuệ minh sát chưa từng có trong dòng luân hồi.'},
+ {ten:'Tinh tấn tăng thiện đã sanh', pali:'Uppannānaṃ bhiyyobhāvāya vāyāma', g:1, chiphap:'Tâm sở <b>Cần</b> (Viriya)', dn:'Nỗ lực làm cho các thiện pháp đã sanh tăng trưởng đến viên mãn — chuyển giới – định – tuệ "bất ổn định" (aniyāma) của phàm nhân thành "ổn định" (niyāma) của bậc Thánh.'},
+ // 9–12 Tứ Như Ý Túc
+ {ten:'Dục như ý túc', pali:'Chandiddhipāda', g:2, chiphap:'Tâm sở <b>Dục</b> (Chanda)', dn:'Nhiệt tâm mãnh liệt: "Nếu không thành đạt trong kiếp này thì thà chết còn hơn" — như vua Dhammasoṇḍa bỏ ngai vàng chỉ để nghe một câu kệ của Đức Phật Kassapa.'},
+ {ten:'Tấn như ý túc', pali:'Viriyiddhipāda', g:2, chiphap:'Tâm sở <b>Cần</b> (Viriya)', dn:'Không rủn chí trước trăm ngàn khó nhọc, không sờn lòng dù phải tinh tấn nhiều năm.'},
+ {ten:'Tâm như ý túc', pali:'Cittiddhipāda', g:2, chiphap:'<b>Tâm</b> (Citta)', dn:'Tâm bám chặt vào pháp hành như nhà luyện kim chăm chú vào vàng bạc, quên cả ăn ngủ.'},
+ {ten:'Trạch quán như ý túc', pali:'Vīmaṃsiddhipāda', g:2, chiphap:'Tâm sở <b>Trí tuệ</b> (Paññā)', dn:'Trí sáng suốt thấy rõ hiểm họa luân hồi; pháp càng thâm sâu, nguyện vọng càng mạnh.'},
+ // 13–17 Ngũ Căn
+ {ten:'Tín căn', pali:'Saddhindriya', g:3, chiphap:'Tâm sở <b>Tín</b> (Saddhā)', dn:'Đức tin cai quản tâm, tìm ở <b>bốn chi phần của bậc Nhập Lưu</b>: bất động tín nơi Phật, Pháp, Tăng và viên mãn Giới tịnh. Tín pakati chỉ đủ đưa đến bố thí – trì giới; tín bhāvanā mới kiểm soát được tâm trong pháp hành.'},
+ {ten:'Tấn căn', pali:'Viriyindriya', g:3, chiphap:'Tâm sở <b>Cần</b> (Viriya)', dn:'Tinh tấn cai quản tâm, tìm ở <b>Tứ Chánh Cần</b> — nỗ lực được trau giồi qua thiền tập, không phải sự siêng năng thông thường.'},
+ {ten:'Niệm căn', pali:'Satindriya', g:3, chiphap:'Tâm sở <b>Niệm</b> (Sati)', dn:'Niệm cai quản tâm, tìm ở <b>Tứ Niệm Xứ</b> — niệm đủ sức an trú vững chắc trên đề mục hàng giờ.'},
+ {ten:'Định căn', pali:'Samādhindriya', g:3, chiphap:'Tâm sở <b>Nhất hành</b> (Ekaggatā)', dn:'Định cai quản tâm, tìm ở <b>Tứ Thiền</b> — từ cận định đến toàn định.'},
+ {ten:'Tuệ căn', pali:'Paññindriya', g:3, chiphap:'Tâm sở <b>Trí tuệ</b> (Paññā)', dn:'Tuệ cai quản tâm, tìm ở <b>Tứ Diệu Đế</b> — hiểu biết do thiền tập soi thấu Khổ, Tập, Diệt, Đạo.'},
+ // 18–22 Ngũ Lực
+ {ten:'Tín lực', pali:'Saddhābala', g:4, chiphap:'Tâm sở <b>Tín</b> (Saddhā)', dn:'Đức tin ở tầng lực, không lay chuyển, <b>khắc chế tham ái (taṇhā)</b> — đưa về bốn Thánh Chủng: tri túc với thực, y, trú xứ và hoan hỷ trong thiền tập.'},
+ {ten:'Tấn lực', pali:'Viriyabala', g:4, chiphap:'Tâm sở <b>Cần</b> (Viriya)', dn:'Tinh tấn ở tầng lực, <b>khắc chế lười biếng (kosajja)</b> — sống viễn ly, khất thực, đầu đà, niệm thân.'},
+ {ten:'Niệm lực', pali:'Satibala', g:4, chiphap:'Tâm sở <b>Niệm</b> (Sati)', dn:'Niệm ở tầng lực, <b>khắc chế thất niệm (muṭṭhasacca)</b> — tâm không còn để tuột mất đề mục.'},
+ {ten:'Định lực', pali:'Samādhibala', g:4, chiphap:'Tâm sở <b>Nhất hành</b> (Ekaggatā)', dn:'Định ở tầng lực, <b>khắc chế loạn động (vikkhepa)</b> — ý nghĩ không còn bay nhảy vô định.'},
+ {ten:'Tuệ lực', pali:'Paññābala', g:4, chiphap:'Tâm sở <b>Trí tuệ</b> (Paññā)', dn:'Tuệ ở tầng lực, <b>khắc chế si mê (sammoha)</b> — thông suốt cả Tam Tạng vẫn chưa đủ, phải là tuệ do thiền tập.'},
+ // 23–29 Thất Giác Chi
+ {ten:'Niệm giác chi', pali:'Sati-sambojjhaṅga', g:5, chiphap:'Tâm sở <b>Niệm</b> (Sati)', dn:'Chính là niệm xứ, niệm căn, niệm lực, chánh niệm — nay ở vai trò một chi phần của sự Giác ngộ.'},
+ {ten:'Trạch pháp giác chi', pali:'Dhammavicaya-sambojjhaṅga', g:5, chiphap:'Tâm sở <b>Trí tuệ</b> (Paññā)', dn:'Như hột bông vải được xay đi xay lại — tiến trình quán ngũ uẩn lặp đi lặp lại dưới ánh sáng tuệ minh sát.'},
+ {ten:'Tinh tấn giác chi', pali:'Viriya-sambojjhaṅga', g:5, chiphap:'Tâm sở <b>Cần</b> (Viriya)', dn:'Nỗ lực nâng đỡ các giác chi khác cùng tiến trên đường minh sát.'},
+ {ten:'Phỉ giác chi', pali:'Pīti-sambojjhaṅga', g:5, chiphap:'Tâm sở <b>Hỷ</b> (Pīti)', dn:'Niềm vui khi tiến trình thấy – biết thật sự tăng trưởng.'},
+ {ten:'Khinh an giác chi', pali:'Passaddhi-sambojjhaṅga', g:5, chiphap:'Tâm sở <b>Tịnh thân · Tịnh tâm</b> (Kāyapassaddhi · Cittapassaddhi)', dn:'Thân và tâm an tĩnh khi suy tư lắng đọng.'},
+ {ten:'Định giác chi', pali:'Samādhi-sambojjhaṅga', g:5, chiphap:'Tâm sở <b>Nhất hành</b> (Ekaggatā)', dn:'Từ tạm định, cận định, toàn định đến không tánh định, vô tướng định, vô nguyện định.'},
+ {ten:'Xả giác chi', pali:'Upekkhā-sambojjhaṅga', g:5, chiphap:'Tâm sở <b>Hành xả</b> (Tatramajjhattatā)', dn:'Khi pháp hành đã đúng phương pháp, không còn phải gắng sức nhiều nữa — trạng thái quân bình tự vận hành.'},
+ // 30–37 Bát Chánh Đạo
+ {ten:'Chánh kiến', pali:'Sammādiṭṭhi', g:6, chiphap:'Tâm sở <b>Trí tuệ</b> (Paññā)', dn:'Thấy đúng Tứ Diệu Đế — thuộc nhóm Tuệ của Con Đường.'},
+ {ten:'Chánh tư duy', pali:'Sammāsaṅkappa', g:6, chiphap:'Tâm sở <b>Tầm</b> (Vitakka)', dn:'Suy nghĩ ly dục, vô sân, bất hại — hướng tâm về đúng đối tượng; thuộc nhóm Tuệ.'},
+ {ten:'Chánh ngữ', pali:'Sammāvācā', g:6, chiphap:'Tâm sở <b>Chánh ngữ</b> (Sammāvācā — tiết chế)', dn:'Từ bỏ nói dối, nói chia rẽ, nói thô ác, nói phù phiếm — thuộc nhóm Giới; trọn vẹn trong ājīvaṭṭhamaka-sīla.'},
+ {ten:'Chánh nghiệp', pali:'Sammākammanta', g:6, chiphap:'Tâm sở <b>Chánh nghiệp</b> (Sammākammanta — tiết chế)', dn:'Từ bỏ sát sanh, trộm cắp, tà hạnh — thuộc nhóm Giới.'},
+ {ten:'Chánh mạng', pali:'Sammā-ājīva', g:6, chiphap:'Tâm sở <b>Chánh mạng</b> (Sammā-ājīva — tiết chế)', dn:'Nuôi mạng chân chánh — chi thứ tám khép lại ājīvaṭṭhamaka-sīla (tám giới chấm dứt bằng Chánh mạng), nền tảng Giới tịnh.'},
+ {ten:'Chánh tinh tấn', pali:'Sammāvāyāma', g:6, chiphap:'Tâm sở <b>Cần</b> (Viriya)', dn:'Chính là Tứ Chánh Cần ở vai trò chi đạo — thuộc nhóm Định.'},
+ {ten:'Chánh niệm', pali:'Sammāsati', g:6, chiphap:'Tâm sở <b>Niệm</b> (Sati)', dn:'Chính là Tứ Niệm Xứ ở vai trò chi đạo — thuộc nhóm Định.'},
+ {ten:'Chánh định', pali:'Sammāsamādhi', g:6, chiphap:'Tâm sở <b>Nhất hành</b> (Ekaggatā)', dn:'Bốn tầng thiền — thuộc nhóm Định. Cả tám chi đồng thời có mặt trọn vẹn ở sát-na Đạo siêu thế.'}
+];
+
+function renderTroDaoPage(){
+  const extra = document.getElementById('extra-content');
+  let html = `<p class="info-note" style="margin-bottom:10px">Gọi là <b>bodhipakkhiya</b> vì đó là những thành phần (pakkhiya) của sự Giác Ngộ (bodhi), giữ vai trò <b>nhân kế cận</b> (padaṭṭhāna), <b>thành phần thiết yếu</b> (sambhāra) và <b>nền tảng đầy đủ</b> (upanissaya) của Đạo Tuệ. Luận đề trung tâm của Ngài Ledi Sayadaw: cô đọng 45 hạ thuyết pháp, cốt tủy Tam Tạng chính là <b>37 Phẩm Trợ Đạo</b>; cô đọng nữa thành <b>7 giai đoạn Thanh tịnh</b>, rồi thành <b>Giới – Định – Tuệ</b>.<br>37 = 4 Niệm xứ + 4 Chánh cần + 4 Như ý túc + 5 Căn + 5 Lực + 7 Giác chi + 8 Đạo chi.</p>`;
+  let n = 0;
+  TD_GROUPS.forEach((gr, gi)=>{
+    const items = TRODAO_DATA.map((d,i)=>({d,i})).filter(x=>x.d.g===gi);
+    html += `<div class="group-head">${gr.ten} · ${gr.pali} (${gr.range}) <span onclick="openTDGroupSheet(${gi})" style="cursor:pointer;color:#b06a28;font-weight:800;padding:2px 6px">ⓘ chi tiết</span></div>`;
+    html += `<div class="circle-grid">`;
+    items.forEach(x=>{
+      n++;
+      html += `<div class="circle ${gr.cls}" onclick="openTroDaoSheet(${x.i})"><div class="cp" style="font-weight:800">${n}</div><div class="cn">${x.d.ten}</div><div class="cp">${x.d.pali.split('-')[0].split(' ')[0]}</div></div>`;
+    });
+    html += `</div>`;
+  });
+  html += `<p class="info-note" style="margin-top:10px"><b>Lời khuyên kết thúc của Ngài:</b> người có trí, muốn trở thành "thừa kế ổn định" (niyata) ngay trong kiếp này hay kiếp kế, hãy: (1) vững chắc trong <b>ājīvaṭṭhamaka-sīla</b>; (2) kiên cố trong <b>Niệm thân</b>; (3) tận lực — tối thiểu ba giờ mỗi ngày — để chứng ngộ <b>ba đặc tướng nơi năm uẩn</b>. Chỉ cần thấy được một trong ba đặc tướng, vị ấy đã bước vào dòng Thánh.<br>Nguồn: <i>Bodhipakkhiya Dīpanī</i> — Ngài Ledi Sayadaw (bản dịch Phạm Kim Khánh); quy nạp chi pháp theo Abhidhammattha Saṅgaha.</p>`;
+  extra.innerHTML = html;
+}
+
+function openTroDaoSheet(i){
+  const d = TRODAO_DATA[i];
+  const gr = TD_GROUPS[d.g];
+  showAttrSheet(`
+    <div class="sheet-head"><span class="num">${i+1}</span><h2>${d.ten}</h2></div>
+    <p class="sheet-pali">${d.pali} · thuộc nhóm ${gr.ten} (${gr.pali})</p>
+    <div class="sec"><div class="sec-label">Chi pháp (pháp thực tính)</div><div class="sec-body">${d.chiphap}</div></div>
+    <div class="sec" style="margin-top:12px"><div class="sec-label">Nội dung</div><div class="sec-body">${d.dn}</div></div>
+    <div class="sec" style="margin-top:12px"><div class="sec-label">Về nhóm ${gr.ten}</div>
+      <div class="qbtn-row" style="margin-top:6px"><button class="qbtn" onclick="openTDGroupSheet(${d.g})">Xem giảng giải nhóm ${gr.ten}</button></div></div>
+  `);
+}
+
+function openTDGroupSheet(gi){
+  const gr = TD_GROUPS[gi];
+  const items = TRODAO_DATA.map((d,i)=>({d,i})).filter(x=>x.d.g===gi);
+  const btns = items.map(x=>`<button class="qbtn" onclick="openTroDaoSheet(${x.i})">${x.i+1}. ${x.d.ten}</button>`).join(' ');
+  showAttrSheet(`
+    <div class="sheet-head"><h2>${gr.ten}</h2></div>
+    <p class="sheet-pali">${gr.pali} · phẩm ${gr.range} trong 37 Phẩm Trợ Đạo</p>
+    <div class="sec"><div class="sec-label">Giảng giải (Bodhipakkhiya Dīpanī — Ledi Sayadaw)</div><div class="sec-body">${gr.body}</div></div>
+    <div class="sec" style="margin-top:12px"><div class="sec-label">Các phẩm trong nhóm</div>
+      <div class="qbtn-row" style="margin-top:6px">${btns}</div></div>
+  `);
+}
+
+function openTDChiPhap14(){
+  showAttrSheet(`
+    <div class="sheet-head"><h2>Chi pháp: 14 tâm sở</h2></div>
+    <p class="sheet-pali">37 phẩm trợ đạo quy nạp về 14 pháp thực tính (Abhidhammattha Saṅgaha)</p>
+    <div class="sec"><div class="sec-body">
+      <b>1. Cần (Viriya) — 9 phẩm:</b> 4 Chánh cần + Tấn như ý túc + Tấn căn + Tấn lực + Tinh tấn giác chi + Chánh tinh tấn.<br><br>
+      <b>2. Niệm (Sati) — 8 phẩm:</b> 4 Niệm xứ + Niệm căn + Niệm lực + Niệm giác chi + Chánh niệm.<br><br>
+      <b>3. Trí tuệ (Paññā) — 5 phẩm:</b> Trạch quán như ý túc + Tuệ căn + Tuệ lực + Trạch pháp giác chi + Chánh kiến.<br><br>
+      <b>4. Nhất hành (Ekaggatā) — 4 phẩm:</b> Định căn + Định lực + Định giác chi + Chánh định.<br><br>
+      <b>5. Tín (Saddhā) — 2 phẩm:</b> Tín căn + Tín lực.<br><br>
+      <b>6. Tầm (Vitakka) — 1:</b> Chánh tư duy.
+      &nbsp;&nbsp;<b>7. Hỷ (Pīti) — 1:</b> Phỉ giác chi.<br>
+      <b>8. Tịnh thân · Tịnh tâm (Passaddhi) — 1:</b> Khinh an giác chi.
+      &nbsp;&nbsp;<b>9. Hành xả (Tatramajjhattatā) — 1:</b> Xả giác chi.<br>
+      <b>10. Dục (Chanda) — 1:</b> Dục như ý túc.
+      &nbsp;&nbsp;<b>11. Tâm (Citta) — 1:</b> Tâm như ý túc.<br>
+      <b>12–14. Ba Tiết chế (Virati):</b> Chánh ngữ, Chánh nghiệp, Chánh mạng.
+    </div></div>
+    <p class="info-note">Cộng: 9 + 8 + 5 + 4 + 2 + 1×5 + 3 = 37 phẩm · 14 chi pháp (1 Tâm + 13 tâm sở).</p>
+  `);
+}
+
+function openTD7TT(){
+  showAttrSheet(`
+    <div class="sheet-head"><h2>Bảy giai đoạn Thanh tịnh</h2></div>
+    <p class="sheet-pali">Thực hành 37 Phẩm Trợ Đạo chính là thực hành 7 Thanh tịnh (Visuddhi)</p>
+    <div class="sec"><div class="sec-body">
+      <b>1. Giới tịnh</b> — trong sạch hành trì ājīvaṭṭhamaka-sīla (tám giới chấm dứt bằng Chánh mạng).<br><br>
+      <b>2. Tâm tịnh</b> — qua Niệm thân: niệm hơi thở, bốn oai nghi, tỉnh giác các động tác, 32 thể trược (hoặc "nhóm năm phần da"), niệm xương.<br><br>
+      <b>3. Kiến tịnh</b> — phân tách và nhận rõ sáu giới: đất, nước, lửa, gió, không gian, thức.<br><br>
+      <b>4. Đoạn nghi tịnh</b> — thấy rõ nhân của sáu giới (nghiệp, tâm, thời tiết, vật thực) và nhân của sáu thức là các cảnh tương ứng.<br><br>
+      <b>5. Đạo phi đạo tri kiến tịnh</b> — chỉ cần cho người nhiều ngã mạn (adhimānika), tưởng đã chứng mà thật chưa.<br><br>
+      <b>6. Đạo tri kiến tịnh</b> — thấy rõ ba đặc tướng vô thường – khổ – vô ngã nơi sáu giới ấy.<br><br>
+      <b>7. Tri kiến tịnh</b> — siêu thế: chứng ngộ bốn Thánh Đạo.
+    </div></div>
+    <p class="info-note">Tâm tịnh theo nghĩa riêng chỉ cần cho hành giả đi đường samatha; hành giả thuần quán sau khi vững Giới tịnh và Niệm thân thì vào thẳng Kiến tịnh, Đoạn nghi tịnh…</p>
+  `);
+}
+
+function openTDMinhHanh(){
+  showAttrSheet(`
+    <div class="sheet-head"><h2>Minh · Hạnh · Bốn hạng người</h2></div>
+    <p class="sheet-pali">Vijjā – Caraṇa · bối cảnh của Bodhipakkhiya Dīpanī</p>
+    <div class="sec"><div class="sec-label">Bốn hạng người gặp Phật Pháp</div><div class="sec-body">
+      Theo Puggala-paññatti và Aṅguttara Nikāya:<br>
+      • <b>Ugghāṭitaññū</b> — hiểu tức khắc, đắc Đạo Quả chỉ sau một thời pháp ngắn.<br>
+      • <b>Vipañcitaññū</b> — hiểu khi được giảng rộng.<br>
+      • <b>Neyya</b> — cần được hướng dẫn: phải học, ghi nhớ, suy tư và hành trì nhiều ngày – nhiều năm.<br>
+      • <b>Padaparama</b> — tối đa chỉ đến ngôn từ, kiếp này chỉ tích trữ vāsanā (tiềm năng).<br>
+      Sau một ngàn năm đầu của Giáo Pháp, chỉ còn hai hạng <b>Neyya và Padaparama</b> — toàn bộ chỉ dẫn pháp hành trong Kinh điển là dành cho hai hạng này. Hạng neyya như người bệnh "lành nếu đúng thuốc, chết nếu không": giải thoát hay không hoàn toàn tùy nơi nỗ lực.
+    </div></div>
+    <div class="sec" style="margin-top:12px"><div class="sec-label">Hai loại hột giống: Minh (Vijjā) và Hạnh (Caraṇa)</div><div class="sec-body">
+      Giới và Định hợp thành <b>Hạnh</b>; Tuệ là <b>Minh</b>. Minh như đôi mắt, Hạnh như đôi chân; Minh như mắt chim, Hạnh như đôi cánh.<br>
+      • Chỉ có Hạnh, thiếu Minh: nhiều duyên gặp vị Phật tương lai nhưng nghe pháp không giác ngộ.<br>
+      • Chỉ có Minh, thiếu Hạnh: đủ khả năng giác ngộ nhưng rất khó gặp được Giáo Pháp.<br>
+      • Đủ cả hai: vừa gặp được Giáo Pháp, vừa có thể giải thoát.<br>
+      Hột giống Tuệ (sắc, danh, uẩn, xứ, giới, đế, duyên khởi) chỉ gieo được trong thời có Giáo Pháp — nên <b>tối thiểu phải cố hiểu thấu đáo Tứ Đại</b> cấu thành thân này.<br><br>
+      <b>15 Caraṇa-dhamma:</b> (1) Giới; (2) Thu thúc lục căn; (3) Tiết độ ẩm thực; (4) Tỉnh thức; (5–11) bảy saddhamma: tín, niệm, tàm, quý, đa văn, tấn, tuệ; (12–15) bốn tầng Thiền Sắc giới. Hành giả thuần quán cần 11 pháp đầu.
+    </div></div>
+    <div class="sec" style="margin-top:12px"><div class="sec-label">Cảnh giác: chướng ngại Giáo Pháp (dhammantarāya)</div><div class="sec-body">
+      Không nên dạy rằng phải hoàn tất trọn vẹn Giới tịnh rồi mới được hành thiền; không nên bảo người thợ săn, thợ chài rằng bỏ nghề mới được hành samatha–vipassanā — nên khuyến khích họ niệm ân đức Tam Bảo (gieo hột giống Hạnh) và quán ba đặc tướng (gieo hột giống Minh).<br>
+      <b>Các giáo huấn sai lầm</b> (micchā-dhamma): không thấy hiểm họa luân hồi; tin thời nay không ai chứng được Đạo Quả; trì hoãn chờ ba-la-mật chín muồi; tin người nay chỉ sanh hai nhân; tin các bậc đại sư không còn nữa. Phản biện của Ngài: <b>không một thiện nghiệp nào là vô ích</b> — người dvi-hetuka tinh tấn có thể thành ti-hetuka kiếp sau; làm nản lòng người tu là dhammantarāya, quả báo kém phước, kém trí trong các kiếp vị lai.
+    </div></div>
+  `);
 }
