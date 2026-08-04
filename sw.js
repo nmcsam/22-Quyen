@@ -1,4 +1,4 @@
-const CACHE_NAME = "quyen22-cache-v86";
+const CACHE_NAME = "quyen22-cache-v87";
 const ASSETS = [
   "./",
   "./index.html",
@@ -7,6 +7,7 @@ const ASSETS = [
   "./dactinh_tl_data.js",
   "./anduc_data.js",
   "./daolo_data.js",
+  "./thap_svg.js",
   "./app.js",
   "./app2.js",
   "./anduc_page.js",
