@@ -35,7 +35,8 @@ function renderAnDucPage(){
     <div class="ad-kinh"><div class="ad-kinh-lbl">Câu tụng niệm</div>${G.kinh}</div>
     <div class="group-head">${G.title} · ${G.pali}</div>
     <div class="ad-list">${list}</div>
-    <p class="info-note" style="margin-top:12px">Chạm <b>chi tiết ›</b> ở mỗi ân đức để xem phần giải thích đầy đủ.</p>
+    ${G.note ? `<div class="group-head">Ghi chú thêm</div><div class="ad-note ad-detail">${G.note}</div>` : ''}
+    <p class="info-note" style="margin-top:12px">Chạm <b>chi tiết ›</b> ở mỗi ân đức để xem phần giải thích đầy đủ. ${G.nguon||''}</p>
   `;
 }
 
