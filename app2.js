@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v78'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v79'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -9,7 +9,7 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['home','Trang đầu'],['xugioi','12 Xứ · 18 Giới'],['canh','21 Cảnh'],['quyen22','22 Quyền'],['duyenhe','24 Duyên hệ'],['coi31','31 Cõi'],['trodao','37 Trợ đạo'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Pháp thực tính'],['duyenkhoi','Duyên khởi'],['demucthien','Đề mục thiền']];
+  const sections = [['home','Trang đầu'],['xugioi','12 Xứ · 18 Giới'],['canh','21 Cảnh'],['quyen22','22 Quyền'],['duyenhe','24 Duyên hệ'],['coi31','31 Cõi'],['trodao','37 Trợ đạo'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Pháp thực tính'],['duyenkhoi','Duyên khởi'],['demucthien','Đề mục thiền'],['anduc','Ân Đức Tam Bảo']];
   const cur = sections.find(x=>x[0]===currentSection);
   const pct = Math.round(((typeof fontScales!=='undefined' && fontScales[currentSection])||1)*100) + '%';
   document.getElementById('section-switch').innerHTML = `
@@ -146,6 +146,12 @@ function switchSection(s){
     legend.style.display='none';
     document.getElementById('nav').innerHTML = '';
     renderCoi31Page();
+  } else if(s==='anduc'){
+    document.getElementById('page-subtitle').textContent = 'Ân Đức Tam Bảo · chọn Phật · Pháp · Tăng rồi chạm "chi tiết" ở mỗi ân đức';
+    grid.style.display='none';
+    legend.style.display='none';
+    document.getElementById('nav').innerHTML = '';
+    renderAnDucPage();
   } else if(s==='demucthien'){
     document.getElementById('page-subtitle').textContent = '40 Đề mục thiền chỉ (Kammaṭṭhāna) · chạm để xem mức định, ấn tướng, tánh nết';
     grid.style.display='none';
