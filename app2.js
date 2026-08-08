@@ -71,6 +71,7 @@ const PAGE_ACTIONS = {
 };
 
 function switchSection(s){
+  if(typeof hideTapInfo==='function') hideTapInfo();
   currentSection = s;
   try{ localStorage.setItem('quyen22-section', s); }catch(e){}
   if(typeof applyFontScale==='function') applyFontScale();
@@ -241,7 +242,7 @@ function renderTamSoPage(){
     else if(chunk.indent) rowStyle += `;margin-left:calc(${chunk.indent} * (var(--dot) + 2px))`;
     cittaHtml += `<div class="pblock${chunk.groupGap?' pblock-gap':''}" style="width:${REFW}">
       <div class="prow" style="grid-template-columns:repeat(${cols2},var(--dot));${rowStyle}">
-        ${items.map(c=>`<div class="pdot-sm" data-k="ci-${c.id}" style="background:${VEDANA_COLOR[c.vedana]}" onclick="openCittaSheet(${c.id})"></div>`).join('')}${dashedDot}
+        ${items.map(c=>`<div class="pdot-sm" data-k="ci-${c.id}" style="background:${VEDANA_COLOR[c.vedana]}" onclick="tapNeuCitta(${c.id})"></div>`).join('')}${dashedDot}
       </div>
     </div>`;
   }
@@ -254,7 +255,7 @@ function renderTamSoPage(){
     const cls = 'pblock' + (chunk.groupGap?' pblock-gap':'');
     cetaHtml += `<div class="${cls}">
       <div class="prow" style="grid-template-columns:repeat(${chunk.cols},var(--dot))">
-        ${items.map(c=>`<div class="pdot-sm" data-k="ce-${c.id}" style="${dotBackgroundStyle(vedanaSetOf(c.id))}" onclick="openCetasikaSheet('${c.id}')"></div>`).join('')}
+        ${items.map(c=>`<div class="pdot-sm" data-k="ce-${c.id}" style="${dotBackgroundStyle(vedanaSetOf(c.id))}" onclick="tapNeuCet('${c.id}')"></div>`).join('')}
       </div>
     </div>`;
   }
@@ -2702,5 +2703,62 @@ function openTDMinhHanh(){
       Không nên dạy rằng phải hoàn tất trọn vẹn Giới tịnh rồi mới được hành thiền; không nên bảo người thợ săn, thợ chài rằng bỏ nghề mới được hành samatha–vipassanā — nên khuyến khích họ niệm ân đức Tam Bảo (gieo hột giống Hạnh) và quán ba đặc tướng (gieo hột giống Minh).<br>
       <b>Các giáo huấn sai lầm</b> (micchā-dhamma): không thấy hiểm họa luân hồi; tin thời nay không ai chứng được Đạo Quả; trì hoãn chờ ba-la-mật chín muồi; tin người nay chỉ sanh hai nhân; tin các bậc đại sư không còn nữa. Phản biện của Ngài: <b>không một thiện nghiệp nào là vô ích</b> — người dvi-hetuka tinh tấn có thể thành ti-hetuka kiếp sau; làm nản lòng người tu là dhammantarāya, quả báo kém phước, kém trí trong các kiếp vị lai.
     </div></div>
+  `);
+}
+
+
+// ===== BẢNG ĐỘNG mô tả nút vừa chạm trên Bảng Nêu (chạm lần 2 mở bảng đầy đủ) =====
+var _neuLastTap = null;
+function hideTapInfo(){
+  const p = document.getElementById('tap-info');
+  if(p) p.classList.remove('show');
+  _neuLastTap = null;
+}
+function _showTapInfo(html){
+  const p = document.getElementById('tap-info');
+  if(!p) return;
+  document.getElementById('tap-info-body').innerHTML = html;
+  p.classList.add('show');
+}
+function showTapInfoByKey(key){
+  const kind = key.slice(0,2), rawId = key.slice(3);
+  if(kind==='ci') showTapInfoCitta(parseInt(rawId,10));
+  else if(kind==='ce') showTapInfoCet(rawId);
+}
+function tapNeuCitta(id){
+  // tới được đây nghĩa là ô đã được chọn từ lần chạm 1 (capture đã hiện bảng động) -> mở bảng đầy đủ
+  hideTapInfo(); openCittaSheet(id);
+}
+function showTapInfoCitta(id){
+  _neuLastTap = 'ci'+id;
+  const c = CITTA_DATA.find(x=>x.id===id);
+  const names = CETASIKA_DATA.filter(x=>c.ceta.includes(x.id)).map(x=>x.ten.replace(/ \(sở hữu\)/,''));
+  _showTapInfo(`
+    <div class="ti-name">${cittaFullName(c)} <span class="ti-gloss">(${glossCitta(c)})</span></div>
+    <div class="ti-sub">${c.groupLabel} · Cảm thọ: ${c.vedanaLabel}</div>
+    <div class="ti-list"><b>${c.ceta.length} tâm sở phối hợp:</b> ${names.join(', ')}.</div>
+    <button class="ti-more" onclick="hideTapInfo();openCittaSheet(${id})">Mở bảng đầy đủ »</button>
+  `);
+}
+function tapNeuCet(id){
+  hideTapInfo(); openCetasikaSheet(id);
+}
+function showTapInfoCet(id){
+  _neuLastTap = 'ce'+id;
+  const ces = CETASIKA_DATA.find(x=>x.id===id);
+  const matching = CITTA_DATA.filter(c=>c.ceta.includes(id));
+  const ani = ANIYATA_INFO[id];
+  const aniN = ani ? ani.cittas.length : 0;
+  const dn4 = (typeof DACTINH_DATA!=='undefined' && DACTINH_DATA[id]) ? DACTINH_DATA[id].dt : '';
+  // công thức nhóm ngắn gọn
+  const gp = []; const seen = [];
+  for(const m of matching){ if(!seen.includes(m.group)){ seen.push(m.group); gp.push(`${matching.filter(x=>x.group===m.group).length} ${m.groupLabel}`);} }
+  let body = matching.length ? `<b>${matching.length} tâm phối hợp${ani?' cố định':''}:</b> ${gp.join(' + ')}.` : '';
+  if(aniN) body += `${body?'<br>':''}<b>${aniN} tâm bất định</b> (chỉ khởi khi có dịp).`;
+  _showTapInfo(`
+    <div class="ti-name">Tâm sở ${ces.ten.replace(/ \(sở hữu\)/,'')}${dn4?` <span class="ti-gloss">(${dn4.charAt(0).toLowerCase()+dn4.slice(1)})</span>`:''}</div>
+    <div class="ti-sub">${ces.pali}</div>
+    <div class="ti-list">${body}</div>
+    <button class="ti-more" onclick="hideTapInfo();openCetasikaSheet('${id}')">Mở bảng đầy đủ »</button>
   `);
 }

@@ -110,7 +110,10 @@ document.addEventListener('click', function(e){
   document.querySelectorAll('.pdot-selected').forEach(x=>x.classList.remove('pdot-selected'));
   clearTamsoLit();
   dot.classList.add('pdot-selected');
-  if(dot.dataset.k) tamsoHighlight(dot.dataset.k); // trang Tâm↔Tâm sở: sáng các ô phối hợp
+  if(dot.dataset.k){
+    tamsoHighlight(dot.dataset.k); // trang Tâm↔Tâm sở: sáng các ô phối hợp
+    if(typeof showTapInfoByKey==='function') showTapInfoByKey(dot.dataset.k); // + bảng động mô tả
+  }
 }, true);
 
 // ===== (Trang Tâm ↔ Tâm sở) Chạm lần 1: làm MỜ các ô không phối hợp =====
