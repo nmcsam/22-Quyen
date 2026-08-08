@@ -185,6 +185,14 @@
   body.lang-pali .circle .cn{display:none}
   body.lang-pali .card .v{display:none}
   body.lang-pali .card .p{font-size:12px;font-weight:700;color:var(--ink)}
+  #tap-info{position:fixed;left:8px;right:8px;bottom:10px;z-index:60;background:var(--card);border:1.5px solid #b06a28;border-radius:14px;padding:10px 34px 10px 12px;box-shadow:0 6px 18px rgba(40,26,6,.35);transform:translateY(120%);opacity:0;transition:transform .18s ease,opacity .18s ease;pointer-events:none;max-height:38vh;overflow-y:auto}
+  #tap-info.show{transform:translateY(0);opacity:1;pointer-events:auto}
+  #tap-info-x{position:absolute;top:6px;right:8px;border:none;background:none;color:var(--ink-soft);font-size:15px;padding:4px;cursor:pointer}
+  #tap-info .ti-name{font-weight:800;font-size:calc(15.5px * var(--fontscale,1));color:var(--ink);line-height:1.35}
+  #tap-info .ti-gloss{font-weight:600;font-size:.78em;color:var(--ink-soft)}
+  #tap-info .ti-sub{font-style:italic;font-size:calc(12.5px * var(--fontscale,1));color:var(--ink-soft);margin:2px 0 6px}
+  #tap-info .ti-list{font-size:calc(13px * var(--fontscale,1));color:var(--ink);line-height:1.55}
+  #tap-info .ti-more{margin-top:8px;padding:5px 11px;border-radius:10px;border:1.5px solid #b06a28;background:transparent;color:var(--ink);font-weight:800;font-size:12px;font-family:inherit;cursor:pointer}
   #sheet{--fontscale:var(--sheetscale,1)}
   #sheet-fontctrl{position:absolute;top:10px;right:56px;display:flex;gap:4px;z-index:3}
   #sheet-editctrl{position:absolute;top:10px;right:140px;display:flex;gap:4px;z-index:3}
@@ -347,6 +355,12 @@
     <div id="extra-content"></div>
   </main>
   <nav id="nav"></nav>
+</div>
+
+<!-- Bảng động mô tả nút vừa chạm (Bảng Nêu Tâm–Tâm sở) -->
+<div id="tap-info">
+  <button id="tap-info-x" onclick="hideTapInfo()" aria-label="Đóng">✕</button>
+  <div id="tap-info-body"></div>
 </div>
 
 <div id="sheet-backdrop" onclick="closeSheet()"></div>
