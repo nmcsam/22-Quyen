@@ -767,18 +767,37 @@ function renderDuyenKhoiPage(){
     arrows += `<path d="${dkArc(R,a1,a2,1)}" stroke="#c8471f" stroke-width="8" fill="none" marker-end="url(#dkarr)"/>`;
   }
 
+  // 4 cung 2 đầu ôm từng phần P1..P4 + nhãn bấm được (thay cho 4 nút bên dưới)
+  const QLBL = ['P1 · 5 nhân quá khứ','P2 · 5 quả hiện tại','P3 · 5 nhân hiện tại','P4 · 5 quả vị lai'];
+  const RO=356, RL=402, CW=170, CH=34, rad=d=>d*Math.PI/180;
+  let groups='';
+  PHAN.forEach((p,gi)=>{
+    const first=p.chis[0], last=p.chis[p.chis.length-1];
+    const a1=-90+first*30-13, a2=-90+last*30+13, mid=(a1+a2)/2;
+    const cx=C+RL*Math.cos(rad(mid)), cy=C+RL*Math.sin(rad(mid));
+    groups += `<g style="cursor:pointer" onclick="openDKQuarterSheet(${gi+1})">
+      <path d="${dkArc(RO,a1,a2,1)}" fill="none" stroke="#c62828" stroke-width="6" marker-start="url(#dkgrp)" marker-end="url(#dkgrp)"/>
+      <rect x="${(cx-CW/2).toFixed(1)}" y="${(cy-CH/2).toFixed(1)}" width="${CW}" height="${CH}" rx="13" fill="#ffffff" stroke="#c62828" stroke-width="2"/>
+      <text x="${cx.toFixed(1)}" y="${(cy+5.5).toFixed(1)}" text-anchor="middle" font-size="15.5" font-weight="700" fill="#b3261e">${QLBL[gi]}</text>
+    </g>`;
+  });
+
   extra.innerHTML = `
     <p class="info-note" style="margin-bottom:6px">Vòng Thập Nhị Nhân Duyên — chạm 1 lần để chọn, chạm lần 2 để xem chi pháp và giảng giải. Chạm <b>tâm vòng tròn</b> để xem các yếu tố chính (2 gốc rễ, 2 đế, 3 mối nối, 3 luân, 20 yếu tố...).</p>
     <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-    <svg viewBox="0 0 720 720" style="width:calc(min(100%, 560px) * var(--fontscale,1));height:auto;display:block;margin:0 auto" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="-80 -55 885 760" style="width:calc(min(100%, 620px) * var(--fontscale,1));height:auto;display:block;margin:0 auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="dkarr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.6" markerHeight="4.6" orient="auto-start-reverse">
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#c8471f"/>
+        </marker>
+        <marker id="dkgrp" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5.2" markerHeight="5.2" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#c62828"/>
         </marker>
       </defs>
       <circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="#d8c9b2" stroke-width="2.5" stroke-dasharray="3 7"/>
       ${arrows}
       ${nodes}
+      ${groups}
       <g class="dkc" onclick="openDKCenterSheet()">
         <circle cx="${C}" cy="${C}" r="118" fill="#16357c" stroke="#0f2a63" stroke-width="3" class="dk-shape"/>
         <text x="${C}" y="${C-30}" text-anchor="middle" font-size="26" font-weight="800" fill="#fff">VÔ MINH · ÁI</text>
@@ -788,13 +807,7 @@ function renderDuyenKhoiPage(){
       </g>
     </svg>
     </div>
-    <div class="qbtn-row" style="justify-content:center">
-      <button class="qbtn" style="border-color:#17357f;color:#1c3f9c" onclick="openDKQuarterSheet(1)">P1 · 5 nhân quá khứ</button>
-      <button class="qbtn" style="border-color:#17357f;color:#1c3f9c" onclick="openDKQuarterSheet(2)">P2 · 5 quả hiện tại</button>
-      <button class="qbtn" style="border-color:#17357f;color:#1c3f9c" onclick="openDKQuarterSheet(3)">P3 · 5 nhân hiện tại</button>
-      <button class="qbtn" style="border-color:#17357f;color:#1c3f9c" onclick="openDKQuarterSheet(4)">P4 · 5 quả vị lai</button>
-    </div>
-    <p class="info-note" style="margin-top:4px"><b>4 phần:</b> P1 · Nhân quá khứ (Vô minh, Hành) · P2 · Quả hiện tại (Thức → Thọ) · P3 · Nhân hiện tại (Ái, Thủ, Hữu) · P4 · Quả vị lai (Sanh, Già chết).<br>Chi pháp theo Đường Vào Thắng Pháp (TK Chánh Minh); giảng giải theo tài liệu truyền thống Mogok.</p>
+    <p class="info-note" style="margin-top:4px"><b>4 phần</b> (chạm nhãn P1–P4 trên vòng để xem chi tiết)<b>:</b> P1 · Nhân quá khứ (Vô minh, Hành) · P2 · Quả hiện tại (Thức → Thọ) · P3 · Nhân hiện tại (Ái, Thủ, Hữu) · P4 · Quả vị lai (Sanh, Già chết).<br>Chi pháp theo Đường Vào Thắng Pháp (TK Chánh Minh); giảng giải theo tài liệu truyền thống Mogok.</p>
     ${tkDuyenKhoi()}
   `;
 }
