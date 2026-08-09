@@ -255,41 +255,39 @@
     .circle.cat-green {--cl:#79926f;--c:#3f6331;--cd:#2c4522;--cdd:#1e3018;color:#ddf5cc}
     .circle.cat-gray  {--cl:#83817a;--c:#565550;--cd:#3d3c38;--cdd:#2a2926;color:#e8e5da}
   }
-  /* ===== BẢNG TÊN oval kim loại: KHÔNG nền, oval CHIỀU DỌC, chữ NỔI — Tâm↔Tâm sở dùng chấm tròn nên không ảnh hưởng ===== */
-  .circle-grid{grid-template-columns:repeat(auto-fill,minmax(calc(82px * var(--fontscale,1)),1fr));gap:calc(10px * var(--fontscale,1))}
+  /* ===== Thẻ bo góc mềm, nền pastel theo nhóm, viền mảnh, chữ nổi nhẹ (kiểu nút "Đã bật") — Tâm↔Tâm sở dùng chấm tròn nên không ảnh hưởng ===== */
+  .circle-grid{grid-template-columns:repeat(auto-fill,minmax(calc(88px * var(--fontscale,1)),1fr));gap:calc(9px * var(--fontscale,1))}
   .circle{
-    border:none;background:none;box-shadow:none;overflow:visible;
-    border-radius:12px;
-    min-height:calc(114px * var(--fontscale,1));
-    padding:10px 6px;
+    border-radius:16px;
+    min-height:calc(80px * var(--fontscale,1));
+    padding:11px 8px;
     justify-content:center;
-  }
-  .circle::before{
-    content:'';position:absolute;inset:3px;z-index:0;border-radius:50%;
-    background:linear-gradient(180deg, var(--cl) 0%, var(--c) 45%, var(--cd) 80%, var(--cdd) 100%);
-    border:1px solid rgba(0,0,0,.35);
+    overflow:hidden;
+    border:1.5px solid var(--c);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.62) 0%, rgba(255,255,255,.14) 48%, rgba(255,255,255,0) 100%),
+      linear-gradient(180deg, var(--cl) 0%, var(--c) 165%);
     box-shadow:
-      inset 0 2px 3px rgba(255,255,255,.6),
-      inset 0 -7px 13px rgba(0,0,0,.42),
-      inset 0 0 0 1px rgba(255,255,255,.2),
-      0 4px 8px -1px rgba(18,20,26,.5),
-      0 1px 2px rgba(0,0,0,.35);
+      0 3px 7px -2px rgba(30,28,20,.22),
+      0 1px 2px rgba(0,0,0,.10),
+      inset 0 1px 0 rgba(255,255,255,.7);
   }
-  .circle::after{
-    content:'';position:absolute;inset:5px;z-index:0;border-radius:50%;pointer-events:none;
-    background:radial-gradient(120% 64% at 50% 12%, rgba(255,255,255,.62) 0%, rgba(255,255,255,.14) 32%, rgba(255,255,255,0) 54%);
-  }
-  .circle>*{position:relative;z-index:1;max-width:84%}
-  /* Chữ NỔI (embossed): highlight phía trên, bóng phía dưới */
-  .circle .cn{text-shadow:0 -1px 0 rgba(255,255,255,.55), 0 1px 1px rgba(0,0,0,.5)}
-  .circle .cp{text-shadow:0 -1px 0 rgba(255,255,255,.45), 0 1px 1px rgba(0,0,0,.45)}
-  .circle:active,.circle.pressed{transform:translateY(2px) scale(.97);box-shadow:none}
-  .circle:active::before,.circle.pressed::before{box-shadow:inset 0 3px 7px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.3),0 2px 4px -1px rgba(18,20,26,.4)}
+  .circle::before{content:none}
+  .circle::after{content:none}
+  .circle>*{position:relative;z-index:1;max-width:92%}
+  .circle .cn{text-shadow:0 1px 0 rgba(255,255,255,.55)}
+  .circle .cp{opacity:.85;text-shadow:0 1px 0 rgba(255,255,255,.45)}
+  .circle:active,.circle.pressed{transform:translateY(1px) scale(.985);box-shadow:0 1px 3px rgba(0,0,0,.18),inset 0 2px 5px rgba(0,0,0,.14)}
   @media (prefers-color-scheme: dark){
-    .circle::after{background:radial-gradient(120% 64% at 50% 12%, rgba(255,255,255,.32) 0%, rgba(255,255,255,.07) 32%, rgba(255,255,255,0) 54%)}
-    .circle::before{box-shadow:inset 0 2px 3px rgba(255,255,255,.22),inset 0 -7px 13px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.1),0 4px 9px -1px rgba(0,0,0,.65),0 1px 2px rgba(0,0,0,.5)}
-    .circle .cn{text-shadow:0 -1px 0 rgba(255,255,255,.14), 0 1px 2px rgba(0,0,0,.7)}
-    .circle .cp{text-shadow:0 -1px 0 rgba(255,255,255,.1), 0 1px 2px rgba(0,0,0,.6)}
+    .circle{
+      border:1.5px solid rgba(255,255,255,.16);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,.02) 50%, rgba(255,255,255,0) 100%),
+        linear-gradient(180deg, var(--cd) 0%, var(--cdd) 140%);
+      box-shadow:0 4px 9px -3px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12);
+    }
+    .circle .cn{text-shadow:0 1px 1px rgba(0,0,0,.55)}
+    .circle .cp{opacity:.9;text-shadow:0 1px 1px rgba(0,0,0,.5)}
   }
   @media (prefers-color-scheme: dark){ .circle-plain{border-color:#e8ded0 !important} }
   @media (prefers-color-scheme: dark){
