@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v91'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v92'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -9,7 +9,7 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['home','Trang đầu'],['anduc','Ân Đức Tam Bảo'],['daolo','Đạo Lộ Tu Tập'],['xugioi','12 Xứ · 18 Giới'],['canh','21 Cảnh'],['quyen22','22 Quyền'],['duyenhe','24 Duyên hệ'],['coi31','31 Cõi'],['trodao','37 Trợ đạo'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Pháp thực tính'],['duyenkhoi','Duyên khởi'],['demucthien','Đề mục thiền']];
+  const sections = [['home','Trang đầu'],['anduc','Ân Đức Tam Bảo'],['kinhtung','Kinh tụng hàng ngày'],['daolo','Đạo Lộ Tu Tập'],['xugioi','12 Xứ · 18 Giới'],['canh','21 Cảnh'],['quyen22','22 Quyền'],['duyenhe','24 Duyên hệ'],['coi31','31 Cõi'],['trodao','37 Trợ đạo'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Pháp thực tính'],['duyenkhoi','Duyên khởi'],['demucthien','Đề mục thiền']];
   const cur = sections.find(x=>x[0]===currentSection);
   const pct = Math.round(((typeof fontScales!=='undefined' && fontScales[currentSection])||1)*100) + '%';
   document.getElementById('section-switch').innerHTML = `
@@ -159,6 +159,12 @@ function switchSection(s){
     legend.style.display='none';
     document.getElementById('nav').innerHTML = '';
     renderAnDucPage();
+  } else if(s==='kinhtung'){
+    document.getElementById('page-subtitle').textContent = 'Kinh tụng hằng ngày · bài Pāli và nghĩa Việt';
+    grid.style.display='none';
+    legend.style.display='none';
+    document.getElementById('nav').innerHTML = '';
+    renderKinhTungPage();
   } else if(s==='demucthien'){
     document.getElementById('page-subtitle').textContent = '40 Đề mục thiền chỉ (Kammaṭṭhāna) · chạm để xem mức định, ấn tướng, tánh nết';
     grid.style.display='none';
@@ -730,6 +736,49 @@ function dkNode(a,r,label,idx,w){
     <rect x="${-w/2-4}" y="-26" width="${w+8}" height="52" rx="26" fill="none" stroke="#f0c419" stroke-width="2.5" opacity=".9"/>
     <text text-anchor="middle" dominant-baseline="central" font-size="21" font-weight="800" fill="#111">${label}</text>
   </g>`;
+}
+
+function renderKinhTungPage(){
+  const extra = document.getElementById('extra-content');
+  extra.innerHTML = `
+  <div class="article">
+    <p class="info-note" style="margin-bottom:10px">Nghi thức tụng niệm hằng ngày (Nam Tông). Phần dưới là các bài <b>căn bản, cố định</b> theo Pāli; bạn có thể gửi thêm các bài theo truyền thống của mình (rải tâm từ, sám hối, hồi hướng…) để bổ sung.</p>
+
+    <div class="sec">
+      <div class="sec-label">1. Đảnh lễ Đức Thế Tôn (Namakāra)</div>
+      <div class="ad-kinh"><div class="ad-kinh-lbl">Pāli · đọc 3 lần</div>
+        Namo tassa Bhagavato Arahato Sammāsambuddhassa. <b>(×3)</b></div>
+      <div class="sec-body" style="margin-top:6px">Con đem hết lòng thành kính đảnh lễ Đức Thế Tôn, bậc A-la-hán, đấng Chánh Đẳng Chánh Giác.</div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">2. Quy y Tam Bảo (Tisaraṇa)</div>
+      <div class="ad-kinh"><div class="ad-kinh-lbl">Pāli</div>
+        Buddhaṃ saraṇaṃ gacchāmi.<br>
+        Dhammaṃ saraṇaṃ gacchāmi.<br>
+        Saṅghaṃ saraṇaṃ gacchāmi.<br><br>
+        Dutiyampi Buddhaṃ saraṇaṃ gacchāmi.<br>
+        Dutiyampi Dhammaṃ saraṇaṃ gacchāmi.<br>
+        Dutiyampi Saṅghaṃ saraṇaṃ gacchāmi.<br><br>
+        Tatiyampi Buddhaṃ saraṇaṃ gacchāmi.<br>
+        Tatiyampi Dhammaṃ saraṇaṃ gacchāmi.<br>
+        Tatiyampi Saṅghaṃ saraṇaṃ gacchāmi.</div>
+      <div class="sec-body" style="margin-top:6px">Con xin quy y Phật · quy y Pháp · quy y Tăng. (Lần thứ nhì · lần thứ ba cũng vậy.)</div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">3. Thọ trì Ngũ Giới (Pañcasīla)</div>
+      <div class="ad-kinh"><div class="ad-kinh-lbl">Pāli</div>
+        1. Pāṇātipātā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
+        2. Adinnādānā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
+        3. Kāmesumicchācārā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
+        4. Musāvādā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
+        5. Surāmeraya-majjapamādaṭṭhānā veramaṇī sikkhāpadaṃ samādiyāmi.</div>
+      <div class="sec-body" style="margin-top:6px">Con xin vâng giữ điều học: (1) không sát sanh · (2) không trộm cắp · (3) không tà dâm · (4) không nói dối · (5) không dùng rượu và các chất say làm nền tảng của sự dể duôi.</div>
+    </div>
+
+    <div class="info-note" style="margin-top:12px">Muốn thêm bài nào (Ân đức Tam Bảo tụng, Rải tâm từ – Mettā, Hồi hướng phước – Pattidāna, Sám hối, Cầu an…), bạn gửi nội dung để mình đưa vào và định dạng đúng kiểu này.</div>
+  </div>`;
 }
 
 function renderDuyenKhoiPage(){
@@ -1867,7 +1916,7 @@ renderSectionSwitch();
 applyLangMode();
 // Mở lại đúng trang đang xem trước khi tải lại (lưu ở localStorage 'quyen22-section'); mặc định Trang đầu
 (function(){
-  var _valid = ['home','daolo','xugioi','canh','quyen22','duyenhe','coi31','trodao','tamso','dactinh','duyenkhoi','demucthien','anduc'];
+  var _valid = ['home','anduc','kinhtung','daolo','xugioi','canh','quyen22','duyenhe','coi31','trodao','tamso','dactinh','duyenkhoi','demucthien'];
   var _s = 'home';
   try{ _s = localStorage.getItem('quyen22-section') || 'home'; }catch(e){}
   switchSection(_valid.indexOf(_s) >= 0 ? _s : 'home');
