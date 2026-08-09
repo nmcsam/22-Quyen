@@ -479,7 +479,9 @@ function openCetasikaSheet(id){
 // ===== Phần "Đặc tính · Chức năng · Thể hiện · Nhân gần" (Aṭṭhasālinī) =====
 
 function plainCircleHTML(id, label, pali, opener, cls){
-  return `<div class="circle ${cls||'circle-plain'}" onclick="${opener}('${id}')"><div class="cn">${label}</div>${pali?`<div class="cp">${pali}</div>`:''}</div>`;
+  const m = /^(\d+)\.\s*([\s\S]*)$/.exec(label);
+  const head = m ? `<div class="cp cnum">${m[1]}</div><div class="cn">${m[2]}</div>` : `<div class="cn">${label}</div>`;
+  return `<div class="circle ${cls||'circle-plain'}" onclick="${opener}('${id}')">${head}${pali?`<div class="cp">${pali}</div>`:''}</div>`;
 }
 
 function renderDacTinhGroup(title, items){
@@ -514,7 +516,7 @@ function renderDacTinhPage(){
     const first = n + 1;
     const circles = g.items.map((it, ii)=>{
       n++;
-      return `<div class="circle ${g.cls||'circle-plain'}" onclick="openDacTinhTL(${gi},${ii})"><div class="cn">${n}. ${it.ten}</div><div class="cp">${it.pali}</div></div>`;
+      return `<div class="circle ${g.cls||'circle-plain'}" onclick="openDacTinhTL(${gi},${ii})"><div class="cp cnum">${n}</div><div class="cn">${it.ten}</div><div class="cp">${it.pali}</div></div>`;
     }).join('');
     const range = first===n ? `${first}.` : `${first}–${n} ·`;
     return `<div class="group-head">${range} ${g.ten}</div><div class="circle-grid">${circles}</div>`;
@@ -523,7 +525,7 @@ function renderDacTinhPage(){
   extra.innerHTML = `
     <p class="info-note" style="margin-bottom:12px"><b>Bốn khía cạnh thực tính (Sabhāvadhamma) của các pháp chân đế (Paramattha)</b> — trình bày đầy đủ theo tài liệu (tr. 531–551): mỗi pháp có <b>Đặc tính (Lakkhaṇā)</b>, <b>Chức năng (Rasā)</b>, <b>Sự thể hiện (Paccupaṭṭhānā)</b> và <b>Nhân gần (Padaṭṭhānā)</b> riêng — tổng cộng <b>135 mục</b>: Tâm, Ngũ Uẩn, Ngũ Song Thức – Ý Giới – Ý Thức Giới – 2 Tâm Tố vô nhân, 52 Tâm sở (Thọ chia 5, 6 cặp thân·tâm), 28 Sắc pháp, 12 chi Duyên khởi cùng Sầu·Bi·Khổ·Ưu·Não, ba loại Khổ, Tứ Đế, Tứ Vô Lượng Tâm, Thập Độ và Níp-bàn. Chạm vào từng pháp để xem 4 khía cạnh kèm Pāli.</p>
     ${groupsHtml}
-    ${renderDacTinhGroup('Phụ lục · 14 chức năng của Tâm (Đường Vào Thắng Pháp — TK Chánh Minh)', [CHUCNANG_TAM_14.map((c,i)=>`<div class="circle circle-vt" onclick="openChucNangTam(${i})"><div class="cn">${i+1}. ${c.ten}</div><div class="cp">${c.pali}</div></div>`).join('')])}
+    ${renderDacTinhGroup('Phụ lục · 14 chức năng của Tâm (Đường Vào Thắng Pháp — TK Chánh Minh)', [CHUCNANG_TAM_14.map((c,i)=>`<div class="circle circle-vt" onclick="openChucNangTam(${i})"><div class="cp cnum">${i+1}</div><div class="cn">${c.ten}</div><div class="cp">${c.pali}</div></div>`).join('')])}
     <p class="info-note">Nguồn: bảng "Bốn khía cạnh thực tính (Sabhāvadhamma) của các pháp chân đế (Paramattha)" theo <i>Milindapañhā, Visuddhimagga</i> và <i>Aṭṭhasālinī</i>; riêng phần giải thích về Thập Độ trích từ <i>Sīlakkhandhaṭīkā</i> và <i>Cariyapiṭaka-Aṭṭhakathā</i> (tài liệu tr. 531–551). Ô Nhân gần của Gió: tài liệu in "Nước, Lửa, Gió", đã sửa thành "Đất, Nước, Lửa" cho đúng ba Đại còn lại. Toàn bộ thuật ngữ Pāli và các ô đặc tính – phận sự – thành tựu – nhân gần đã được đối chiếu và hiệu đính theo <i>Visuddhimagga</i> (XIV, XVI) và <i>Aṭṭhasālinī</i> bản VRI.</p>
     ${tkDacTinh()}
   `;
@@ -735,10 +737,10 @@ function renderDuyenKhoiPage(){
   const extra = document.getElementById('extra-content');
   // 4 phần theo truyền thống Mogok: màu nền từng chi
   const PHAN = [
-    {chis:[0,1],       fill:'#fbe3dc', stroke:'#b34a32', ink:'#6d2413', label:'Nhân quá khứ'},
-    {chis:[2,3,4,5,6], fill:'#e2f2da', stroke:'#4c7a3a', ink:'#274617', label:'Quả hiện tại'},
-    {chis:[7,8,9],     fill:'#fdecca', stroke:'#b07a1f', ink:'#5f3e08', label:'Nhân hiện tại'},
-    {chis:[10,11],     fill:'#e5dcf5', stroke:'#6b4fa0', ink:'#392564', label:'Quả vị lai'}
+    {chis:[0,1],       fill:'#2b54c2', stroke:'#17357f', ink:'#ffffff', label:'Nhân quá khứ'},
+    {chis:[2,3,4,5,6], fill:'#2b54c2', stroke:'#17357f', ink:'#ffffff', label:'Quả hiện tại'},
+    {chis:[7,8,9],     fill:'#2b54c2', stroke:'#17357f', ink:'#ffffff', label:'Nhân hiện tại'},
+    {chis:[10,11],     fill:'#2b54c2', stroke:'#17357f', ink:'#ffffff', label:'Quả vị lai'}
   ];
   const phanOf = i => PHAN.find(p=>p.chis.includes(i));
   // Tên hiển thị (tối đa 2 dòng)
@@ -757,7 +759,7 @@ function renderDuyenKhoiPage(){
          <text x="0" y="20" text-anchor="middle" font-size="20" font-weight="800" fill="${p.ink}">${lines[1]}</text>`;
     nodes += `<g class="dkc" transform="translate(${x.toFixed(1)},${y.toFixed(1)})" onclick="openDuyenKhoiSheet(${i})">
       <circle r="${NR}" fill="${p.fill}" stroke="${p.stroke}" stroke-width="3.5" class="dk-shape"/>
-      <text x="0" y="-26" text-anchor="middle" font-size="15" font-weight="700" fill="${p.stroke}">${i+1}</text>
+      <text x="0" y="-25" text-anchor="middle" font-size="16" font-weight="800" fill="#ffd257">${i+1}</text>
       ${texts}
     </g>`;
     // mũi tên nối chi i -> i+1 (cung ngắn giữa 2 nút)
@@ -778,7 +780,7 @@ function renderDuyenKhoiPage(){
       ${arrows}
       ${nodes}
       <g class="dkc" onclick="openDKCenterSheet()">
-        <circle cx="${C}" cy="${C}" r="118" fill="#96651f" stroke="#7a5218" stroke-width="3" class="dk-shape"/>
+        <circle cx="${C}" cy="${C}" r="118" fill="#16357c" stroke="#0f2a63" stroke-width="3" class="dk-shape"/>
         <text x="${C}" y="${C-30}" text-anchor="middle" font-size="26" font-weight="800" fill="#fff">VÔ MINH · ÁI</text>
         <text x="${C}" y="${C+2}" text-anchor="middle" font-size="15.5" fill="#f5e4c3">hai gốc rễ của luân hồi</text>
         <text x="${C}" y="${C+34}" text-anchor="middle" font-size="15.5" fill="#f5e4c3">Paṭicca-samuppāda</text>
@@ -787,12 +789,12 @@ function renderDuyenKhoiPage(){
     </svg>
     </div>
     <div class="qbtn-row" style="justify-content:center">
-      <button class="qbtn" style="border-color:#b34a32;color:#8a2f18" onclick="openDKQuarterSheet(1)">P1 · 5 nhân quá khứ</button>
-      <button class="qbtn" style="border-color:#4c7a3a;color:#33591f" onclick="openDKQuarterSheet(2)">P2 · 5 quả hiện tại</button>
-      <button class="qbtn" style="border-color:#b07a1f;color:#7c550e" onclick="openDKQuarterSheet(3)">P3 · 5 nhân hiện tại</button>
-      <button class="qbtn" style="border-color:#6b4fa0;color:#4b3380" onclick="openDKQuarterSheet(4)">P4 · 5 quả vị lai</button>
+      <button class="qbtn" style="border-color:#17357f;color:#1c3f9c" onclick="openDKQuarterSheet(1)">P1 · 5 nhân quá khứ</button>
+      <button class="qbtn" style="border-color:#17357f;color:#1c3f9c" onclick="openDKQuarterSheet(2)">P2 · 5 quả hiện tại</button>
+      <button class="qbtn" style="border-color:#17357f;color:#1c3f9c" onclick="openDKQuarterSheet(3)">P3 · 5 nhân hiện tại</button>
+      <button class="qbtn" style="border-color:#17357f;color:#1c3f9c" onclick="openDKQuarterSheet(4)">P4 · 5 quả vị lai</button>
     </div>
-    <p class="info-note" style="margin-top:4px"><b>Màu 4 phần:</b> <span style="color:#b34a32">■</span> Nhân quá khứ (Vô minh, Hành) · <span style="color:#4c7a3a">■</span> Quả hiện tại (Thức → Thọ) · <span style="color:#b07a1f">■</span> Nhân hiện tại (Ái, Thủ, Hữu) · <span style="color:#6b4fa0">■</span> Quả vị lai (Sanh, Già chết).<br>Chi pháp theo Đường Vào Thắng Pháp (TK Chánh Minh); giảng giải theo tài liệu truyền thống Mogok.</p>
+    <p class="info-note" style="margin-top:4px"><b>4 phần:</b> P1 · Nhân quá khứ (Vô minh, Hành) · P2 · Quả hiện tại (Thức → Thọ) · P3 · Nhân hiện tại (Ái, Thủ, Hữu) · P4 · Quả vị lai (Sanh, Già chết).<br>Chi pháp theo Đường Vào Thắng Pháp (TK Chánh Minh); giảng giải theo tài liệu truyền thống Mogok.</p>
     ${tkDuyenKhoi()}
   `;
 }
@@ -1078,7 +1080,7 @@ function renderDuyenHePage(){
   let circles = '';
   DUYENHE_DATA.forEach((d,i)=>{
     circles += `<div class="circle circle-dh" onclick="openDuyenHeSheet(${i})">
-      <div class="cp" style="font-weight:800">${i+1}</div>
+      <div class="cp cnum">${i+1}</div>
       <div class="cn">${d.ten}</div>
       <div class="cp">${d.pali.replace('paccaya','').replace('paccayo','')}</div>
     </div>`;
@@ -1382,10 +1384,10 @@ function renderXuGioiPage(){
   const xu = (arr, from) => arr.map((d,i)=>{
     const idx = from + i;
     return `<div class="circle ${XGC[d.nhom]}" onclick="openXuSheet(${XU_DATA.indexOf(d)})">
-      <div class="cp" style="font-weight:800">${idx}</div><div class="cn">${d.ten}</div><div class="cp">${d.pali.replace('āyatana','')}</div></div>`;
+      <div class="cp cnum">${idx}</div><div class="cn">${d.ten}</div><div class="cp">${d.pali.replace('āyatana','')}</div></div>`;
   }).join('');
   const gioi = GIOI_DATA.map((d,i)=>`<div class="circle ${XGC[d.nhom]}" onclick="openGioiSheet(${i})">
-      <div class="cp" style="font-weight:800">${i+1}</div><div class="cn">${d.ten}</div><div class="cp">${d.pali.replace('-dhātu','')}</div></div>`).join('');
+      <div class="cp cnum">${i+1}</div><div class="cn">${d.ten}</div><div class="cp">${d.pali.replace('-dhātu','')}</div></div>`).join('');
 
   extra.innerHTML = `
     <p class="info-note" style="margin-bottom:10px"><b>Xứ (āyatana)</b> và <b>Giới (dhātu)</b> là hai cách phân loại các pháp chân đế (tâm, tâm sở, sắc pháp) nhìn dưới góc độ "cửa ngõ tiếp xúc" và "yếu tố cấu thành kinh nghiệm". 12 Xứ nhóm theo 6 cặp căn – cảnh (nội xứ – ngoại xứ); 18 Giới tách rõ thêm phần <b>thức</b>: phân biệt riêng các loại tâm sinh khởi nơi mỗi căn.</p>
@@ -1620,7 +1622,7 @@ function renderDeMucThienPage(){
     const circles = g.items.map((it, ii)=>{
       n++;
       const label = it.ten.replace(/^Đề mục /,'');
-      return `<div class="circle ${g.cls}" onclick="openDeMucThien(${gi},${ii})"><div class="cn">${n}. ${label}</div><div class="cp">${it.pali}</div></div>`;
+      return `<div class="circle ${g.cls}" onclick="openDeMucThien(${gi},${ii})"><div class="cp cnum">${n}</div><div class="cn">${label}</div><div class="cp">${it.pali}</div></div>`;
     }).join('');
     return `<div class="group-head">${first}–${n} · ${g.ten}</div><div class="circle-grid">${circles}</div>`;
   }).join('');
@@ -1851,7 +1853,13 @@ switchSection = function(s){
 // ===== Khởi tạo app (đặt cuối file để mọi const dữ liệu đã sẵn sàng) =====
 renderSectionSwitch();
 applyLangMode();
-switchSection('home'); // Luôn mở app ở Trang đầu
+// Mở lại đúng trang đang xem trước khi tải lại (lưu ở localStorage 'quyen22-section'); mặc định Trang đầu
+(function(){
+  var _valid = ['home','daolo','xugioi','canh','quyen22','duyenhe','coi31','trodao','tamso','dactinh','duyenkhoi','demucthien','anduc'];
+  var _s = 'home';
+  try{ _s = localStorage.getItem('quyen22-section') || 'home'; }catch(e){}
+  switchSection(_valid.indexOf(_s) >= 0 ? _s : 'home');
+})();
 
 
 // ===== Tên đầy đủ + định nghĩa ngắn cho Tâm =====
@@ -2438,7 +2446,7 @@ function renderCoi31Page(){
   const extra = document.getElementById('extra-content');
   const CLS = {kho:'circle-bt', vui:'circle-tt', sac:'circle-sac', vosac:'circle-vt'};
   const circle = (d,i)=>`<div class="circle ${CLS[d.nhom]}" onclick="openCoi31Sheet(${i})">
-    <div class="cp" style="font-weight:800">${i+1}</div><div class="cn">${d.ten}</div><div class="cp">${d.pali}</div></div>`;
+    <div class="cp cnum">${i+1}</div><div class="cn">${d.ten}</div><div class="cp">${d.pali}</div></div>`;
   const group = (title, from, to)=>`
     <div class="group-head">${title}</div>
     <div class="circle-grid">${COI31_DATA.slice(from,to).map((d,k)=>circle(d,from+k)).join('')}</div>`;
@@ -2615,7 +2623,7 @@ function renderTroDaoPage(){
     html += `<div class="circle-grid">`;
     items.forEach(x=>{
       n++;
-      html += `<div class="circle ${gr.cls}" onclick="openTroDaoSheet(${x.i})"><div class="cp" style="font-weight:800">${n}</div><div class="cn">${x.d.ten}</div><div class="cp">${x.d.pali.split('-')[0].split(' ')[0]}</div></div>`;
+      html += `<div class="circle ${gr.cls}" onclick="openTroDaoSheet(${x.i})"><div class="cp cnum">${n}</div><div class="cn">${x.d.ten}</div><div class="cp">${x.d.pali.split('-')[0].split(' ')[0]}</div></div>`;
     });
     html += `</div>`;
   });

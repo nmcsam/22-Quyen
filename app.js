@@ -27,7 +27,7 @@ function renderQuyenGrid(){
   grid.innerHTML = QUYEN_DATA.map(d=>{
     const cat = v.colors[v.key(d)] || 'gray';
     return `<div class="circle cat-${cat}" onclick="openQuyenSheet(${d.id})">
-      <div class="cp" style="font-weight:800">${d.id}</div>
+      <div class="cp cnum">${d.id}</div>
       <div class="cn">${d.ten}</div>
       <div class="cp">${d.pali.split(' ')[0]}</div>
     </div>`;
