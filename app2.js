@@ -769,30 +769,30 @@ function renderDuyenKhoiPage(){
 
   // 4 cung 2 đầu ôm từng phần P1..P4 + nhãn bấm được (thay cho 4 nút bên dưới)
   const QLBL = ['P1 · 5 nhân quá khứ','P2 · 5 quả hiện tại','P3 · 5 nhân hiện tại','P4 · 5 quả vị lai'];
+  const QCOL = ['#c0392b','#2e7d32','#c77f1a','#6b4fa0']; // P1 đỏ · P2 lục · P3 cam · P4 tím
   const RO=356, RL=402, CW=170, CH=34, rad=d=>d*Math.PI/180;
-  let groups='';
+  let groups='', grpMarkers='';
   PHAN.forEach((p,gi)=>{
     const first=p.chis[0], last=p.chis[p.chis.length-1];
     const a1=-90+first*30-13, a2=-90+last*30+13, mid=(a1+a2)/2;
     const cx=C+RL*Math.cos(rad(mid)), cy=C+RL*Math.sin(rad(mid));
+    const col=QCOL[gi];
+    grpMarkers += `<marker id="dkgrp${gi}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5.2" markerHeight="5.2" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="${col}"/></marker>`;
     groups += `<g style="cursor:pointer" onclick="openDKQuarterSheet(${gi+1})">
-      <path d="${dkArc(RO,a1,a2,1)}" fill="none" stroke="#c62828" stroke-width="6" marker-start="url(#dkgrp)" marker-end="url(#dkgrp)"/>
-      <rect x="${(cx-CW/2).toFixed(1)}" y="${(cy-CH/2).toFixed(1)}" width="${CW}" height="${CH}" rx="13" fill="#ffffff" stroke="#c62828" stroke-width="2"/>
-      <text x="${cx.toFixed(1)}" y="${(cy+5.5).toFixed(1)}" text-anchor="middle" font-size="15.5" font-weight="700" fill="#b3261e">${QLBL[gi]}</text>
+      <path d="${dkArc(RO,a1,a2,1)}" fill="none" stroke="${col}" stroke-width="6" marker-start="url(#dkgrp${gi})" marker-end="url(#dkgrp${gi})"/>
+      <rect x="${(cx-CW/2).toFixed(1)}" y="${(cy-CH/2).toFixed(1)}" width="${CW}" height="${CH}" rx="13" fill="#ffffff" stroke="${col}" stroke-width="2"/>
+      <text x="${cx.toFixed(1)}" y="${(cy+5.5).toFixed(1)}" text-anchor="middle" font-size="15.5" font-weight="700" fill="${col}">${QLBL[gi]}</text>
     </g>`;
   });
 
   extra.innerHTML = `
-    <p class="info-note" style="margin-bottom:6px">Vòng Thập Nhị Nhân Duyên — chạm 1 lần để chọn, chạm lần 2 để xem chi pháp và giảng giải. Chạm <b>tâm vòng tròn</b> để xem các yếu tố chính (2 gốc rễ, 2 đế, 3 mối nối, 3 luân, 20 yếu tố...).</p>
     <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
     <svg viewBox="-80 -55 885 760" style="width:calc(min(100%, 620px) * var(--fontscale,1));height:auto;display:block;margin:0 auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="dkarr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.6" markerHeight="4.6" orient="auto-start-reverse">
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#c8471f"/>
         </marker>
-        <marker id="dkgrp" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5.2" markerHeight="5.2" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#c62828"/>
-        </marker>
+        ${grpMarkers}
       </defs>
       <circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="#d8c9b2" stroke-width="2.5" stroke-dasharray="3 7"/>
       ${arrows}
@@ -807,7 +807,6 @@ function renderDuyenKhoiPage(){
       </g>
     </svg>
     </div>
-    <p class="info-note" style="margin-top:4px"><b>4 phần</b> (chạm nhãn P1–P4 trên vòng để xem chi tiết)<b>:</b> P1 · Nhân quá khứ (Vô minh, Hành) · P2 · Quả hiện tại (Thức → Thọ) · P3 · Nhân hiện tại (Ái, Thủ, Hữu) · P4 · Quả vị lai (Sanh, Già chết).<br>Chi pháp theo Đường Vào Thắng Pháp (TK Chánh Minh); giảng giải theo tài liệu truyền thống Mogok.</p>
     ${tkDuyenKhoi()}
   `;
 }
