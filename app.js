@@ -142,6 +142,7 @@ function tamsoHighlight(key){
   document.querySelectorAll('[data-k]').forEach(el=>{
     const k = el.dataset.k;
     if(!partners.has(k)) el.classList.add('pdot-dim');
+    else if(aniSet.has(k) && k!==key) el.classList.add('pdot-lit-ani'); // bất định: viền đứt, sáng nửa
   });
   // các ô ngoài phạm vi phối hợp (sắc pháp, Níp-bàn, chế định...) cũng mờ đi
   document.querySelectorAll('#extra-content .pdot-sm:not([data-k]), #extra-content .pdot-ring-big').forEach(el=>el.classList.add('pdot-dim'));

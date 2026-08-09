@@ -374,10 +374,19 @@ function openCittaSheet(id){
     <div class="big-count"><span class="big-num">${c.ceta.length}</span><span class="big-unit">tâm sở phối hợp</span></div>
     ${c.note ? `<div class="info-note"><b>Trường hợp đặc biệt:</b> ${c.note}</div>` : ''}
     <div class="sec" style="margin-top:14px">
-      <div class="sec-label">Tâm sở phối hợp</div>
+      <div class="sec-label">Tâm sở phối hợp cố định (niyata)</div>
       <div class="sec-body"><b>${c.ceta.length}</b> = ${groupFormula}</div>
       <div class="sec-body" style="margin-top:8px"><b>${c.ceta.length}</b> = (${names.join(' + ')})</div>
     </div>
+    ${(function(){
+      const ani = aniyataOfCitta(id);
+      if(!ani.length) return '';
+      return `<div class="sec" style="margin-top:14px">
+        <div class="sec-label">+ ${ani.length} tâm sở BẤT ĐỊNH (aniyata) — khi có chỉ có một, đôi khi không có</div>
+        <div class="sec-body">${ani.join(' · ')}</div>
+        <div class="info-note" style="margin-top:8px">Các tâm sở bất định chỉ khởi khi có cảnh tương ứng (Giới phần khi gặp đối tượng cần tiết chế; Bi khi thấy chúng sinh khổ; Tùy hỷ khi thấy chúng sinh hạnh phúc) và trong một sát-na <b>chỉ có tối đa một</b> trong số này. Tính tổng quát: ${c.ceta.length} + ${ani.length} = <b>${c.ceta.length + ani.length}</b> tâm sở. — <i>Đường Vào Thắng Pháp, Tỳ khưu Chánh Minh.</i></div>
+      </div>`;
+    })()}
   `;
   document.getElementById('sheet-content').innerHTML = html;
   document.getElementById('sheet').classList.add('show');
@@ -2729,14 +2738,30 @@ function tapNeuCitta(id){
   // tới được đây nghĩa là ô đã được chọn từ lần chạm 1 (capture đã hiện bảng động) -> mở bảng đầy đủ
   hideTapInfo(); openCittaSheet(id);
 }
+function aniyataOfCitta(id){
+  const out = [];
+  if(typeof ANIYATA_INFO!=='undefined'){
+    for(const [cid,info] of Object.entries(ANIYATA_INFO)){
+      if(info.cittas.includes(id)){
+        const ce = CETASIKA_DATA.find(x=>x.id===cid);
+        if(ce) out.push(ce.ten.replace(/ \(sở hữu\)/,''));
+      }
+    }
+  }
+  return out;
+}
 function showTapInfoCitta(id){
   _neuLastTap = 'ci'+id;
   const c = CITTA_DATA.find(x=>x.id===id);
   const names = CETASIKA_DATA.filter(x=>c.ceta.includes(x.id)).map(x=>x.ten.replace(/ \(sở hữu\)/,''));
+  const aniNames = aniyataOfCitta(id);
+  const aniLine = aniNames.length
+    ? `<br><b>+ ${aniNames.length} bất định</b> <span class="ti-gloss">(aniyata — khi có chỉ có một, đôi khi không có)</span>: ${aniNames.join(', ')}.`
+    : '';
   _showTapInfo(`
     <div class="ti-name">${cittaFullName(c)} <span class="ti-gloss">(${glossCitta(c)})</span></div>
     <div class="ti-sub">${c.groupLabel} · Cảm thọ: ${c.vedanaLabel}</div>
-    <div class="ti-list"><b>${c.ceta.length} tâm sở phối hợp:</b> ${names.join(', ')}.</div>
+    <div class="ti-list"><b>${c.ceta.length} tâm sở cố định:</b> ${names.join(', ')}.${aniLine}</div>
     <button class="ti-more" onclick="hideTapInfo();openCittaSheet(${id})">Mở bảng đầy đủ »</button>
   `);
 }
