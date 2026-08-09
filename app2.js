@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v92'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v93'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -740,9 +740,21 @@ function dkNode(a,r,label,idx,w){
 
 function renderKinhTungPage(){
   const extra = document.getElementById('extra-content');
+  const patthana = (typeof PATTHANA_UDDESA!=='undefined') ? `
+    <div class="sec">
+      <div class="sec-label">6. Kinh Paṭṭhāna — 24 Duyên</div>
+      <div class="ad-kinh"><div class="ad-kinh-lbl">Paccayuddesa · tóm tắt 24 duyên</div>
+        ${PATTHANA_UDDESA}</div>
+      <details class="kt-details">
+        <summary>Toàn văn 24 Duyên (Paccayaniddesa)</summary>
+        <div class="kt-niddesa">${PATTHANA_NIDDESA}
+          <div style="text-align:center;font-weight:800;color:#7c4a12;margin-top:6px">— Paccayaniddeso niṭṭhito —</div>
+        </div>
+      </details>
+    </div>` : '';
   extra.innerHTML = `
   <div class="article">
-    <p class="info-note" style="margin-bottom:10px">Nghi thức tụng niệm hằng ngày (Nam Tông). Phần dưới là các bài <b>căn bản, cố định</b> theo Pāli; bạn có thể gửi thêm các bài theo truyền thống của mình (rải tâm từ, sám hối, hồi hướng…) để bổ sung.</p>
+    <p class="info-note" style="margin-bottom:10px">Nghi thức tụng niệm hằng ngày (Nam Tông). Các bài dưới đây theo Pāli; bạn có thể gửi thêm bài theo truyền thống của mình (rải tâm từ, sám hối, hồi hướng…) để bổ sung.</p>
 
     <div class="sec">
       <div class="sec-label">1. Đảnh lễ Đức Thế Tôn (Namakāra)</div>
@@ -767,7 +779,18 @@ function renderKinhTungPage(){
     </div>
 
     <div class="sec">
-      <div class="sec-label">3. Thọ trì Ngũ Giới (Pañcasīla)</div>
+      <div class="sec-label">3. Tụng Ân Đức Tam Bảo</div>
+      <div class="ad-kinh"><div class="ad-kinh-lbl">Ân đức Phật · Buddhaguṇa</div>
+        Iti pi so Bhagavā arahaṃ, sammāsambuddho, vijjācaraṇasampanno, sugato, lokavidū, anuttaro purisadammasārathi, satthā devamanussānaṃ, buddho, bhagavā ti.</div>
+      <div class="ad-kinh" style="margin-top:8px"><div class="ad-kinh-lbl">Ân đức Pháp · Dhammaguṇa</div>
+        Svākkhāto Bhagavatā dhammo, sandiṭṭhiko, akāliko, ehipassiko, opanayiko, paccattaṃ veditabbo viññūhī ti.</div>
+      <div class="ad-kinh" style="margin-top:8px"><div class="ad-kinh-lbl">Ân đức Tăng · Saṅghaguṇa</div>
+        Supaṭipanno Bhagavato sāvakasaṅgho, ujupaṭipanno Bhagavato sāvakasaṅgho, ñāyapaṭipanno Bhagavato sāvakasaṅgho, sāmīcipaṭipanno Bhagavato sāvakasaṅgho, yadidaṃ cattāri purisayugāni aṭṭha purisapuggalā, esa Bhagavato sāvakasaṅgho, āhuneyyo, pāhuneyyo, dakkhiṇeyyo, añjalikaraṇīyo, anuttaraṃ puññakkhettaṃ lokassā ti.</div>
+      <div class="sec-body" style="margin-top:6px">Xem chi tiết 9 ân đức Phật · 6 ân đức Pháp · 9 ân đức Tăng ở trang <b>Ân Đức Tam Bảo</b>.</div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">4. Thọ trì Ngũ Giới (Pañcasīla)</div>
       <div class="ad-kinh"><div class="ad-kinh-lbl">Pāli</div>
         1. Pāṇātipātā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
         2. Adinnādānā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
@@ -777,7 +800,22 @@ function renderKinhTungPage(){
       <div class="sec-body" style="margin-top:6px">Con xin vâng giữ điều học: (1) không sát sanh · (2) không trộm cắp · (3) không tà dâm · (4) không nói dối · (5) không dùng rượu và các chất say làm nền tảng của sự dể duôi.</div>
     </div>
 
-    <div class="info-note" style="margin-top:12px">Muốn thêm bài nào (Ân đức Tam Bảo tụng, Rải tâm từ – Mettā, Hồi hướng phước – Pattidāna, Sám hối, Cầu an…), bạn gửi nội dung để mình đưa vào và định dạng đúng kiểu này.</div>
+    <div class="sec">
+      <div class="sec-label">5. Thọ trì Bát Quan Trai Giới (Aṭṭhaṅga-sīla · 8 giới)</div>
+      <div class="ad-kinh"><div class="ad-kinh-lbl">Pāli</div>
+        1. Pāṇātipātā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
+        2. Adinnādānā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
+        3. Abrahmacariyā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
+        4. Musāvādā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
+        5. Surāmeraya-majjapamādaṭṭhānā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
+        6. Vikālabhojanā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
+        7. Nacca-gīta-vādita-visūkadassanā mālā-gandha-vilepana-dhāraṇa-maṇḍana-vibhūsanaṭṭhānā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
+        8. Uccāsayana-mahāsayanā veramaṇī sikkhāpadaṃ samādiyāmi.</div>
+      <div class="sec-body" style="margin-top:6px">Ngoài 4 giới đầu như ngũ giới, Bát quan trai đặc biệt: (3) tránh hành dâm (trọn vẹn phạm hạnh) · (6) không ăn sái giờ (quá ngọ) · (7) không múa hát, đờn kèn, xem diễn, không trang điểm phấn hoa dầu thơm · (8) không nằm ngồi nơi quá cao và sang trọng.</div>
+    </div>
+    ${patthana}
+
+    <div class="info-note" style="margin-top:12px">Muốn thêm bài nào (Rải tâm từ – Mettā, Hồi hướng phước – Pattidāna, Sám hối, Cầu an…), bạn gửi nội dung để mình đưa vào và định dạng đúng kiểu này.</div>
   </div>`;
 }
 
