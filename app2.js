@@ -774,7 +774,7 @@ function renderDuyenKhoiPage(){
   let groups='', grpMarkers='';
   PHAN.forEach((p,gi)=>{
     const first=p.chis[0], last=p.chis[p.chis.length-1];
-    const a1=-90+first*30-13, a2=-90+last*30+13, mid=(a1+a2)/2;
+    const a1=-90+first*30-10, a2=-90+last*30+10, mid=(a1+a2)/2;
     const cx=C+RL*Math.cos(rad(mid)), cy=C+RL*Math.sin(rad(mid));
     const col=QCOL[gi];
     grpMarkers += `<marker id="dkgrp${gi}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5.2" markerHeight="5.2" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="${col}"/></marker>`;
@@ -787,7 +787,7 @@ function renderDuyenKhoiPage(){
 
   extra.innerHTML = `
     <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-    <svg viewBox="-80 -55 885 760" style="width:calc(min(100%, 620px) * var(--fontscale,1));height:auto;display:block;margin:0 auto" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="-80 -58 885 812" style="width:calc(min(100%, 620px) * var(--fontscale,1));height:auto;display:block;margin:0 auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="dkarr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.6" markerHeight="4.6" orient="auto-start-reverse">
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#c8471f"/>
