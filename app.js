@@ -33,10 +33,8 @@ function renderQuyenGrid(){
     </div>`;
   }).join('');
   const legend = document.getElementById('legend');
-  legend.style.display = 'flex';
-  legend.innerHTML = v.legend.map(([c,,label])=>
-    `<div class="legend-item"><span class="dot cat-${c}"></span>${label}</div>`
-  ).join('');
+  legend.style.display = 'none';
+  legend.innerHTML = '';
   document.getElementById('extra-content').innerHTML = (typeof tkQuyen==='function' ? tkQuyen() : '');
 }
 
