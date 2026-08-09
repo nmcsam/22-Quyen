@@ -307,7 +307,7 @@ function renderTamSoPage(){
         <div class="poster-col-title" style="margin-top:14px">SẮC PHÁP (28) &amp; NÍP-BÀN</div>
         <div style="display:flex;gap:10px;align-items:flex-end">
           <div style="flex:1">${rupaHtml}</div>
-          <div class="pdot-ring-big" style="margin-right:66px" onclick="openNibbanaSheet()"></div>
+          <div class="pdot-ring-big" style="margin-right:4px" onclick="openNibbanaSheet()"></div>
         </div>
       </div>
     </div>
