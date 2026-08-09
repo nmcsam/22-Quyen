@@ -255,39 +255,39 @@
     .circle.cat-green {--cl:#79926f;--c:#3f6331;--cd:#2c4522;--cdd:#1e3018;color:#ddf5cc}
     .circle.cat-gray  {--cl:#83817a;--c:#565550;--cd:#3d3c38;--cdd:#2a2926;color:#e8e5da}
   }
-  /* ===== Thẻ bo góc mềm, nền pastel theo nhóm, viền mảnh, chữ nổi nhẹ (kiểu nút "Đã bật") — Tâm↔Tâm sở dùng chấm tròn nên không ảnh hưởng ===== */
-  .circle-grid{grid-template-columns:repeat(auto-fill,minmax(calc(88px * var(--fontscale,1)),1fr));gap:calc(9px * var(--fontscale,1))}
+  /* ===== Thẻ bo góc mềm, MỘT màu nền chung (xanh ngọc), ô nhỏ vừa khít chữ, chữ nổi bật ===== */
+  .circle-grid{grid-template-columns:repeat(auto-fill,minmax(calc(80px * var(--fontscale,1)),1fr));gap:calc(8px * var(--fontscale,1))}
   .circle{
-    border-radius:16px;
-    min-height:calc(80px * var(--fontscale,1));
-    padding:11px 8px;
+    border-radius:14px;
+    min-height:0;
+    padding:7px 7px;
     justify-content:center;
     overflow:hidden;
-    border:1.5px solid var(--c);
+    border:1.5px solid #3f9e85;
     background:
-      linear-gradient(180deg, rgba(255,255,255,.62) 0%, rgba(255,255,255,.14) 48%, rgba(255,255,255,0) 100%),
-      linear-gradient(180deg, var(--cl) 0%, var(--c) 165%);
+      linear-gradient(180deg, rgba(255,255,255,.5) 0%, rgba(255,255,255,.08) 55%, rgba(255,255,255,0) 100%),
+      linear-gradient(180deg, #cdece2 0%, #79c9b2 150%);
     box-shadow:
-      0 3px 7px -2px rgba(30,28,20,.22),
+      0 3px 6px -2px rgba(20,50,42,.28),
       0 1px 2px rgba(0,0,0,.10),
-      inset 0 1px 0 rgba(255,255,255,.7);
+      inset 0 1px 0 rgba(255,255,255,.75);
   }
   .circle::before{content:none}
   .circle::after{content:none}
-  .circle>*{position:relative;z-index:1;max-width:92%}
-  .circle .cn{text-shadow:0 1px 0 rgba(255,255,255,.55)}
-  .circle .cp{opacity:.85;text-shadow:0 1px 0 rgba(255,255,255,.45)}
-  .circle:active,.circle.pressed{transform:translateY(1px) scale(.985);box-shadow:0 1px 3px rgba(0,0,0,.18),inset 0 2px 5px rgba(0,0,0,.14)}
+  .circle>*{position:relative;z-index:1;max-width:94%}
+  .circle .cn{color:#083a30;text-shadow:0 1px 0 rgba(255,255,255,.6)}
+  .circle .cp{color:#0c4438;opacity:.9;text-shadow:0 1px 0 rgba(255,255,255,.5)}
+  .circle:active,.circle.pressed{transform:translateY(1px) scale(.98);box-shadow:0 1px 3px rgba(0,0,0,.18),inset 0 2px 5px rgba(0,0,0,.14)}
   @media (prefers-color-scheme: dark){
     .circle{
-      border:1.5px solid rgba(255,255,255,.16);
+      border:1.5px solid #2f8770;
       background:
-        linear-gradient(180deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,.02) 50%, rgba(255,255,255,0) 100%),
-        linear-gradient(180deg, var(--cd) 0%, var(--cdd) 140%);
+        linear-gradient(180deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.02) 50%, rgba(255,255,255,0) 100%),
+        linear-gradient(180deg, #1f6a58 0%, #12483c 140%);
       box-shadow:0 4px 9px -3px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12);
     }
-    .circle .cn{text-shadow:0 1px 1px rgba(0,0,0,.55)}
-    .circle .cp{opacity:.9;text-shadow:0 1px 1px rgba(0,0,0,.5)}
+    .circle .cn{color:#e8fff7;text-shadow:0 1px 1px rgba(0,0,0,.55)}
+    .circle .cp{color:#c8f2e6;opacity:.95;text-shadow:0 1px 1px rgba(0,0,0,.5)}
   }
   @media (prefers-color-scheme: dark){ .circle-plain{border-color:#e8ded0 !important} }
   @media (prefers-color-scheme: dark){
