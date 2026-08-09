@@ -286,20 +286,20 @@ function renderTamSoPage(){
     if(colorKey==='split-bp') return 'background:linear-gradient(180deg, #5fa8d3 50%, #4b3f8f 50%)';
     return `background:${colorKey}`;
   }
-  const pannattiHtml = `<div class="pblock" style="display:flex;justify-content:space-between;width:100%">
-    <div class="prow" style="grid-template-columns:repeat(7,var(--dot))">
+  const atthaHtml = `<div class="pblock"><div class="prow" style="grid-template-columns:repeat(7,var(--dot))">
       ${atthaP.map(p=>`<div class="pdot-sm" style="background:#4b3f8f" onclick="openPannattiSheet('${p.id}')"></div>`).join('')}
-    </div>
-    <div class="prow" style="grid-template-columns:repeat(6,var(--dot))">
+    </div></div>`;
+  const namaHtml = `<div class="pblock"><div class="prow" style="grid-template-columns:repeat(6,var(--dot))">
       ${namaP.map((p,i)=>`<div class="pdot-sm" style="${pannattiDotStyle(namaColors[i])}" onclick="openPannattiSheet('${p.id}')"></div>`).join('')}
-    </div>
-  </div>`;
+    </div></div>`;
 
   extra.innerHTML = `
     <div class="poster-cols">
       <div class="poster-col">
         <div class="poster-col-title">TÂM (121)</div>
         ${cittaHtml}
+        <div class="poster-col-title" style="margin-top:14px">NGHĨA CHẾ ĐỊNH (7)</div>
+        ${atthaHtml}
       </div>
       <div class="poster-col">
         <div class="poster-col-title">TÂM SỞ (52)</div>
@@ -309,10 +309,10 @@ function renderTamSoPage(){
           <div style="flex:1">${rupaHtml}</div>
           <div class="pdot-ring-big" style="margin-right:4px" onclick="openNibbanaSheet()"></div>
         </div>
+        <div class="poster-col-title" style="margin-top:14px">DANH CHẾ ĐỊNH (6)</div>
+        ${namaHtml}
       </div>
     </div>
-    <div class="poster-col-title" style="margin-top:14px">PHÁP CHẾ ĐỊNH (13) — 7 Nghĩa (trái) · 6 Danh (phải)</div>
-    ${pannattiHtml}
     ${tkTamSo()}
   `;
 }
