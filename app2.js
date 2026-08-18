@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v93'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v94'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -1732,6 +1732,68 @@ function renderDeMucThienPage(){
   const th = td + ';font-weight:800;background:rgba(128,128,128,.16);text-align:center';
   const secRow = c => `<tr><td colspan="3" style="${td};font-weight:800;background:rgba(63,124,184,.16)">${c}</td></tr>`;
   const row = (label, num, items) => `<tr><td style="${td}">${label}</td><td style="${tdNum}">${num}</td><td style="${td}">${items}</td></tr>`;
+  const rowJ = (a, b, c) => `<tr><td style="${td}">${a}</td><td style="${td}">${b}</td><td style="${tdNum}">${c}</td></tr>`;
+  const thJ = (c1, c2, c3) => `<tr><th style="${th};width:26%">${c1}</th><th style="${th}">${c2}</th><th style="${th};width:18%;white-space:nowrap">${c3}</th></tr>`;
+  const tbl = 'border-collapse:collapse;width:100%;background:var(--card);margin-bottom:12px';
+  const sub = t => `<div class="group-head" style="margin-top:16px">${t}</div>`;
+
+  const bangChiTiet = `
+  <div class="group-head" style="margin-top:22px">Tâm – Tâm sở mỗi tầng thiền (Abhidhamma)</div>
+  <p class="info-note" style="margin-bottom:10px">Mọi tâm thiền đáo đại (mahaggata) đều là <b>trí tương ưng</b> nên luôn có tâm sở Trí tuệ. Nền tảng cố định gồm <b>30 tâm sở</b>; khác biệt giữa các tầng thiền chỉ nằm ở sự có mặt / vắng mặt của <b>Tầm (Vitakka), Tứ (Vicāra), Hỷ (Pīti)</b>, và <b>Bi (Karuṇā)</b> hoặc <b>Hỷ vô lượng (Muditā)</b> ở đề mục vô lượng tâm.</p>
+
+  <table style="${tbl}">
+    <tr><th style="${th};width:40%">Nhóm tâm sở nền</th><th style="${th};width:12%">Số</th><th style="${th}">Chi tiết</th></tr>
+    ${row('7 Biến hành (Sabbacittasādhāraṇa)','7','Xúc, Thọ, Tưởng, Tư, Nhất hành, Mạng quyền, Tác ý')}
+    ${row('Biệt cảnh — 3 cố định','3','Dục (Chanda), Thắng giải (Adhimokkha), Cần (Viriya)')}
+    ${row('19 Tịnh hảo biến hành','19','Tín, Niệm, Tàm, Quý, Vô tham, Vô sân, Hành xả; Tịnh / Khinh / Nhu / Thích / Thuần / Chánh — cả thân & tâm')}
+    ${row('Trí tuệ (Paññā)','1','Luôn có mặt do thiền đáo đại trí tương ưng')}
+    <tr><td style="${td};font-weight:800">Tổng nền cố định</td><td style="${tdNum}">30</td><td style="${td}">7 + 3 + 19 + 1 = 30 — có trong MỌI tâm thiền đáo đại</td></tr>
+  </table>
+
+  ${sub('A. Kasiṇa (10) & Niệm hơi thở (1) — đắc đủ 5 tầng thiền')}
+  <table style="${tbl}">
+    ${thJ('Tầng thiền','Chi thiền có mặt','Tâm sở')}
+    ${rowJ('Sơ thiền','Tầm, Tứ, Hỷ, Lạc, Nhất hành','33')}
+    ${rowJ('Nhị thiền','Tứ, Hỷ, Lạc, Nhất hành','32')}
+    ${rowJ('Tam thiền','Hỷ, Lạc, Nhất hành','31')}
+    ${rowJ('Tứ thiền','Lạc, Nhất hành','30')}
+    ${rowJ('Ngũ thiền','Xả, Nhất hành','30')}
+  </table>
+
+  ${sub('B. Bất tịnh – tử thi (10) & Thân hành niệm (1) — chỉ đắc Sơ thiền')}
+  <table style="${tbl}">
+    ${thJ('Tầng thiền','Chi thiền có mặt','Tâm sở')}
+    ${rowJ('Sơ thiền','Tầm, Tứ, Hỷ, Lạc, Nhất hành','33')}
+  </table>
+
+  ${sub('C. Tứ Vô Lượng Tâm (Brahmavihāra)')}
+  <table style="${tbl}">
+    ${thJ('Đề mục','Ghi chú','Tâm sở (theo tầng)')}
+    ${rowJ('Từ (Mettā) · Sơ → Tứ thiền','Vô sân đã nằm trong 19 tịnh hảo → không thêm tâm sở','33, 32, 31, 30')}
+    ${rowJ('Bi (Karuṇā) · Sơ → Tứ thiền','Bi là tâm sở vô lượng riêng → +1','34, 33, 32, 31')}
+    ${rowJ('Hỷ (Muditā) · Sơ → Tứ thiền','Muditā là tâm sở vô lượng riêng → +1','34, 33, 32, 31')}
+    ${rowJ('Xả (Upekkhā) · chỉ Ngũ thiền','Hành xả đã nằm trong 19 tịnh hảo → không thêm','30')}
+  </table>
+
+  ${sub('D. Bốn Vô sắc — mỗi đề mục đắc 1 tầng (chi thiền bậc Ngũ thiền: Xả + Nhất hành)')}
+  <table style="${tbl}">
+    ${thJ('Thiền vô sắc','Đối tượng','Tâm sở')}
+    ${rowJ('Không vô biên xứ (Ākāsānañcāyatana)','Hư không chế định (Ākāsa-paññatti)','30')}
+    ${rowJ('Thức vô biên xứ (Viññāṇañcāyatana)','Tâm thiền Không vô biên xứ (mahaggata)','30')}
+    ${rowJ('Vô sở hữu xứ (Ākiñcaññāyatana)','Khái niệm không có gì (Natthibhāva-paññatti)','30')}
+    ${rowJ('Phi tưởng phi phi tưởng xứ','Tâm thiền Vô sở hữu xứ','30')}
+  </table>
+
+  ${sub('Ba giai đoạn ấn tướng (Nimitta)')}
+  <table style="${tbl}">
+    <tr><th style="${th};width:34%">Giai đoạn</th><th style="${th}">Đặc tính</th></tr>
+    <tr><td style="${td}">Chuẩn bị tướng (Parikamma-nimitta)</td><td style="${td}">Đối tượng thô ban đầu khi mới tu tập</td></tr>
+    <tr><td style="${td}">Thủ tướng (Uggaha-nimitta)</td><td style="${td}">Hình ảnh tâm bắt được, khi nhắm mắt vẫn thấy</td></tr>
+    <tr><td style="${td}">Tợ tướng (Paṭibhāga-nimitta)</td><td style="${td}">Ảnh tâm tinh khiết, sáng suốt, hoàn toàn trong sạch</td></tr>
+  </table>
+  <p class="info-note" style="margin-top:2px">22 đề mục có tợ tướng = 10 Kasiṇa + 10 tử thi (Asubha) + Thân hành niệm + Niệm hơi thở.</p>
+
+  <p class="info-note" style="margin-top:10px"><b>Điểm mấu chốt:</b> nền 30 tâm sở luôn cố định cho mọi thiền đáo đại; khác biệt chỉ ở Tầm – Tứ – Hỷ (theo tầng thiền) và Karuṇā hoặc Muditā (theo đề mục vô lượng tâm). Nguồn: phân tích theo Abhidhamma (Vi Diệu Pháp) — truyền thống Theravāda.</p>`;
 
   const bangTongKet = `
   <table style="border-collapse:collapse;width:100%;background:var(--card)">
@@ -1774,6 +1836,7 @@ function renderDeMucThienPage(){
     </div>
     <div id="dmt-sum-wrap" style="--dmtscale:${dmtScale};font-size:calc(14.5px * var(--dmtscale));line-height:1.5;overflow-x:auto">
       ${bangTongKet}
+      ${bangChiTiet}
       <p class="info-note" style="margin-top:10px;font-size:calc(13px * var(--dmtscale));line-height:1.5">Nguồn: bảng "40 đề mục thiền chỉ phân theo thiền và tánh nết" — Abhidhammatthasaṅgaha ch. IX (tr. 545); "Thanh Tịnh Đạo Giảng Giải — Giới và Định" đv. 117 (22 đề mục có quang tướng; 12 đề mục lấy pháp thực tính làm cảnh; 6 đề mục còn lại cảnh không xếp loại như vậy). Số lượng mục ① đếm theo dấu x từng cột thiền trong bảng gốc: một đề mục đắc nhiều tầng được tính ở mọi tầng nó đạt tới.</p>
     </div>
   `;
