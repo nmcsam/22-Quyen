@@ -216,7 +216,7 @@ function applySheetScale(){
   if(z) z.textContent = Math.round(sheetScale*100) + '%';
 }
 function adjustSheetScale(delta){
-  sheetScale = Math.min(1.7, Math.max(0.9, sheetScale + delta));
+  sheetScale = Math.min(2.0, Math.max(0.9, sheetScale + delta));
   applySheetScale();
 }
 applySheetScale();
