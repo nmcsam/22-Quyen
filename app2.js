@@ -9,7 +9,7 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['home','Trang đầu'],['anduc','Ân Đức Tam Bảo'],['kinhtung','Kinh tụng hàng ngày'],['daolo','Đạo Lộ Tu Tập'],['xugioi','12 Xứ · 18 Giới'],['canh','21 Cảnh'],['quyen22','22 Quyền'],['duyen','Duyên'],['coi31','31 Cõi'],['trodao','37 Trợ đạo'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Pháp thực tính'],['demucthien','Đề mục thiền']];
+  const sections = const sections = [['home','Trang đầu'],['anduc','Ân Đức Tam Bảo'],['kinhtung','Kinh tụng hàng ngày'],['daolo','Đạo Lộ Tu Tập'],['xugioi','12 Xứ · 18 Giới'],['canh','21 Cảnh'],['quyen22','22 Quyền'],['coi31','31 Cõi'],['trodao','37 Trợ đạo'],['duyen','Duyên'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Pháp thực tính'],['demucthien','Đề mục thiền']];
   const cur = sections.find(x=>x[0]===currentSection);
   const pct = Math.round(((typeof fontScales!=='undefined' && fontScales[currentSection])||1)*100) + '%';
   document.getElementById('section-switch').innerHTML = `
