@@ -9,7 +9,7 @@ const CETASIKA_GROUP_LABEL = {bienhanh:'Biến hành (7)', toitha:'Tợ tha - Bi
 const CETASIKA_GROUP_ORDER = ['bienhanh','toitha','batthien_bh','batthien_rieng','tinhhao_bh','tietche','voluong','tuequyen'];
 
 function renderSectionSwitch(){
-  const sections = [['home','Trang đầu'],['anduc','Ân Đức Tam Bảo'],['kinhtung','Kinh tụng hàng ngày'],['daolo','Đạo Lộ Tu Tập'],['xugioi','12 Xứ · 18 Giới'],['canh','21 Cảnh'],['quyen22','22 Quyền'],['duyenhe','24 Duyên hệ'],['coi31','31 Cõi'],['trodao','37 Trợ đạo'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Pháp thực tính'],['duyenkhoi','Duyên khởi'],['demucthien','Đề mục thiền']];
+  const sections = [['home','Trang đầu'],['anduc','Ân Đức Tam Bảo'],['kinhtung','Kinh tụng hàng ngày'],['daolo','Đạo Lộ Tu Tập'],['xugioi','12 Xứ · 18 Giới'],['canh','21 Cảnh'],['quyen22','22 Quyền'],['duyen','Duyên'],['coi31','31 Cõi'],['trodao','37 Trợ đạo'],['tamso','Tâm ↔ Tâm sở'],['dactinh','Pháp thực tính'],['demucthien','Đề mục thiền']];
   const cur = sections.find(x=>x[0]===currentSection);
   const pct = Math.round(((typeof fontScales!=='undefined' && fontScales[currentSection])||1)*100) + '%';
   document.getElementById('section-switch').innerHTML = `
@@ -83,7 +83,7 @@ function switchSection(s){
   const legend = document.getElementById('legend');
   const extra = document.getElementById('extra-content');
   const vp = document.getElementById('viewport-meta');
-  if(s==='tamso'||s==='duyenkhoi'){
+  if(s==='tamso'||s==='duyen'){
     vp.setAttribute('content','width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes');
   } else {
     vp.setAttribute('content','width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
@@ -117,18 +117,12 @@ function switchSection(s){
     legend.style.display='none';
     document.getElementById('nav').innerHTML = '';
     renderCanhPage();
-  } else if(s==='duyenkhoi'){
-    document.getElementById('page-subtitle').textContent = 'Duyên khởi (Paṭiccasamuppāda) · chạm vào một chi để xem chi pháp';
+  } else if(s==='duyen'){
+    document.getElementById('page-subtitle').textContent = 'Duyên khởi (Paṭiccasamuppāda) & 24 Duyên hệ (Paṭṭhāna) · chạm để xem chi pháp và định nghĩa';
     grid.style.display='none';
     legend.style.display='none';
     document.getElementById('nav').innerHTML = '';
-    renderDuyenKhoiPage();
-  } else if(s==='duyenhe'){
-    document.getElementById('page-subtitle').textContent = '24 Duyên hệ (Paṭṭhāna) · chạm để xem định nghĩa và chi pháp';
-    grid.style.display='none';
-    legend.style.display='none';
-    document.getElementById('nav').innerHTML = '';
-    renderDuyenHePage();
+    renderDuyenPage();
   } else if(s==='xugioi'){
     document.getElementById('page-subtitle').textContent = '12 Xứ (Āyatana) · 18 Giới (Dhātu) — chạm để xem chi pháp';
     grid.style.display='none';
@@ -658,42 +652,52 @@ function openCanhSheet(id){
 const DUYENKHOI_DATA = [
  {ten:'Vô minh', pali:'Avijjā',
   duyen:'Vô minh duyên Hành — Avijjāpaccayā saṅkhārā',
+  duyenhe:[0,8],
   chiphap:'Tâm sở <b>Si</b> hợp trong <b>12 tâm bất thiện</b>.',
   mogok:'Trạng thái không sáng suốt, bị si mê che lấp, không thấy rõ thực tánh của các pháp: bất tri trong <b>Tam tướng</b> (vô thường xem là trường tồn, khổ xem là hạnh phúc, vô ngã xem là "tôi, của tôi") và bất tri trong <b>Tứ Diệu Đế</b>. Vô minh có mặt do đời sống thất niệm — chính vì Vô minh nên làm duyên cho Hành có mặt.'},
  {ten:'Hành', pali:'Saṅkhāra',
   duyen:'Hành duyên Thức — Saṅkhārapaccayā viññāṇaṃ',
+  duyenhe:[12],
   chiphap:'Tâm sở <b>Tư</b> hợp trong <b>12 tâm bất thiện</b> + <b>17 tâm thiện hiệp thế</b> (gom thành <b>29 Tư</b>).',
   mogok:'Sự chủ ý tạo tác nghiệp thiện, bất thiện, bất động, dẫn đến tái sanh trong ba giới bốn loài. Có 3 kiểu: <b>Phúc hành</b> (Puññābhisaṅkhāra — làm thiện, sanh cõi người, trời Dục giới, Sắc giới), <b>Phi phúc hành</b> (Apuññābhisaṅkhāra — làm bất thiện, sanh 4 đường ác đạo), <b>Bất động hành</b> (Āneñjābhisaṅkhāra — tu thiền Vô sắc, sanh cõi Vô sắc, thọ tối đa 84.000 đại kiếp).'},
  {ten:'Thức', pali:'Viññāṇa',
   duyen:'Thức duyên Danh sắc — Viññāṇapaccayā nāmarūpaṃ',
+  duyenhe:[5],
   chiphap:'<b>32 tâm quả hiệp thế</b>.',
   mogok:'Thức tái sanh do chủ ý: mỗi chủ ý tạo tác thiện – bất thiện là sự quyết định tái sanh trong các cõi. Thức quy tụ năng lực ở chặng tư tưởng cuối cùng (cận tử) để quyết định tái sanh vào cảnh giới tương ứng. Thức (danh) luôn nương tựa sắc pháp, không thể đi riêng lẻ.'},
  {ten:'Danh sắc', pali:'Nāma-rūpa',
   duyen:'Danh sắc duyên Lục nhập — Nāmarūpapaccayā saḷāyatanaṃ',
+  duyenhe:[7,9],
   chiphap:'<b>Danh:</b> 35 tâm sở hợp trong 32 tâm quả hiệp thế.<br><b>Sắc:</b> sắc nghiệp tái tục, sắc nghiệp bình nhật, sắc tâm.',
   mogok:'Thức tái sanh thì tiếp tục có một Danh-Sắc mới để duy trì. Chết không phải là hết — chết là sự bắt đầu cho một hình hài mới, đời sống mới. Có 4 kiểu tái sanh: <b>Thai sanh, Noãn sanh, Hoá sanh, Thấp sanh</b>.'},
  {ten:'Lục nhập', pali:'Saḷāyatana',
   duyen:'Lục nhập duyên Xúc — Saḷāyatanapaccayā phasso',
+  duyenhe:[7],
   chiphap:'<b>6 nội xứ:</b> 5 sắc thần kinh + 32 tâm quả hiệp thế (ý xứ).',
   mogok:'Khi có Danh-Sắc thì hình thành 6 căn (6 nội xứ). <b>6 căn</b>: mắt, tai, mũi, lưỡi, thân, ý; <b>6 trần</b>: sắc, thanh, khí, vị, xúc, pháp; <b>6 thức</b>: nhãn, nhĩ, tỷ, thiệt, thân, ý. Khi 6 căn tiếp xúc 6 trần lập tức làm duyên cho 6 Xúc phát sanh.'},
  {ten:'Xúc', pali:'Phassa',
   duyen:'Xúc duyên Thọ — Phassapaccayā vedanā',
+  duyenhe:[5],
   chiphap:'Tâm sở <b>Xúc</b> hợp trong <b>32 tâm quả hiệp thế</b>.',
   mogok:'Sự giao tiếp, va chạm của 6 căn và 6 trần: 6 nội xứ tiếp xúc 6 ngoại xứ sinh ra 6 Xúc (nhãn xúc, nhĩ xúc, tỷ xúc, thiệt xúc, thân xúc, ý xúc). Do có 6 Xúc mà làm duyên cho 6 Thọ phát sanh.'},
  {ten:'Thọ', pali:'Vedanā',
   duyen:'Thọ duyên Ái — Vedanāpaccayā taṇhā',
+  duyenhe:[8],
   chiphap:'Tâm sở <b>Thọ</b> hợp trong <b>32 tâm quả hiệp thế</b>.',
   mogok:'Cảm giác tích cực, tiêu cực, trung tính của Thân – Tâm trước 6 trần cảnh: 3 loại (khổ, lạc, xả) hay 5 loại (khổ, lạc, hỷ, ưu, xả); theo môn có 6 thọ (nhãn thọ... ý thọ). Theo Mogok: <b>6 cảm thọ ngoại khách</b> (thọ xả nơi nhãn – nhĩ – tỷ – thiệt thức, thọ lạc và khổ nơi thân thức), <b>3 cảm thọ nội khách</b> (hỷ, ưu, xả sanh nơi tâm), <b>3 cảm thọ chủ</b> (hỷ, ưu, xả đi cùng hơi thở vô – ra). Do 6 Thọ dẫn đến 6 Ái.'},
  {ten:'Ái', pali:'Taṇhā',
   duyen:'Ái duyên Thủ — Taṇhāpaccayā upādānaṃ',
+  duyenhe:[8],
   chiphap:'Tâm sở <b>Tham</b> hợp trong <b>8 tâm tham</b> (<b>6 ái</b>).',
   mogok:'Sự thích thú, đam mê trên 6 trần cảnh — thèm khát không bao giờ thấy đủ. 6 ái: sắc ái... pháp ái. Có 3 loại: <b>Dục ái</b> (Kāmataṇhā — tham đắm trong 6 trần), <b>Hữu ái</b> (Bhavataṇhā — tham đắm hợp Thường kiến: tin cái tôi vĩnh cửu, đấng bề trên tối thượng, sự cứu cánh ngược lý nhân quả), <b>Phi hữu ái</b> (Vibhavataṇhā — tham đắm hợp Đoạn kiến: vô nhân kiến, vô hành kiến, vô hữu kiến). "Thọ duyên Ái" chính là mắt xích then chốt của vòng luân hồi.'},
  {ten:'Thủ', pali:'Upādāna',
   duyen:'Thủ duyên Hữu — Upādānapaccayā bhavo',
+  duyenhe:[8,12],
   chiphap:'Tâm sở <b>Tham</b> + tâm sở <b>Tà kiến</b> hợp trong <b>8 tâm tham</b> (<b>4 thủ</b>).',
   mogok:'Nắm giữ, chấp chặt vào đối tượng, gắn liền với tà kiến. <b>4 loại Thủ</b>: Dục thủ (Kāmupādāna — bám víu 5 trần cảnh), Kiến thủ (Diṭṭhupādāna — chấp chặt quan điểm sai lầm), Giới cấm thủ (Sīlabbatupādāna — chấp pháp hành sai lạc ngược Đạo Đế, mê tín lễ lạy cúng kiếng cầu xin), Ngã chấp thủ (Attavādupādāna — chấp "cái tôi" thường còn; thật ra chỉ có sự buồn, sự khổ chứ không có "tôi buồn, tôi khổ"). Chính 4 Thủ làm duyên cho Hữu có mặt.'},
  {ten:'Hữu', pali:'Bhava',
   duyen:'Hữu duyên Sanh — Bhavapaccayā jāti',
+  duyenhe:[12],
   chiphap:'<b>Nghiệp hữu:</b> tâm sở Tư hợp trong 12 tâm bất thiện + 17 tâm thiện hiệp thế (gom thành 29 Tư).<br><b>Sanh hữu:</b> 32 tâm quả hiệp thế, 35 tâm sở hợp, 20 sắc nghiệp.',
   mogok:'Tiến trình tạo tác và tái sanh. <b>2 loại</b>: <b>Nghiệp hữu</b> (Kammabhava — nhân: tiến trình tạo nghiệp thiện, bất thiện, bất động) và <b>Sanh hữu</b> (Upapattibhava — quả: Danh-Sắc của kiếp sống mới). Sanh hữu gồm 3 cảnh giới tái sanh: Dục hữu, Sắc hữu, Vô sắc hữu.'},
  {ten:'Sanh', pali:'Jāti',
@@ -819,9 +823,33 @@ function renderKinhTungPage(){
   </div>`;
 }
 
+// ===== Trang "Duyên" (gộp Duyên khởi + 24 Duyên hệ) =====
+let duyenTab = (function(){ try{ return localStorage.getItem('quyen22-duyen-tab') || 'khoi'; }catch(e){ return 'khoi'; } })();
+
+function switchDuyenTab(k){
+  duyenTab = k;
+  try{ localStorage.setItem('quyen22-duyen-tab', k); }catch(e){}
+  renderDuyenPage();
+  document.getElementById('main').scrollTop = 0;
+}
+
+function renderDuyenPage(){
+  const extra = document.getElementById('extra-content');
+  const TABS = [['khoi','Duyên khởi · 12 chi'],['he','24 Duyên hệ']];
+  const tabbar = `<div class="ad-tabs">` + TABS.map(([k,label])=>
+      `<button class="ad-tab ${k===duyenTab?'on':''}" onclick="switchDuyenTab('${k}')">${label}</button>`
+    ).join('') + `</div>`;
+  extra.innerHTML = `${tabbar}<div id="duyen-body"></div>`;
+  if(duyenTab==='he'){
+    renderDuyenHePage();
+  } else {
+    renderDuyenKhoiPage();
+  }
+}
+
 function renderDuyenKhoiPage(){
   dkPid = 0;
-  const extra = document.getElementById('extra-content');
+  const extra = document.getElementById('duyen-body') || document.getElementById('extra-content');
   // 4 phần theo truyền thống Mogok: màu nền từng chi
   const PHAN = [
     {chis:[0,1],       fill:'#2b54c2', stroke:'#17357f', ink:'#ffffff', label:'Nhân quá khứ'},
@@ -954,12 +982,25 @@ function openDuyenKhoiSheet(i){
       d.extra.map(([t,p,c])=>`<div style="margin-bottom:7px"><b>${t}</b> <i>(${p})</i>: ${c}</div>`).join('') +
       `</div></div>`;
   }
+  let duyenheHtml = '';
+  if(d.duyenhe && d.duyenhe.length){
+    const btns = d.duyenhe.map(idx=>{
+      const dh = DUYENHE_DATA[idx];
+      return `<button class="qbtn" onclick="openDuyenHeSheet(${idx})">${dh.ten}</button>`;
+    }).join(' ');
+    duyenheHtml = `<div class="sec" style="margin-top:12px">
+      <div class="sec-label">Duyên hệ chi phối (Paṭṭhāna)</div>
+      <div class="sec-body" style="margin-bottom:6px">Mắt xích này vận hành chủ yếu qua ${d.duyenhe.length>1?'các duyên sau':'duyên sau'} trong 24 duyên hệ. Chạm để xem định nghĩa và chi pháp đầy đủ.</div>
+      <div class="qbtn-row">${btns}</div>
+    </div>`;
+  }
   const html = `
     <div class="sheet-head"><h2>${i+1}. ${d.ten}</h2></div>
     <p class="sheet-pali">${d.pali}</p>
     <div class="sec"><div class="sec-label">Chi pháp</div><div class="sec-body">${d.chiphap}</div></div>
     ${d.mogok ? `<div class="sec" style="margin-top:12px"><div class="sec-label">Giảng giải (truyền thống Mogok)</div><div class="sec-body">${d.mogok}</div></div>` : ''}
     <div class="info-note" style="margin-top:10px"><b>Duyên:</b> ${d.duyen}</div>
+    ${duyenheHtml}
     ${extraHtml}
   `;
   document.getElementById('sheet-content').innerHTML = html;
@@ -1175,7 +1216,7 @@ function dhChiphapRows(d){
 }
 
 function renderDuyenHePage(){
-  const extra = document.getElementById('extra-content');
+  const extra = document.getElementById('duyen-body') || document.getElementById('extra-content');
   let circles = '';
   DUYENHE_DATA.forEach((d,i)=>{
     circles += `<div class="circle circle-dh" onclick="openDuyenHeSheet(${i})">
@@ -2017,7 +2058,7 @@ renderSectionSwitch();
 applyLangMode();
 // Mở lại đúng trang đang xem trước khi tải lại (lưu ở localStorage 'quyen22-section'); mặc định Trang đầu
 (function(){
-  var _valid = ['home','anduc','kinhtung','daolo','xugioi','canh','quyen22','duyenhe','coi31','trodao','tamso','dactinh','duyenkhoi','demucthien'];
+  var _valid = ['home','anduc','kinhtung','daolo','xugioi','canh','quyen22','duyen','coi31','trodao','tamso','dactinh','demucthien'];
   var _s = 'home';
   try{ _s = localStorage.getItem('quyen22-section') || 'home'; }catch(e){}
   switchSection(_valid.indexOf(_s) >= 0 ? _s : 'home');
