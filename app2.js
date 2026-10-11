@@ -1346,7 +1346,7 @@ function tkCanh(){
 // ---- Tổng kết 22 Quyền ----
 function tkQuyen(){
   if(typeof QUYEN_DATA==='undefined') return '';
-  const rows = QUYEN_DATA.map(d=>tkRow(d.id, d.ten, d.pali.split(' ')[0], d.sacdanh==='sac'?'Sắc':(d.sacdanh==='danh'?'Danh':'Sắc·Danh'), d.chiphap)).join('');
+  const rows = QUYEN_DATA.map(d=>tkRow(d.id, d.ten, d.pali, d.sacdanh==='sac'?'Sắc':(d.sacdanh==='danh'?'Danh':'Sắc·Danh'), d.chiphap)).join('');
   return tkBlock('Tổng kết 22 Quyền', 'Mỗi quyền kèm <b>chi pháp</b> và phân loại <b>Sắc quyền – Danh quyền</b>. 22 quyền quy nạp về <b>16 chi pháp chân đế</b>: 5 sắc thần kinh, 2 sắc tính, sắc mạng quyền + tâm sở Mạng quyền, Tâm (121), tâm sở Thọ (5 thọ quyền), Tín, Cần, Niệm, Nhất hành, Trí tuệ (4 quyền tuệ).', rows,
     'Phân cõi và vai trò Quyền duyên: xem 4 bảng tổng quát ở các nút phía trên. Nguồn: Visuddhimagga XVI (Indriyasaccaniddesa) — đã đối chiếu bản VRI.');
 }
@@ -1422,7 +1422,7 @@ function openDuyenHeSheet(i){
 }
 
 // ===== (Trang 22 Quyền) 4 bảng tổng quát =====
-function qList(arr){ return arr.map(d=>`${d.id}. ${d.ten} <i style="color:var(--ink-soft)">(${d.pali.split(' ')[0]})</i>`).join('<br>'); }
+function qList(arr){ return arr.map(d=>`${d.id}. ${d.ten} <i style="color:var(--ink-soft)">(${d.pali})</i>`).join('<br>'); }
 
 function openQuyenDanhSac(){
   const sac = QUYEN_DATA.filter(d=>d.sacdanh==='sac');
