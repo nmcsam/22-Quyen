@@ -519,9 +519,7 @@ function renderDacTinhPage(){
       return `<div class="circle ${g.cls||'circle-plain'}" onclick="openDacTinhTL(${gi},${ii})"><div class="cp cnum">${n}</div><div class="cn">${it.ten}</div><div class="cp">${it.pali}</div></div>`;
     }).join('');
     const range = first===n ? `${first}.` : `${first}–${n} ·`;
-    // Thử màu: các nhóm xen kẽ nâu cam / tím
-    const tone = gi%2 ? 'tone-purple' : 'tone-amber';
-    return `<div class="group-head ${tone}">${range} ${g.ten}</div><div class="circle-grid ${tone}">${circles}</div>`;
+    return `<div class="group-head">${range} ${g.ten}</div><div class="circle-grid">${circles}</div>`;
   }).join('');
 
   extra.innerHTML = `
