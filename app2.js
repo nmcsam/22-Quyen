@@ -2053,440 +2053,6 @@ switchSection = function(s){
   if(typeof applyPageOverride==='function') applyPageOverride();
 };
 
-// ===== Khởi tạo app (đặt cuối file để mọi const dữ liệu đã sẵn sàng) =====
-renderSectionSwitch();
-applyLangMode();
-// Mở lại đúng trang đang xem trước khi tải lại (lưu ở localStorage 'quyen22-section'); mặc định Trang đầu
-(function(){
-  var _valid = ['home','anduc','kinhtung','daolo','xugioi','canh','quyen22','duyen','coi31','trodao','tamso','dactinh','demucthien'];
-  var _s = 'home';
-  try{ _s = localStorage.getItem('quyen22-section') || 'home'; }catch(e){}
-  switchSection(_valid.indexOf(_s) >= 0 ? _s : 'home');
-})();
-
-
-// ===== Tên đầy đủ + định nghĩa ngắn cho Tâm =====
-function cittaFullName(c){
-  return 'Tâm ' + c.name;
-}
-function glossCitta(c){
-  const n = c.name, g = c.groupLabel || '';
-  if(g.startsWith('Bất thiện')){
-    const goc = n.startsWith('Tham') ? 'gốc Tham' : n.startsWith('Sân') ? 'gốc Sân' : 'gốc Si';
-    return 'tâm bất thiện ' + goc + ', tạo nghiệp xấu';
-  }
-  if(g.startsWith('Vô nhân')){
-    if(n.includes('quả')) return 'tâm quả vô nhân — kết quả của nghiệp, không có nhân tương ưng';
-    return 'tâm duy tác vô nhân — chỉ làm phận sự, không tạo nghiệp';
-  }
-  if(g.startsWith('Dục giới Tịnh hảo')){
-    if(n.startsWith('Thiện')) return 'tâm đại thiện dục giới, tạo nghiệp lành';
-    if(n.startsWith('Quả')) return 'tâm đại quả dục giới — quả của đại thiện';
-    return 'tâm đại duy tác dục giới — tâm của bậc Alahán';
-  }
-  if(g.startsWith('Sắc giới')){
-    const loai = n.startsWith('Thiện') ? 'thiện' : n.startsWith('Quả') ? 'quả' : 'duy tác';
-    return 'tâm thiền Sắc giới (' + loai + '), chứng đắc bằng thiền định';
-  }
-  if(g.startsWith('Vô Sắc giới')){
-    const loai = n.startsWith('Thiện') ? 'thiện' : n.startsWith('Quả') ? 'quả' : 'duy tác';
-    return 'tâm thiền Vô sắc giới (' + loai + '), lấy cảnh vô sắc';
-  }
-  if(g.startsWith('Siêu thế')){
-    return n.includes('Đạo') ? 'tâm Đạo siêu thế — sát-na đoạn trừ phiền não, lấy Níp-bàn làm cảnh'
-                             : 'tâm Quả siêu thế — hưởng quả giải thoát, lấy Níp-bàn làm cảnh';
-  }
-  return 'tâm';
-}
-
-
-function importAppData(input){
-  const file = input.files && input.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(ev){
-    try{
-      const data = JSON.parse(ev.target.result);
-      let applied = [];
-      const cd = data.cai_dat || {};
-      if(cd.ngon_ngu){
-        try{ localStorage.setItem('quyen22-lang', cd.ngon_ngu); }catch(e){}
-        applyLangMode(); applied.push('ngôn ngữ');
-      }
-      if(cd.co_chu_tung_trang && typeof fontScales!=='undefined'){
-        Object.assign(fontScales, cd.co_chu_tung_trang);
-        try{ localStorage.setItem('quyen22-fontscales', JSON.stringify(fontScales)); }catch(e){}
-        applyFontScale(); applied.push('cỡ chữ từng trang');
-      }
-      if(cd.co_chu_bang_chi_tiet && typeof sheetScale!=='undefined'){
-        sheetScale = cd.co_chu_bang_chi_tiet; applySheetScale(); applied.push('cỡ chữ bảng chi tiết');
-      }
-      if(cd.co_chu_tom_luoc_duyen && typeof tomluocScale!=='undefined'){
-        tomluocScale = cd.co_chu_tom_luoc_duyen;
-        try{ localStorage.setItem('quyen22-tomluoc-scale', String(tomluocScale)); }catch(e){}
-        applied.push('cỡ chữ bản tóm lược duyên');
-      }
-      if(cd.co_chu_tong_ket_de_muc && typeof dmtScale!=='undefined'){
-        dmtScale = cd.co_chu_tong_ket_de_muc;
-        try{ localStorage.setItem('quyen22-dmt-scale', String(dmtScale)); }catch(e){}
-        applied.push('cỡ chữ bảng tổng kết đề mục thiền');
-      }
-      if(cd.trang_hien_tai){
-        try{ localStorage.setItem('quyen22-section', cd.trang_hien_tai); }catch(e){}
-      }
-      if(data.noi_dung_da_sua && typeof data.noi_dung_da_sua==='object'){
-        Object.assign(contentEdits, data.noi_dung_da_sua);
-        saveEditsStore();
-        applyPageOverride();
-        applied.push('các nội dung đã sửa (' + Object.keys(data.noi_dung_da_sua).length + ' mục)');
-      }
-      alert(applied.length ? ('Đã nhập và khôi phục: ' + applied.join(', ') + '.')
-        : 'Tệp hợp lệ nhưng không có phần cài đặt để khôi phục (dữ liệu giáo pháp của app là bản dựng sẵn, không bị ghi đè).');
-      openSettingsSheet();
-    }catch(err){
-      alert('Tệp không hợp lệ — cần tệp JSON đã xuất từ app này.');
-    }
-    input.value = '';
-  };
-  reader.readAsText(file, 'utf-8');
-}
-
-// ===== ĐỒNG BỘ ĐÁM MÂY (Firebase Firestore) — đồng bộ các mục đã chỉnh sửa + cài đặt giữa các thiết bị =====
-// Dùng chung Firebase project với app Thiền / Cúng dường; document có tiền tố AB- trong collection 'syncs'.
-const AB_FIREBASE_CONFIG = {
-  apiKey: "AIzaSyBDvIFgBq0PmZ4fjWu0RUSZAgh_V5N58G0",
-  authDomain: "daily-meditation-d6bdf.firebaseapp.com",
-  projectId: "daily-meditation-d6bdf",
-  storageBucket: "daily-meditation-d6bdf.firebasestorage.app",
-  messagingSenderId: "619038884675",
-  appId: "1:619038884675:web:4db3c469bb5f70c899a5f6"
-};
-let abDb=null, abUnsub=null, abSyncCode='', abEcho=false, abTimer=null, abConflict=null, abUpdatedAt=0, abLastPayload='', abApplying=false;
-try{ abSyncCode = localStorage.getItem('quyen22-sync-code') || ''; }catch(e){}
-try{ abUpdatedAt = parseInt(localStorage.getItem('quyen22-updated-at')||'0',10) || 0; }catch(e){}
-
-function abToast(msg){
-  let t = document.getElementById('ab-toast');
-  if(!t){
-    t = document.createElement('div');
-    t.id = 'ab-toast';
-    t.style.cssText = 'position:fixed;left:50%;bottom:34px;transform:translateX(-50%);background:#2c2620;color:#fff8ec;padding:10px 18px;border-radius:24px;font-size:13px;font-weight:600;z-index:999;max-width:88vw;text-align:center;opacity:0;transition:.25s;pointer-events:none';
-    document.body.appendChild(t);
-  }
-  t.textContent = msg; t.style.opacity = '1';
-  clearTimeout(abToast._t);
-  abToast._t = setTimeout(()=>{ t.style.opacity='0'; }, 2600);
-}
-function abErr(msg){
-  const st = document.getElementById('ab-sync-status');
-  if(st){ st.textContent = msg; st.style.color = '#b3261e'; }
-  abToast(msg);
-}
-function abInitFirebase(){
-  if(typeof firebase==='undefined') return false;
-  try{ if(!abDb){ if(!firebase.apps.length) firebase.initializeApp(AB_FIREBASE_CONFIG); abDb = firebase.firestore(); } return true; }
-  catch(e){ console.error(e); return false; }
-}
-function abPackState(){
-  return JSON.stringify({
-    edits: contentEdits,
-    caiDat: {
-      ngon_ngu: getLangMode(),
-      co_chu_tung_trang: (typeof fontScales!=='undefined')?fontScales:{},
-      co_chu_bang_chi_tiet: (typeof sheetScale!=='undefined')?sheetScale:1,
-      co_chu_tom_luoc_duyen: (typeof tomluocScale!=='undefined')?tomluocScale:1,
-      co_chu_tong_ket: (typeof tkScale!=='undefined')?tkScale:1,
-      co_chu_tong_ket_de_muc: (typeof dmtScale!=='undefined')?dmtScale:1
-    }
-  });
-}
-function abSummary(st){
-  const n = st && st.edits ? Object.keys(st.edits).length : 0;
-  const lang = st && st.caiDat && st.caiDat.ngon_ngu ? st.caiDat.ngon_ngu : '—';
-  return {count:n, lang:lang};
-}
-function abStamp(t){ abUpdatedAt = t || Date.now(); try{ localStorage.setItem('quyen22-updated-at', String(abUpdatedAt)); }catch(e){} }
-function abApplyRemote(remote, updatedAt){
-  abApplying = true;
-  try{
-  contentEdits = (remote && remote.edits) || {};
-  try{ localStorage.setItem('quyen22-edits', JSON.stringify(contentEdits)); }catch(e){}
-  const cd = (remote && remote.caiDat) || {};
-  try{
-    if(cd.ngon_ngu){ localStorage.setItem('quyen22-lang', cd.ngon_ngu); applyLangMode(); }
-    if(cd.co_chu_tung_trang && typeof fontScales!=='undefined'){ fontScales = cd.co_chu_tung_trang; localStorage.setItem('quyen22-fontscales', JSON.stringify(fontScales)); }
-    if(cd.co_chu_bang_chi_tiet && typeof sheetScale!=='undefined'){ sheetScale = cd.co_chu_bang_chi_tiet; }
-    if(cd.co_chu_tom_luoc_duyen && typeof tomluocScale!=='undefined'){ tomluocScale = cd.co_chu_tom_luoc_duyen; try{localStorage.setItem('quyen22-tomluoc-scale',String(tomluocScale));}catch(e){} }
-    if(cd.co_chu_tong_ket && typeof tkScale!=='undefined'){ tkScale = cd.co_chu_tong_ket; try{localStorage.setItem('quyen22-tk-scale',String(tkScale));}catch(e){} }
-    if(cd.co_chu_tong_ket_de_muc && typeof dmtScale!=='undefined'){ dmtScale = cd.co_chu_tong_ket_de_muc; try{localStorage.setItem('quyen22-dmt-scale',String(dmtScale));}catch(e){} }
-    if(typeof applyFontScale==='function') applyFontScale();
-    if(typeof applySheetScale==='function') applySheetScale();
-  }catch(e){ console.error(e); }
-  abStamp(updatedAt);
-  abLastPayload = abPackState();
-  try{ switchSection(currentSection); }catch(e){}
-  } finally { abApplying = false; }
-}
-function abPush(){
-  if(!abSyncCode||!abDb) return;
-  const payload = abPackState();
-  if(payload===abLastPayload && abUpdatedAt>0) return; // không có gì mới thì không đẩy
-  abStamp();
-  abLastPayload = payload;
-  abEcho = true;
-  abDb.collection('syncs').doc('AB-'+abSyncCode).set({payload:payload, updatedAt:abUpdatedAt},{merge:true})
-    .catch(function(e){ console.error(e); abErr('Lỗi ghi đám mây: '+(e&&e.message||e)); });
-}
-function queueCloudSave(){
-  if(!abSyncCode||abConflict||abApplying) return;
-  clearTimeout(abTimer);
-  abTimer = setTimeout(abPush, 900);
-}
-function abAttach(ref){
-  abUpdateSyncBtn();
-  abUnsub = ref.onSnapshot(function(doc){
-    if(!doc.exists || abConflict) return;
-    if(abEcho){ abEcho=false; return; }
-    const remote = doc.data();
-    if(!remote || !remote.updatedAt || remote.updatedAt<=abUpdatedAt) return;
-    let remoteST=null;
-    try{ remoteST=JSON.parse(remote.payload); }catch(e){ return; }
-    const l=abSummary(JSON.parse(abPackState())), r=abSummary(remoteST);
-    if(r.count===0 && l.count>0){
-      abConflict={remoteST:remoteST, ref:ref};
-      abUpdateSyncBtn();
-      abToast('⚠️ Đám mây báo không có mục chỉnh sửa nào — đã CHẶN để bảo vệ dữ liệu máy này. Mở phần Đồng bộ để xử lý.');
-      return;
-    }
-    abApplyRemote(remoteST, remote.updatedAt);
-    abToast('☁️ Đã nhận cập nhật từ thiết bị khác');
-  }, function(err){ console.error(err); abErr('Lỗi đồng bộ: '+(err&&err.message||err)); });
-}
-function abConnect(code, silent){
-  code=(code||'').trim().toUpperCase();
-  if(!code){ if(!silent)abToast('Nhập hoặc tạo mã trước'); return; }
-  if(!abInitFirebase()){ abErr('⚠️ Không tải được Firebase — kiểm tra kết nối mạng rồi thử lại'); return; }
-  abSyncCode=code; try{ localStorage.setItem('quyen22-sync-code', abSyncCode); }catch(e){}
-  if(abUnsub){ abUnsub(); abUnsub=null; }
-  abConflict=null;
-  const st0=document.getElementById('ab-sync-status'); if(st0){ st0.style.color=''; st0.textContent='Đang kết nối…'; }
-  const ref = abDb.collection('syncs').doc('AB-'+abSyncCode);
-  ref.get().then(function(doc){
-    if(!doc.exists){
-      abLastPayload=''; abPush(); abAttach(ref);
-      if(!silent){ abToast('✓ Đã kết nối — đã tải dữ liệu máy này lên đám mây'); openSyncSheet(); }
-      return;
-    }
-    let remoteST=null;
-    try{ remoteST=JSON.parse(doc.data().payload); }catch(e){ remoteST={edits:{}}; }
-    const l=abSummary(JSON.parse(abPackState())), r=abSummary(remoteST);
-    if(l.count===0 && r.count>0){
-      abApplyRemote(remoteST, doc.data().updatedAt); abAttach(ref);
-      if(!silent){ abToast('☁️ Đã tải dữ liệu từ đám mây về máy này'); openSyncSheet(); }
-    }else if(l.count>0 && r.count===0){
-      abLastPayload=''; abPush(); abAttach(ref);
-      if(!silent){ abToast('✓ Đã đẩy dữ liệu máy này lên đám mây'); openSyncSheet(); }
-    }else if(l.count===0 && r.count===0){
-      abApplyRemote(remoteST, doc.data().updatedAt); abAttach(ref);
-      if(!silent){ abToast('✓ Đã kết nối'); openSyncSheet(); }
-    }else{
-      // Cả hai bên đều có dữ liệu — so sánh trước, KHÔNG hỏi nếu không thật sự khác nhau
-      const remoteUp = doc.data().updatedAt || 0;
-      if(doc.data().payload === abPackState()){
-        // Giống hệt nhau -> chỉ kết nối
-        abStamp(Math.max(abUpdatedAt, remoteUp));
-        abLastPayload = abPackState();
-        abAttach(ref);
-        if(!silent){ abToast('✓ Đã kết nối — dữ liệu hai bên giống nhau'); openSyncSheet(); }
-      }else if(remoteUp > abUpdatedAt){
-        // Mây mới hơn (thiết bị khác vừa sửa) -> tải về
-        abApplyRemote(remoteST, remoteUp); abAttach(ref);
-        if(!silent){ abToast('☁️ Đã nhận bản mới hơn từ đám mây'); openSyncSheet(); }
-      }else if(remoteUp < abUpdatedAt){
-        // Máy này mới hơn -> đẩy lên
-        abLastPayload=''; abPush(); abAttach(ref);
-        if(!silent){ abToast('✓ Đã đẩy bản mới hơn của máy này lên đám mây'); openSyncSheet(); }
-      }else{
-        // Cùng mốc thời gian mà nội dung khác -> xung đột thật, mới cần hỏi
-        abConflict={remoteST:remoteST, ref:ref};
-        abUpdateSyncBtn();
-        if(silent){ abToast('⚠️ Dữ liệu máy và đám mây khác nhau — mở ⚙ Cài đặt → Đồng bộ để chọn bên giữ lại'); }
-        else openSyncSheet();
-      }
-    }
-  }).catch(function(err){
-    console.error(err);
-    let m=(err&&err.message)||String(err);
-    if(err&&err.code==='permission-denied') m='Bị từ chối quyền (permission-denied) — cần mở quyền ghi trong Firestore Rules.';
-    abErr('Lỗi kết nối: '+m);
-  });
-}
-function abKeepLocal(){
-  if(!abConflict)return;
-  const ref=abConflict.ref;
-  abConflict=null;
-  abLastPayload=''; abPush(); abAttach(ref);
-  abToast('✓ Đã giữ dữ liệu máy này — đã ghi đè lên đám mây');
-  openSyncSheet();
-}
-function abKeepRemote(){
-  if(!abConflict)return;
-  const ref=abConflict.ref, remoteST=abConflict.remoteST;
-  abConflict=null;
-  abApplyRemote(remoteST, Date.now());
-  abLastPayload=''; abPush();
-  abAttach(ref);
-  abToast('✓ Đã dùng dữ liệu từ đám mây');
-  openSyncSheet();
-}
-function abDisconnect(){
-  if(abUnsub){ abUnsub(); abUnsub=null; }
-  setTimeout(abUpdateSyncBtn,0);
-  abSyncCode=''; abConflict=null;
-  try{ localStorage.removeItem('quyen22-sync-code'); }catch(e){}
-  abToast('Đã ngắt đồng bộ — dữ liệu trên đám mây vẫn còn');
-  openSyncSheet();
-}
-function abUpdateSyncBtn(){
-  const it=document.getElementById('ab-sync-item');
-  const dot=document.getElementById('ab-sync-dot');
-  const st = abConflict ? 'warn' : (abSyncCode&&abDb ? 'on' : '');
-  if(it){
-    it.classList.remove('on','warn');
-    if(st) it.classList.add(st);
-    it.textContent = st==='warn' ? '⚠️ Đồng bộ — cần xử lý' : (st==='on' ? '☁️ Đồng bộ — Đang bật' : '☁️ Đồng bộ đám mây');
-    it.title = st==='warn' ? 'Có khác biệt dữ liệu — chạm để xử lý' : (st==='on' ? ('Đang đồng bộ — mã: '+abSyncCode) : 'Đồng bộ đám mây (chưa bật)');
-  }
-  if(dot){
-    dot.classList.remove('on','warn');
-    if(st) dot.classList.add(st);
-  }
-}
-function abGenCode(){
-  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c='';
-  for(let i=0;i<10;i++)c+=chars[Math.floor(Math.random()*chars.length)];
-  const inp=document.getElementById('ab-sync-code-input'); if(inp) inp.value=c;
-}
-function openSyncSheet(){
-  const qb='padding:9px 6px;border:none;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit';
-  let conflictHtml='';
-  if(abConflict){
-    const l=abSummary(JSON.parse(abPackState())), r=abSummary(abConflict.remoteST);
-    conflictHtml=`<div style="margin-top:12px;padding:12px;border:1.5px solid #c0503e;border-radius:10px;background:rgba(192,80,62,.1)">
-      <div style="font-size:13px;line-height:1.55">⚠️ <b>Phát hiện khác biệt dữ liệu</b> — chưa tự động đồng bộ để tránh mất dữ liệu.<br><br>
-      Máy này: <b>${l.count}</b> mục đã sửa · ngôn ngữ: ${l.lang}<br>
-      Đám mây: <b>${r.count}</b> mục đã sửa · ngôn ngữ: ${r.lang}<br><br>
-      Chọn bên bạn muốn <b>giữ lại</b> (bên còn lại sẽ bị thay thế):</div>
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button style="${qb};flex:1;background:var(--card);color:var(--ink);border:1px solid rgba(128,128,128,.4)" onclick="abKeepLocal()">📱 Giữ máy này</button>
-        <button style="${qb};flex:1;background:var(--card);color:var(--ink);border:1px solid rgba(128,128,128,.4)" onclick="abKeepRemote()">☁️ Giữ đám mây</button>
-      </div>
-    </div>`;
-  }
-  const status = abConflict ? '' : (abSyncCode ? ('✓ Đang đồng bộ — mã: '+abSyncCode) : 'Chưa kết nối');
-  document.getElementById('sheet-content').innerHTML = `
-    <div class="sheet-head"><h2>☁️ Đồng bộ nhiều thiết bị</h2></div>
-    <p class="sheet-pali">Đồng bộ các mục bạn đã chỉnh sửa và cài đặt hiển thị giữa các thiết bị, kèm bản lưu dự phòng trên đám mây.</p>
-    <div class="sec"><div class="sec-label">Mã đồng bộ</div>
-      <input type="text" id="ab-sync-code-input" value="${abSyncCode}" placeholder="VD: SAM2026AB" maxlength="14"
-        style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid rgba(128,128,128,.5);border-radius:10px;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:var(--card);color:var(--ink);font-family:inherit">
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button style="${qb};flex:1;background:var(--card);color:var(--ink);border:1px solid rgba(128,128,128,.4)" onclick="abGenCode()">🎲 Tạo mã mới</button>
-        <button style="${qb};flex:1;background:#1c5b9e;color:#fff" onclick="abConnect(document.getElementById('ab-sync-code-input').value,false)">✓ Kết nối</button>
-      </div>
-      <div id="ab-sync-status" style="font-size:12.5px;color:var(--ink-soft);margin-top:12px;text-align:center">${status}</div>
-      ${conflictHtml}
-      <div style="display:flex;gap:8px;margin-top:14px">
-        <button style="${qb};flex:1;background:var(--card);color:var(--ink);border:1px solid rgba(128,128,128,.4)" onclick="abDisconnect()">Ngắt kết nối</button>
-        <button style="${qb};flex:1;background:var(--card);color:var(--ink);border:1px solid rgba(128,128,128,.4)" onclick="closeSheet()">Đóng</button>
-      </div>
-    </div>
-  `;
-  document.getElementById('sheet').classList.add('show');
-  document.getElementById('sheet-backdrop').classList.add('show');
-}
-async function abRequestPersist(){ try{ if(navigator.storage&&navigator.storage.persist){ await navigator.storage.persist(); } }catch(e){} }
-function abInitSync(){ if(abSyncCode && abInitFirebase()) abConnect(abSyncCode, true); }
-// Nối các thao tác lưu vào hàng đợi đồng bộ
-(function(){
-  function wrap(name){
-    const f = window[name];
-    if(typeof f!=='function') return;
-    window[name] = function(){ const r=f.apply(this,arguments); try{ queueCloudSave(); }catch(e){} return r; };
-  }
-  ['saveEditsStore','setLangMode','applyFontScale','applySheetScale','adjustTomLuocScale','adjustTkScale','adjustDmtScale'].forEach(wrap);
-})();
-abRequestPersist();
-setTimeout(abInitSync, 400);
-setTimeout(abUpdateSyncBtn, 600);
-
-// ===== SAO LƯU ĐỊNH KỲ LÊN ĐÁM MÂY =====
-function abBkFreq(){ try{ return localStorage.getItem('quyen22-bk-freq')||'off'; }catch(e){ return 'off'; } }
-function abBkLast(){ try{ return parseInt(localStorage.getItem('quyen22-bk-last')||'0',10)||0; }catch(e){ return 0; } }
-function abBkMs(f){ return f==='d'?86400000 : f==='w'?604800000 : f==='m'?2592000000 : 0; }
-function abBkFreqLabel(f){ return f==='d'?'hàng ngày' : f==='w'?'hàng tuần' : f==='m'?'hàng tháng' : 'đang tắt'; }
-function abBkStatusText(){
-  const l=abBkLast();
-  return 'Chu kỳ: '+abBkFreqLabel(abBkFreq())+(l?(' · Lần gần nhất: '+new Date(l).toLocaleString('vi-VN')):' · Chưa sao lưu lần nào');
-}
-function abBkSetFreq(f){
-  try{ localStorage.setItem('quyen22-bk-freq',f); }catch(e){}
-  openSettingsSheet();
-  if(f!=='off') abBkCheckAuto();
-}
-function abBkDocRef(){ return abDb.collection('syncs').doc('AB-'+abSyncCode+'-BK'); }
-function abBkNow(manual){
-  if(!abSyncCode||!abDb){ if(manual)abToast('Cần bật Đồng bộ đám mây trước (mục Đồng bộ nhiều thiết bị)'); return; }
-  const day=new Date().toISOString().slice(0,10);
-  abBkDocRef().get().then(function(doc){
-    const sn=(doc.exists&&doc.data().snapshots)||{};
-    sn[day]=abPackState();
-    const ks=Object.keys(sn).sort();
-    while(ks.length>4){ delete sn[ks.shift()]; }
-    return abBkDocRef().set({snapshots:sn,updatedAt:Date.now()});
-  }).then(function(){
-    try{ localStorage.setItem('quyen22-bk-last',String(Date.now())); }catch(e){}
-    abToast('✓ Đã sao lưu lên đám mây ('+day+')');
-    const st=document.getElementById('ab-bk-status'); if(st) st.textContent=abBkStatusText();
-  }).catch(function(e){ abToast('Lỗi sao lưu: '+(e&&e.message||e)); });
-}
-function abBkCheckAuto(){
-  const f=abBkFreq(); if(f==='off')return;
-  if(Date.now()-abBkLast() < abBkMs(f)) return;
-  if(abSyncCode&&abDb) abBkNow(false);
-  else abToast('⏰ Đến hạn sao lưu định kỳ — hãy bật Đồng bộ đám mây hoặc Xuất dữ liệu trong ⚙ Cài đặt');
-}
-function abBkShowList(){
-  if(!abSyncCode||!abDb){ abToast('Cần bật Đồng bộ đám mây trước'); return; }
-  const box=document.getElementById('ab-bk-list');
-  if(!box) return;
-  box.innerHTML='<span style="color:var(--ink-soft)">Đang tải…</span>';
-  abBkDocRef().get().then(function(doc){
-    const sn=(doc.exists&&doc.data().snapshots)||{};
-    const ks=Object.keys(sn).sort().reverse();
-    if(!ks.length){ box.innerHTML='<span style="color:var(--ink-soft)">Chưa có bản sao lưu nào.</span>'; return; }
-    box.innerHTML=ks.map(function(d){
-      let n=0; try{ n=Object.keys(JSON.parse(sn[d]).edits||{}).length; }catch(e){}
-      return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid rgba(128,128,128,.25)">'+
-        '<span style="flex:1">📅 '+d+' <span style="color:var(--ink-soft);font-size:.88em">('+n+' mục đã sửa)</span></span>'+
-        '<button class="qbtn" style="margin:0" onclick="abBkRestore(\''+d+'\')">Khôi phục</button></div>';
-    }).join('');
-  }).catch(function(e){ box.innerHTML=''; abToast('Lỗi: '+(e&&e.message||e)); });
-}
-function abBkRestore(day){
-  if(!confirm('Khôi phục từ bản sao lưu ngày '+day+'?\nCác mục đã sửa và cài đặt hiện tại (trên máy và trên đám mây) sẽ bị thay thế bằng bản này.'))return;
-  abBkDocRef().get().then(function(doc){
-    const sn=(doc.exists&&doc.data().snapshots)||{};
-    if(!sn[day]){ abToast('Không tìm thấy bản sao lưu'); return; }
-    let st=null; try{ st=JSON.parse(sn[day]); }catch(e){ abToast('Bản sao lưu bị lỗi'); return; }
-    abApplyRemote(st, Date.now());
-    abLastPayload=''; abPush();
-    abToast('✓ Đã khôi phục bản sao lưu '+day);
-    openSettingsSheet();
-  }).catch(function(e){ abToast('Lỗi: '+(e&&e.message||e)); });
-}
-setTimeout(abBkCheckAuto, 4500);
-
 // ===== Trang "31 Cõi" (Bhūmi) =====
 // Nguồn: "31 Cõi.pdf" + "Tử Sinh Luân Hồi Trong 31 Cõi" + "Ma trận 12 hạng người & cõi giới" (Google Drive)
 // Đối chiếu Vīthimuttasaṅgaha — Abhidhammatthasaṅgaha chương V.
@@ -2926,6 +2492,440 @@ function openTDMinhHanh(){
   `);
 }
 
+
+// ===== Khởi tạo app (đặt cuối file để mọi const dữ liệu đã sẵn sàng) =====
+renderSectionSwitch();
+applyLangMode();
+// Mở lại đúng trang đang xem trước khi tải lại (lưu ở localStorage 'quyen22-section'); mặc định Trang đầu
+(function(){
+  var _valid = ['home','anduc','kinhtung','daolo','xugioi','canh','quyen22','duyen','coi31','trodao','tamso','dactinh','demucthien'];
+  var _s = 'home';
+  try{ _s = localStorage.getItem('quyen22-section') || 'home'; }catch(e){}
+  switchSection(_valid.indexOf(_s) >= 0 ? _s : 'home');
+})();
+
+
+// ===== Tên đầy đủ + định nghĩa ngắn cho Tâm =====
+function cittaFullName(c){
+  return 'Tâm ' + c.name;
+}
+function glossCitta(c){
+  const n = c.name, g = c.groupLabel || '';
+  if(g.startsWith('Bất thiện')){
+    const goc = n.startsWith('Tham') ? 'gốc Tham' : n.startsWith('Sân') ? 'gốc Sân' : 'gốc Si';
+    return 'tâm bất thiện ' + goc + ', tạo nghiệp xấu';
+  }
+  if(g.startsWith('Vô nhân')){
+    if(n.includes('quả')) return 'tâm quả vô nhân — kết quả của nghiệp, không có nhân tương ưng';
+    return 'tâm duy tác vô nhân — chỉ làm phận sự, không tạo nghiệp';
+  }
+  if(g.startsWith('Dục giới Tịnh hảo')){
+    if(n.startsWith('Thiện')) return 'tâm đại thiện dục giới, tạo nghiệp lành';
+    if(n.startsWith('Quả')) return 'tâm đại quả dục giới — quả của đại thiện';
+    return 'tâm đại duy tác dục giới — tâm của bậc Alahán';
+  }
+  if(g.startsWith('Sắc giới')){
+    const loai = n.startsWith('Thiện') ? 'thiện' : n.startsWith('Quả') ? 'quả' : 'duy tác';
+    return 'tâm thiền Sắc giới (' + loai + '), chứng đắc bằng thiền định';
+  }
+  if(g.startsWith('Vô Sắc giới')){
+    const loai = n.startsWith('Thiện') ? 'thiện' : n.startsWith('Quả') ? 'quả' : 'duy tác';
+    return 'tâm thiền Vô sắc giới (' + loai + '), lấy cảnh vô sắc';
+  }
+  if(g.startsWith('Siêu thế')){
+    return n.includes('Đạo') ? 'tâm Đạo siêu thế — sát-na đoạn trừ phiền não, lấy Níp-bàn làm cảnh'
+                             : 'tâm Quả siêu thế — hưởng quả giải thoát, lấy Níp-bàn làm cảnh';
+  }
+  return 'tâm';
+}
+
+
+function importAppData(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      const data = JSON.parse(ev.target.result);
+      let applied = [];
+      const cd = data.cai_dat || {};
+      if(cd.ngon_ngu){
+        try{ localStorage.setItem('quyen22-lang', cd.ngon_ngu); }catch(e){}
+        applyLangMode(); applied.push('ngôn ngữ');
+      }
+      if(cd.co_chu_tung_trang && typeof fontScales!=='undefined'){
+        Object.assign(fontScales, cd.co_chu_tung_trang);
+        try{ localStorage.setItem('quyen22-fontscales', JSON.stringify(fontScales)); }catch(e){}
+        applyFontScale(); applied.push('cỡ chữ từng trang');
+      }
+      if(cd.co_chu_bang_chi_tiet && typeof sheetScale!=='undefined'){
+        sheetScale = cd.co_chu_bang_chi_tiet; applySheetScale(); applied.push('cỡ chữ bảng chi tiết');
+      }
+      if(cd.co_chu_tom_luoc_duyen && typeof tomluocScale!=='undefined'){
+        tomluocScale = cd.co_chu_tom_luoc_duyen;
+        try{ localStorage.setItem('quyen22-tomluoc-scale', String(tomluocScale)); }catch(e){}
+        applied.push('cỡ chữ bản tóm lược duyên');
+      }
+      if(cd.co_chu_tong_ket_de_muc && typeof dmtScale!=='undefined'){
+        dmtScale = cd.co_chu_tong_ket_de_muc;
+        try{ localStorage.setItem('quyen22-dmt-scale', String(dmtScale)); }catch(e){}
+        applied.push('cỡ chữ bảng tổng kết đề mục thiền');
+      }
+      if(cd.trang_hien_tai){
+        try{ localStorage.setItem('quyen22-section', cd.trang_hien_tai); }catch(e){}
+      }
+      if(data.noi_dung_da_sua && typeof data.noi_dung_da_sua==='object'){
+        Object.assign(contentEdits, data.noi_dung_da_sua);
+        saveEditsStore();
+        applyPageOverride();
+        applied.push('các nội dung đã sửa (' + Object.keys(data.noi_dung_da_sua).length + ' mục)');
+      }
+      alert(applied.length ? ('Đã nhập và khôi phục: ' + applied.join(', ') + '.')
+        : 'Tệp hợp lệ nhưng không có phần cài đặt để khôi phục (dữ liệu giáo pháp của app là bản dựng sẵn, không bị ghi đè).');
+      openSettingsSheet();
+    }catch(err){
+      alert('Tệp không hợp lệ — cần tệp JSON đã xuất từ app này.');
+    }
+    input.value = '';
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+// ===== ĐỒNG BỘ ĐÁM MÂY (Firebase Firestore) — đồng bộ các mục đã chỉnh sửa + cài đặt giữa các thiết bị =====
+// Dùng chung Firebase project với app Thiền / Cúng dường; document có tiền tố AB- trong collection 'syncs'.
+const AB_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBDvIFgBq0PmZ4fjWu0RUSZAgh_V5N58G0",
+  authDomain: "daily-meditation-d6bdf.firebaseapp.com",
+  projectId: "daily-meditation-d6bdf",
+  storageBucket: "daily-meditation-d6bdf.firebasestorage.app",
+  messagingSenderId: "619038884675",
+  appId: "1:619038884675:web:4db3c469bb5f70c899a5f6"
+};
+let abDb=null, abUnsub=null, abSyncCode='', abEcho=false, abTimer=null, abConflict=null, abUpdatedAt=0, abLastPayload='', abApplying=false;
+try{ abSyncCode = localStorage.getItem('quyen22-sync-code') || ''; }catch(e){}
+try{ abUpdatedAt = parseInt(localStorage.getItem('quyen22-updated-at')||'0',10) || 0; }catch(e){}
+
+function abToast(msg){
+  let t = document.getElementById('ab-toast');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'ab-toast';
+    t.style.cssText = 'position:fixed;left:50%;bottom:34px;transform:translateX(-50%);background:#2c2620;color:#fff8ec;padding:10px 18px;border-radius:24px;font-size:13px;font-weight:600;z-index:999;max-width:88vw;text-align:center;opacity:0;transition:.25s;pointer-events:none';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(abToast._t);
+  abToast._t = setTimeout(()=>{ t.style.opacity='0'; }, 2600);
+}
+function abErr(msg){
+  const st = document.getElementById('ab-sync-status');
+  if(st){ st.textContent = msg; st.style.color = '#b3261e'; }
+  abToast(msg);
+}
+function abInitFirebase(){
+  if(typeof firebase==='undefined') return false;
+  try{ if(!abDb){ if(!firebase.apps.length) firebase.initializeApp(AB_FIREBASE_CONFIG); abDb = firebase.firestore(); } return true; }
+  catch(e){ console.error(e); return false; }
+}
+function abPackState(){
+  return JSON.stringify({
+    edits: contentEdits,
+    caiDat: {
+      ngon_ngu: getLangMode(),
+      co_chu_tung_trang: (typeof fontScales!=='undefined')?fontScales:{},
+      co_chu_bang_chi_tiet: (typeof sheetScale!=='undefined')?sheetScale:1,
+      co_chu_tom_luoc_duyen: (typeof tomluocScale!=='undefined')?tomluocScale:1,
+      co_chu_tong_ket: (typeof tkScale!=='undefined')?tkScale:1,
+      co_chu_tong_ket_de_muc: (typeof dmtScale!=='undefined')?dmtScale:1
+    }
+  });
+}
+function abSummary(st){
+  const n = st && st.edits ? Object.keys(st.edits).length : 0;
+  const lang = st && st.caiDat && st.caiDat.ngon_ngu ? st.caiDat.ngon_ngu : '—';
+  return {count:n, lang:lang};
+}
+function abStamp(t){ abUpdatedAt = t || Date.now(); try{ localStorage.setItem('quyen22-updated-at', String(abUpdatedAt)); }catch(e){} }
+function abApplyRemote(remote, updatedAt){
+  abApplying = true;
+  try{
+  contentEdits = (remote && remote.edits) || {};
+  try{ localStorage.setItem('quyen22-edits', JSON.stringify(contentEdits)); }catch(e){}
+  const cd = (remote && remote.caiDat) || {};
+  try{
+    if(cd.ngon_ngu){ localStorage.setItem('quyen22-lang', cd.ngon_ngu); applyLangMode(); }
+    if(cd.co_chu_tung_trang && typeof fontScales!=='undefined'){ fontScales = cd.co_chu_tung_trang; localStorage.setItem('quyen22-fontscales', JSON.stringify(fontScales)); }
+    if(cd.co_chu_bang_chi_tiet && typeof sheetScale!=='undefined'){ sheetScale = cd.co_chu_bang_chi_tiet; }
+    if(cd.co_chu_tom_luoc_duyen && typeof tomluocScale!=='undefined'){ tomluocScale = cd.co_chu_tom_luoc_duyen; try{localStorage.setItem('quyen22-tomluoc-scale',String(tomluocScale));}catch(e){} }
+    if(cd.co_chu_tong_ket && typeof tkScale!=='undefined'){ tkScale = cd.co_chu_tong_ket; try{localStorage.setItem('quyen22-tk-scale',String(tkScale));}catch(e){} }
+    if(cd.co_chu_tong_ket_de_muc && typeof dmtScale!=='undefined'){ dmtScale = cd.co_chu_tong_ket_de_muc; try{localStorage.setItem('quyen22-dmt-scale',String(dmtScale));}catch(e){} }
+    if(typeof applyFontScale==='function') applyFontScale();
+    if(typeof applySheetScale==='function') applySheetScale();
+  }catch(e){ console.error(e); }
+  abStamp(updatedAt);
+  abLastPayload = abPackState();
+  try{ switchSection(currentSection); }catch(e){}
+  } finally { abApplying = false; }
+}
+function abPush(){
+  if(!abSyncCode||!abDb) return;
+  const payload = abPackState();
+  if(payload===abLastPayload && abUpdatedAt>0) return; // không có gì mới thì không đẩy
+  abStamp();
+  abLastPayload = payload;
+  abEcho = true;
+  abDb.collection('syncs').doc('AB-'+abSyncCode).set({payload:payload, updatedAt:abUpdatedAt},{merge:true})
+    .catch(function(e){ console.error(e); abErr('Lỗi ghi đám mây: '+(e&&e.message||e)); });
+}
+function queueCloudSave(){
+  if(!abSyncCode||abConflict||abApplying) return;
+  clearTimeout(abTimer);
+  abTimer = setTimeout(abPush, 900);
+}
+function abAttach(ref){
+  abUpdateSyncBtn();
+  abUnsub = ref.onSnapshot(function(doc){
+    if(!doc.exists || abConflict) return;
+    if(abEcho){ abEcho=false; return; }
+    const remote = doc.data();
+    if(!remote || !remote.updatedAt || remote.updatedAt<=abUpdatedAt) return;
+    let remoteST=null;
+    try{ remoteST=JSON.parse(remote.payload); }catch(e){ return; }
+    const l=abSummary(JSON.parse(abPackState())), r=abSummary(remoteST);
+    if(r.count===0 && l.count>0){
+      abConflict={remoteST:remoteST, ref:ref};
+      abUpdateSyncBtn();
+      abToast('⚠️ Đám mây báo không có mục chỉnh sửa nào — đã CHẶN để bảo vệ dữ liệu máy này. Mở phần Đồng bộ để xử lý.');
+      return;
+    }
+    abApplyRemote(remoteST, remote.updatedAt);
+    abToast('☁️ Đã nhận cập nhật từ thiết bị khác');
+  }, function(err){ console.error(err); abErr('Lỗi đồng bộ: '+(err&&err.message||err)); });
+}
+function abConnect(code, silent){
+  code=(code||'').trim().toUpperCase();
+  if(!code){ if(!silent)abToast('Nhập hoặc tạo mã trước'); return; }
+  if(!abInitFirebase()){ abErr('⚠️ Không tải được Firebase — kiểm tra kết nối mạng rồi thử lại'); return; }
+  abSyncCode=code; try{ localStorage.setItem('quyen22-sync-code', abSyncCode); }catch(e){}
+  if(abUnsub){ abUnsub(); abUnsub=null; }
+  abConflict=null;
+  const st0=document.getElementById('ab-sync-status'); if(st0){ st0.style.color=''; st0.textContent='Đang kết nối…'; }
+  const ref = abDb.collection('syncs').doc('AB-'+abSyncCode);
+  ref.get().then(function(doc){
+    if(!doc.exists){
+      abLastPayload=''; abPush(); abAttach(ref);
+      if(!silent){ abToast('✓ Đã kết nối — đã tải dữ liệu máy này lên đám mây'); openSyncSheet(); }
+      return;
+    }
+    let remoteST=null;
+    try{ remoteST=JSON.parse(doc.data().payload); }catch(e){ remoteST={edits:{}}; }
+    const l=abSummary(JSON.parse(abPackState())), r=abSummary(remoteST);
+    if(l.count===0 && r.count>0){
+      abApplyRemote(remoteST, doc.data().updatedAt); abAttach(ref);
+      if(!silent){ abToast('☁️ Đã tải dữ liệu từ đám mây về máy này'); openSyncSheet(); }
+    }else if(l.count>0 && r.count===0){
+      abLastPayload=''; abPush(); abAttach(ref);
+      if(!silent){ abToast('✓ Đã đẩy dữ liệu máy này lên đám mây'); openSyncSheet(); }
+    }else if(l.count===0 && r.count===0){
+      abApplyRemote(remoteST, doc.data().updatedAt); abAttach(ref);
+      if(!silent){ abToast('✓ Đã kết nối'); openSyncSheet(); }
+    }else{
+      // Cả hai bên đều có dữ liệu — so sánh trước, KHÔNG hỏi nếu không thật sự khác nhau
+      const remoteUp = doc.data().updatedAt || 0;
+      if(doc.data().payload === abPackState()){
+        // Giống hệt nhau -> chỉ kết nối
+        abStamp(Math.max(abUpdatedAt, remoteUp));
+        abLastPayload = abPackState();
+        abAttach(ref);
+        if(!silent){ abToast('✓ Đã kết nối — dữ liệu hai bên giống nhau'); openSyncSheet(); }
+      }else if(remoteUp > abUpdatedAt){
+        // Mây mới hơn (thiết bị khác vừa sửa) -> tải về
+        abApplyRemote(remoteST, remoteUp); abAttach(ref);
+        if(!silent){ abToast('☁️ Đã nhận bản mới hơn từ đám mây'); openSyncSheet(); }
+      }else if(remoteUp < abUpdatedAt){
+        // Máy này mới hơn -> đẩy lên
+        abLastPayload=''; abPush(); abAttach(ref);
+        if(!silent){ abToast('✓ Đã đẩy bản mới hơn của máy này lên đám mây'); openSyncSheet(); }
+      }else{
+        // Cùng mốc thời gian mà nội dung khác -> xung đột thật, mới cần hỏi
+        abConflict={remoteST:remoteST, ref:ref};
+        abUpdateSyncBtn();
+        if(silent){ abToast('⚠️ Dữ liệu máy và đám mây khác nhau — mở ⚙ Cài đặt → Đồng bộ để chọn bên giữ lại'); }
+        else openSyncSheet();
+      }
+    }
+  }).catch(function(err){
+    console.error(err);
+    let m=(err&&err.message)||String(err);
+    if(err&&err.code==='permission-denied') m='Bị từ chối quyền (permission-denied) — cần mở quyền ghi trong Firestore Rules.';
+    abErr('Lỗi kết nối: '+m);
+  });
+}
+function abKeepLocal(){
+  if(!abConflict)return;
+  const ref=abConflict.ref;
+  abConflict=null;
+  abLastPayload=''; abPush(); abAttach(ref);
+  abToast('✓ Đã giữ dữ liệu máy này — đã ghi đè lên đám mây');
+  openSyncSheet();
+}
+function abKeepRemote(){
+  if(!abConflict)return;
+  const ref=abConflict.ref, remoteST=abConflict.remoteST;
+  abConflict=null;
+  abApplyRemote(remoteST, Date.now());
+  abLastPayload=''; abPush();
+  abAttach(ref);
+  abToast('✓ Đã dùng dữ liệu từ đám mây');
+  openSyncSheet();
+}
+function abDisconnect(){
+  if(abUnsub){ abUnsub(); abUnsub=null; }
+  setTimeout(abUpdateSyncBtn,0);
+  abSyncCode=''; abConflict=null;
+  try{ localStorage.removeItem('quyen22-sync-code'); }catch(e){}
+  abToast('Đã ngắt đồng bộ — dữ liệu trên đám mây vẫn còn');
+  openSyncSheet();
+}
+function abUpdateSyncBtn(){
+  const it=document.getElementById('ab-sync-item');
+  const dot=document.getElementById('ab-sync-dot');
+  const st = abConflict ? 'warn' : (abSyncCode&&abDb ? 'on' : '');
+  if(it){
+    it.classList.remove('on','warn');
+    if(st) it.classList.add(st);
+    it.textContent = st==='warn' ? '⚠️ Đồng bộ — cần xử lý' : (st==='on' ? '☁️ Đồng bộ — Đang bật' : '☁️ Đồng bộ đám mây');
+    it.title = st==='warn' ? 'Có khác biệt dữ liệu — chạm để xử lý' : (st==='on' ? ('Đang đồng bộ — mã: '+abSyncCode) : 'Đồng bộ đám mây (chưa bật)');
+  }
+  if(dot){
+    dot.classList.remove('on','warn');
+    if(st) dot.classList.add(st);
+  }
+}
+function abGenCode(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c='';
+  for(let i=0;i<10;i++)c+=chars[Math.floor(Math.random()*chars.length)];
+  const inp=document.getElementById('ab-sync-code-input'); if(inp) inp.value=c;
+}
+function openSyncSheet(){
+  const qb='padding:9px 6px;border:none;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit';
+  let conflictHtml='';
+  if(abConflict){
+    const l=abSummary(JSON.parse(abPackState())), r=abSummary(abConflict.remoteST);
+    conflictHtml=`<div style="margin-top:12px;padding:12px;border:1.5px solid #c0503e;border-radius:10px;background:rgba(192,80,62,.1)">
+      <div style="font-size:13px;line-height:1.55">⚠️ <b>Phát hiện khác biệt dữ liệu</b> — chưa tự động đồng bộ để tránh mất dữ liệu.<br><br>
+      Máy này: <b>${l.count}</b> mục đã sửa · ngôn ngữ: ${l.lang}<br>
+      Đám mây: <b>${r.count}</b> mục đã sửa · ngôn ngữ: ${r.lang}<br><br>
+      Chọn bên bạn muốn <b>giữ lại</b> (bên còn lại sẽ bị thay thế):</div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button style="${qb};flex:1;background:var(--card);color:var(--ink);border:1px solid rgba(128,128,128,.4)" onclick="abKeepLocal()">📱 Giữ máy này</button>
+        <button style="${qb};flex:1;background:var(--card);color:var(--ink);border:1px solid rgba(128,128,128,.4)" onclick="abKeepRemote()">☁️ Giữ đám mây</button>
+      </div>
+    </div>`;
+  }
+  const status = abConflict ? '' : (abSyncCode ? ('✓ Đang đồng bộ — mã: '+abSyncCode) : 'Chưa kết nối');
+  document.getElementById('sheet-content').innerHTML = `
+    <div class="sheet-head"><h2>☁️ Đồng bộ nhiều thiết bị</h2></div>
+    <p class="sheet-pali">Đồng bộ các mục bạn đã chỉnh sửa và cài đặt hiển thị giữa các thiết bị, kèm bản lưu dự phòng trên đám mây.</p>
+    <div class="sec"><div class="sec-label">Mã đồng bộ</div>
+      <input type="text" id="ab-sync-code-input" value="${abSyncCode}" placeholder="VD: SAM2026AB" maxlength="14"
+        style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid rgba(128,128,128,.5);border-radius:10px;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:var(--card);color:var(--ink);font-family:inherit">
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button style="${qb};flex:1;background:var(--card);color:var(--ink);border:1px solid rgba(128,128,128,.4)" onclick="abGenCode()">🎲 Tạo mã mới</button>
+        <button style="${qb};flex:1;background:#1c5b9e;color:#fff" onclick="abConnect(document.getElementById('ab-sync-code-input').value,false)">✓ Kết nối</button>
+      </div>
+      <div id="ab-sync-status" style="font-size:12.5px;color:var(--ink-soft);margin-top:12px;text-align:center">${status}</div>
+      ${conflictHtml}
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button style="${qb};flex:1;background:var(--card);color:var(--ink);border:1px solid rgba(128,128,128,.4)" onclick="abDisconnect()">Ngắt kết nối</button>
+        <button style="${qb};flex:1;background:var(--card);color:var(--ink);border:1px solid rgba(128,128,128,.4)" onclick="closeSheet()">Đóng</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('sheet').classList.add('show');
+  document.getElementById('sheet-backdrop').classList.add('show');
+}
+async function abRequestPersist(){ try{ if(navigator.storage&&navigator.storage.persist){ await navigator.storage.persist(); } }catch(e){} }
+function abInitSync(){ if(abSyncCode && abInitFirebase()) abConnect(abSyncCode, true); }
+// Nối các thao tác lưu vào hàng đợi đồng bộ
+(function(){
+  function wrap(name){
+    const f = window[name];
+    if(typeof f!=='function') return;
+    window[name] = function(){ const r=f.apply(this,arguments); try{ queueCloudSave(); }catch(e){} return r; };
+  }
+  ['saveEditsStore','setLangMode','applyFontScale','applySheetScale','adjustTomLuocScale','adjustTkScale','adjustDmtScale'].forEach(wrap);
+})();
+abRequestPersist();
+setTimeout(abInitSync, 400);
+setTimeout(abUpdateSyncBtn, 600);
+
+// ===== SAO LƯU ĐỊNH KỲ LÊN ĐÁM MÂY =====
+function abBkFreq(){ try{ return localStorage.getItem('quyen22-bk-freq')||'off'; }catch(e){ return 'off'; } }
+function abBkLast(){ try{ return parseInt(localStorage.getItem('quyen22-bk-last')||'0',10)||0; }catch(e){ return 0; } }
+function abBkMs(f){ return f==='d'?86400000 : f==='w'?604800000 : f==='m'?2592000000 : 0; }
+function abBkFreqLabel(f){ return f==='d'?'hàng ngày' : f==='w'?'hàng tuần' : f==='m'?'hàng tháng' : 'đang tắt'; }
+function abBkStatusText(){
+  const l=abBkLast();
+  return 'Chu kỳ: '+abBkFreqLabel(abBkFreq())+(l?(' · Lần gần nhất: '+new Date(l).toLocaleString('vi-VN')):' · Chưa sao lưu lần nào');
+}
+function abBkSetFreq(f){
+  try{ localStorage.setItem('quyen22-bk-freq',f); }catch(e){}
+  openSettingsSheet();
+  if(f!=='off') abBkCheckAuto();
+}
+function abBkDocRef(){ return abDb.collection('syncs').doc('AB-'+abSyncCode+'-BK'); }
+function abBkNow(manual){
+  if(!abSyncCode||!abDb){ if(manual)abToast('Cần bật Đồng bộ đám mây trước (mục Đồng bộ nhiều thiết bị)'); return; }
+  const day=new Date().toISOString().slice(0,10);
+  abBkDocRef().get().then(function(doc){
+    const sn=(doc.exists&&doc.data().snapshots)||{};
+    sn[day]=abPackState();
+    const ks=Object.keys(sn).sort();
+    while(ks.length>4){ delete sn[ks.shift()]; }
+    return abBkDocRef().set({snapshots:sn,updatedAt:Date.now()});
+  }).then(function(){
+    try{ localStorage.setItem('quyen22-bk-last',String(Date.now())); }catch(e){}
+    abToast('✓ Đã sao lưu lên đám mây ('+day+')');
+    const st=document.getElementById('ab-bk-status'); if(st) st.textContent=abBkStatusText();
+  }).catch(function(e){ abToast('Lỗi sao lưu: '+(e&&e.message||e)); });
+}
+function abBkCheckAuto(){
+  const f=abBkFreq(); if(f==='off')return;
+  if(Date.now()-abBkLast() < abBkMs(f)) return;
+  if(abSyncCode&&abDb) abBkNow(false);
+  else abToast('⏰ Đến hạn sao lưu định kỳ — hãy bật Đồng bộ đám mây hoặc Xuất dữ liệu trong ⚙ Cài đặt');
+}
+function abBkShowList(){
+  if(!abSyncCode||!abDb){ abToast('Cần bật Đồng bộ đám mây trước'); return; }
+  const box=document.getElementById('ab-bk-list');
+  if(!box) return;
+  box.innerHTML='<span style="color:var(--ink-soft)">Đang tải…</span>';
+  abBkDocRef().get().then(function(doc){
+    const sn=(doc.exists&&doc.data().snapshots)||{};
+    const ks=Object.keys(sn).sort().reverse();
+    if(!ks.length){ box.innerHTML='<span style="color:var(--ink-soft)">Chưa có bản sao lưu nào.</span>'; return; }
+    box.innerHTML=ks.map(function(d){
+      let n=0; try{ n=Object.keys(JSON.parse(sn[d]).edits||{}).length; }catch(e){}
+      return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid rgba(128,128,128,.25)">'+
+        '<span style="flex:1">📅 '+d+' <span style="color:var(--ink-soft);font-size:.88em">('+n+' mục đã sửa)</span></span>'+
+        '<button class="qbtn" style="margin:0" onclick="abBkRestore(\''+d+'\')">Khôi phục</button></div>';
+    }).join('');
+  }).catch(function(e){ box.innerHTML=''; abToast('Lỗi: '+(e&&e.message||e)); });
+}
+function abBkRestore(day){
+  if(!confirm('Khôi phục từ bản sao lưu ngày '+day+'?\nCác mục đã sửa và cài đặt hiện tại (trên máy và trên đám mây) sẽ bị thay thế bằng bản này.'))return;
+  abBkDocRef().get().then(function(doc){
+    const sn=(doc.exists&&doc.data().snapshots)||{};
+    if(!sn[day]){ abToast('Không tìm thấy bản sao lưu'); return; }
+    let st=null; try{ st=JSON.parse(sn[day]); }catch(e){ abToast('Bản sao lưu bị lỗi'); return; }
+    abApplyRemote(st, Date.now());
+    abLastPayload=''; abPush();
+    abToast('✓ Đã khôi phục bản sao lưu '+day);
+    openSettingsSheet();
+  }).catch(function(e){ abToast('Lỗi: '+(e&&e.message||e)); });
+}
+setTimeout(abBkCheckAuto, 4500);
 
 // ===== BẢNG ĐỘNG mô tả nút vừa chạm trên Bảng Nêu (chạm lần 2 mở bảng đầy đủ) =====
 var _neuLastTap = null;

@@ -303,6 +303,15 @@
     .circle .cp{color:#cfe0ff;opacity:.95;text-shadow:0 1px 1px rgba(0,0,0,.45)}
   }
   @media (prefers-color-scheme: dark){ .circle-plain{border-color:#e8ded0 !important} }
+  /* ===== Dạng DÒNG: mỗi ô hiển thị thành một dòng ngang (số · tên · Pāli); màn hình rộng xếp nhiều cột dòng ===== */
+  .circle-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%, calc(300px * var(--fontscale,1))),1fr));gap:calc(6px * var(--fontscale,1))}
+  .circle{flex-direction:row;align-items:center;justify-content:flex-start;text-align:left;gap:calc(10px * var(--fontscale,1));padding:8px 12px;border-radius:12px;min-height:calc(40px * var(--fontscale,1))}
+  .circle>*{max-width:none}
+  .circle .cnum{margin:0;flex:none}
+  .circle .cn{max-width:none;flex:0 1 auto;min-width:0;font-size:min(calc(14px * var(--fontscale)), 19px)}
+  .circle .cp{max-width:none;margin-top:0;flex:0 1 auto;min-width:0;font-size:min(calc(12px * var(--fontscale)), 16px)}
+  .circle:active,.circle.pressed{transform:translateY(1px) scale(.99)}
+  .circle.pdot-selected{transform:none}
   @media (prefers-color-scheme: dark){
     .card{box-shadow:0 4px 10px -3px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 4px rgba(0,0,0,.3);text-shadow:0 1px 1px rgba(0,0,0,.65)}
   }
