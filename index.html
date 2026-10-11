@@ -312,6 +312,11 @@
   .circle .cp{display:inline;margin:0;color:#5f5a52;opacity:1;font-style:italic;font-weight:400;text-shadow:none;font-size:min(calc(18px * var(--fontscale)), 24px)}
   .circle .cn + .cp::before{content:' — ';font-style:normal;color:#5f5a52}
   body.lang-pali .circle .cn + .cp::before{content:none}
+  /* Ô số vuông xanh rêu dùng chung (Kinh tụng, Ân Đức Tam Bảo) — cùng kiểu số trên các dòng */
+  .num-sq,body .ad-no{display:inline-flex;align-items:center;justify-content:center;min-width:min(calc(24px * var(--fontscale,1)), 32px);height:min(calc(24px * var(--fontscale,1)), 32px);padding:0 4px;box-sizing:border-box;border-radius:2px;background:#1f6e5c;box-shadow:none;color:#fff;font-family:"Noto Serif","Times New Roman",Times,serif;font-style:normal;font-weight:700;font-size:min(calc(14px * var(--fontscale,1)), 19px);line-height:1;text-shadow:none}
+  .num-sq{vertical-align:.1em;margin-right:calc(8px * var(--fontscale,1))}
+  body .ad-no{width:auto;border-radius:2px;background:#1f6e5c;margin-top:1px}
+  @media (prefers-color-scheme: dark){ .num-sq,body .ad-no{background:#2b8a73;color:#fff} }
   .circle:hover{background:rgba(31,110,92,.06)}
   .circle:active,.circle.pressed{transform:none;filter:none;box-shadow:none;background:rgba(31,110,92,.12)}
   .circle.pdot-selected{transform:none;outline:2px solid #1f6e5c;outline-offset:-2px;background:rgba(31,110,92,.08)}
@@ -488,10 +493,10 @@
 <script src="anduc_data.js"></script>
 <script src="daolo_data.js"></script>
 <script src="patthana_tung.js"></script>
-<script src="app.js"></script>
-<script src="app2.js"></script>
 <script src="anduc_page.js"></script>
 <script src="daolo_page.js"></script>
+<script src="app.js"></script>
+<script src="app2.js"></script>
 <div id="zoom-float" style="display:none;position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:500;background:linear-gradient(180deg,rgba(255,255,255,.95) 0%,rgba(255,255,255,.4) 30%,rgba(255,255,255,0) 60%),linear-gradient(180deg,#fffdf6 0%,#f0e5cb 100%);border:1.5px solid #a86524;border-radius:18px;box-shadow:0 10px 24px rgba(60,40,10,.45),0 1px 0 rgba(255,255,255,.9) inset;padding:12px 14px;flex-direction:column;gap:10px;min-width:min(320px,86vw)">
   <div style="display:flex;align-items:center;gap:10px;justify-content:space-between">
     <span style="font-size:12.5px;font-weight:700;color:#4a3608;min-width:96px">Các ô bên ngoài</span>

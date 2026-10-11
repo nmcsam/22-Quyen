@@ -746,7 +746,7 @@ function renderKinhTungPage(){
   const extra = document.getElementById('extra-content');
   const patthana = (typeof PATTHANA_UDDESA!=='undefined') ? `
     <div class="sec">
-      <div class="sec-label">6. Kinh Paṭṭhāna — 24 Duyên</div>
+      <div class="sec-label"><span class="num-sq">6</span>Kinh Paṭṭhāna — 24 Duyên</div>
       <div class="ad-kinh"><div class="ad-kinh-lbl">Paccayuddesa · tóm tắt 24 duyên</div>
         ${PATTHANA_UDDESA}</div>
       <details class="kt-details">
@@ -761,14 +761,14 @@ function renderKinhTungPage(){
     <p class="info-note" style="margin-bottom:10px">Nghi thức tụng niệm hằng ngày (Nam Tông). Các bài dưới đây theo Pāli; bạn có thể gửi thêm bài theo truyền thống của mình (rải tâm từ, sám hối, hồi hướng…) để bổ sung.</p>
 
     <div class="sec">
-      <div class="sec-label">1. Đảnh lễ Đức Thế Tôn (Namakāra)</div>
+      <div class="sec-label"><span class="num-sq">1</span>Đảnh lễ Đức Thế Tôn (Namakāra)</div>
       <div class="ad-kinh"><div class="ad-kinh-lbl">Pāli · đọc 3 lần</div>
         Namo tassa Bhagavato Arahato Sammāsambuddhassa. <b>(×3)</b></div>
       <div class="sec-body" style="margin-top:6px">Con đem hết lòng thành kính đảnh lễ Đức Thế Tôn, bậc A-la-hán, đấng Chánh Đẳng Chánh Giác.</div>
     </div>
 
     <div class="sec">
-      <div class="sec-label">2. Quy y Tam Bảo (Tisaraṇa)</div>
+      <div class="sec-label"><span class="num-sq">2</span>Quy y Tam Bảo (Tisaraṇa)</div>
       <div class="ad-kinh"><div class="ad-kinh-lbl">Pāli</div>
         Buddhaṃ saraṇaṃ gacchāmi.<br>
         Dhammaṃ saraṇaṃ gacchāmi.<br>
@@ -783,7 +783,7 @@ function renderKinhTungPage(){
     </div>
 
     <div class="sec">
-      <div class="sec-label">3. Tụng Ân Đức Tam Bảo</div>
+      <div class="sec-label"><span class="num-sq">3</span>Tụng Ân Đức Tam Bảo</div>
       <div class="ad-kinh"><div class="ad-kinh-lbl">Ân đức Phật · Buddhaguṇa</div>
         Iti pi so Bhagavā arahaṃ, sammāsambuddho, vijjācaraṇasampanno, sugato, lokavidū, anuttaro purisadammasārathi, satthā devamanussānaṃ, buddho, bhagavā ti.</div>
       <div class="ad-kinh" style="margin-top:8px"><div class="ad-kinh-lbl">Ân đức Pháp · Dhammaguṇa</div>
@@ -794,7 +794,7 @@ function renderKinhTungPage(){
     </div>
 
     <div class="sec">
-      <div class="sec-label">4. Thọ trì Ngũ Giới (Pañcasīla)</div>
+      <div class="sec-label"><span class="num-sq">4</span>Thọ trì Ngũ Giới (Pañcasīla)</div>
       <div class="ad-kinh"><div class="ad-kinh-lbl">Pāli</div>
         1. Pāṇātipātā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
         2. Adinnādānā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
@@ -805,7 +805,7 @@ function renderKinhTungPage(){
     </div>
 
     <div class="sec">
-      <div class="sec-label">5. Thọ trì Bát Quan Trai Giới (Aṭṭhaṅga-sīla · 8 giới)</div>
+      <div class="sec-label"><span class="num-sq">5</span>Thọ trì Bát Quan Trai Giới (Aṭṭhaṅga-sīla · 8 giới)</div>
       <div class="ad-kinh"><div class="ad-kinh-lbl">Pāli</div>
         1. Pāṇātipātā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
         2. Adinnādānā veramaṇī sikkhāpadaṃ samādiyāmi.<br>
