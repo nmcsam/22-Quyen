@@ -317,6 +317,21 @@
   .num-sq{vertical-align:.1em;margin-right:calc(8px * var(--fontscale,1))}
   body .ad-no{width:auto;border-radius:2px;background:#1f6e5c;margin-top:1px}
   @media (prefers-color-scheme: dark){ .num-sq,body .ad-no{background:#2b8a73;color:#fff} }
+  /* Thử màu (trang Pháp thực tính): nhóm nâu cam / nhóm tím */
+  .group-head.tone-amber{color:#a65c1a;border-bottom:1.5px solid #c98a4a;padding-bottom:3px}
+  .group-head.tone-purple{color:#6b3d8f;border-bottom:1.5px solid #9a74b8;padding-bottom:3px}
+  .circle-grid.tone-amber .circle .cp.cnum{background:#b5651d;border-radius:4px}
+  .circle-grid.tone-amber .circle .cn{color:#a65c1a}
+  .circle-grid.tone-amber .circle{border-bottom-color:rgba(181,101,29,.2)}
+  .circle-grid.tone-purple .circle .cp.cnum{background:#6f3f8f;border-radius:4px}
+  .circle-grid.tone-purple .circle .cn{color:#6b3d8f}
+  .circle-grid.tone-purple .circle{border-bottom-color:rgba(111,63,143,.2)}
+  @media (prefers-color-scheme: dark){
+    .group-head.tone-amber,.circle-grid.tone-amber .circle .cn{color:#e2a565}
+    .group-head.tone-purple,.circle-grid.tone-purple .circle .cn{color:#c7a0e6}
+    .circle-grid.tone-amber .circle .cp.cnum{background:#c27530}
+    .circle-grid.tone-purple .circle .cp.cnum{background:#8656ab}
+  }
   .circle:hover{background:rgba(31,110,92,.06)}
   .circle:active,.circle.pressed{transform:none;filter:none;box-shadow:none;background:rgba(31,110,92,.12)}
   .circle.pdot-selected{transform:none;outline:2px solid #1f6e5c;outline-offset:-2px;background:rgba(31,110,92,.08)}
