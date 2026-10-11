@@ -1278,7 +1278,7 @@ function renderDuyenHeTomLuoc(){
     <div id="tomluoc-wrap" style="--tlscale:${tomluocScale}">
       <p class="info-note" style="margin-bottom:8px;font-size:calc(14px * var(--tlscale));line-height:1.5"><b>24 duyên chính</b>, trong đó <b>${soPhanRong} duyên phân rộng</b> thành <b>${tongPhu} duyên phụ</b> (ghi thụt vào ↳ dưới duyên chính sinh ra nó). Số bên phải là <b>số kể 01–48</b> theo bảng: duyên không phân rộng mang một số; duyên phân rộng thì các duyên phụ mang số. Riêng <b>Đẳng Vô Gián Duyên</b> nghĩa lý đồng với Vô Gián Duyên nên kể chung số <b>06*</b>.</p>
       <div style="background:var(--card);border:1px solid rgba(128,128,128,.25);border-radius:12px;overflow:hidden;font-size:calc(14.5px * var(--tlscale));line-height:1.45">${rows}</div>
-      <p class="info-note" style="margin-top:8px;font-size:calc(13px * var(--tlscale));line-height:1.5">Tên gọi theo "Bản tóm lược 24 duyên chính trong Đại Phát Thú"; tên khác trên các ô tròn phía trên được ghi kèm sau dấu "=".</p>
+      <p class="info-note" style="margin-top:8px;font-size:calc(13px * var(--tlscale));line-height:1.5">Tên gọi theo "Bản tóm lược 24 duyên chính trong Đại Phát Thú"; tên khác trên các dòng phía trên được ghi kèm sau dấu "=".</p>
     </div>
   `;
 }
@@ -1638,7 +1638,7 @@ function openSettingsSheet(){
       <div id="ab-bk-list" style="margin-top:8px;font-size:calc(13.5px * var(--fontscale))"></div>
       <div class="sec-body" style="margin-top:8px;font-size:calc(13px * var(--fontscale));color:var(--ink-soft)">Tự động lưu một bản chụp (các mục đã sửa + cài đặt) lên đám mây theo chu kỳ, giữ 4 bản gần nhất. Cần đang bật Đồng bộ.</div>
     </div>
-    <div class="sec" style="margin-top:14px"><div class="sec-label">Ngôn ngữ hiển thị (tên trên các ô)</div>
+    <div class="sec" style="margin-top:14px"><div class="sec-label">Ngôn ngữ hiển thị (tên trên các dòng)</div>
       <div class="setopt">
         ${btn('vi','Tiếng Việt')}
         ${btn('both','Việt – Pāli')}
