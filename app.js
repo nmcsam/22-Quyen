@@ -29,7 +29,7 @@ function renderQuyenGrid(){
     return `<div class="circle cat-${cat}" onclick="openQuyenSheet(${d.id})">
       <div class="cp cnum">${d.id}</div>
       <div class="cn">${d.ten}</div>
-      <div class="cp">${d.pali.split(' ')[0]}</div>
+      <div class="cp">${d.pali}</div>
     </div>`;
   }).join('');
   const legend = document.getElementById('legend');

@@ -1222,7 +1222,7 @@ function renderDuyenHePage(){
     circles += `<div class="circle circle-dh" onclick="openDuyenHeSheet(${i})">
       <div class="cp cnum">${i+1}</div>
       <div class="cn">${d.ten}</div>
-      <div class="cp">${d.pali.replace('paccaya','').replace('paccayo','')}</div>
+      <div class="cp">${d.pali}</div>
     </div>`;
   });
   extra.innerHTML = `
@@ -1524,10 +1524,10 @@ function renderXuGioiPage(){
   const xu = (arr, from) => arr.map((d,i)=>{
     const idx = from + i;
     return `<div class="circle ${XGC[d.nhom]}" onclick="openXuSheet(${XU_DATA.indexOf(d)})">
-      <div class="cp cnum">${idx}</div><div class="cn">${d.ten}</div><div class="cp">${d.pali.replace('āyatana','')}</div></div>`;
+      <div class="cp cnum">${idx}</div><div class="cn">${d.ten}</div><div class="cp">${d.pali}</div></div>`;
   }).join('');
   const gioi = GIOI_DATA.map((d,i)=>`<div class="circle ${XGC[d.nhom]}" onclick="openGioiSheet(${i})">
-      <div class="cp cnum">${i+1}</div><div class="cn">${d.ten}</div><div class="cp">${d.pali.replace('-dhātu','')}</div></div>`).join('');
+      <div class="cp cnum">${i+1}</div><div class="cn">${d.ten}</div><div class="cp">${d.pali}</div></div>`).join('');
 
   extra.innerHTML = `
     <p class="info-note" style="margin-bottom:10px"><b>Xứ (āyatana)</b> và <b>Giới (dhātu)</b> là hai cách phân loại các pháp chân đế (tâm, tâm sở, sắc pháp) nhìn dưới góc độ "cửa ngõ tiếp xúc" và "yếu tố cấu thành kinh nghiệm". 12 Xứ nhóm theo 6 cặp căn – cảnh (nội xứ – ngoại xứ); 18 Giới tách rõ thêm phần <b>thức</b>: phân biệt riêng các loại tâm sinh khởi nơi mỗi căn.</p>
@@ -2392,7 +2392,7 @@ function renderTroDaoPage(){
     html += `<div class="circle-grid">`;
     items.forEach(x=>{
       n++;
-      html += `<div class="circle ${gr.cls}" onclick="openTroDaoSheet(${x.i})"><div class="cp cnum">${n}</div><div class="cn">${x.d.ten}</div><div class="cp">${x.d.pali.split('-')[0].split(' ')[0]}</div></div>`;
+      html += `<div class="circle ${gr.cls}" onclick="openTroDaoSheet(${x.i})"><div class="cp cnum">${n}</div><div class="cn">${x.d.ten}</div><div class="cp">${x.d.pali}</div></div>`;
     });
     html += `</div>`;
   });
