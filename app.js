@@ -84,7 +84,10 @@ function openQuyenSheet(id){
       <div class="sec-body" style="margin-top:4px">${d.duyen_detail}</div>
     </div>
   `;
-  document.getElementById('sheet-content').innerHTML = html;
+  const qi = QUYEN_DATA.indexOf(d);
+  const nav = typeof sheetNavHTML==='function' ? sheetNavHTML(qi, QUYEN_DATA.length, j=>`openQuyenSheet(${QUYEN_DATA[j].id})`, j=>`${QUYEN_DATA[j].id}. ${QUYEN_DATA[j].ten}`) : '';
+  document.getElementById('sheet-content').innerHTML = html + nav;
+  document.getElementById('sheet-content').scrollTop = 0;
   document.getElementById('sheet').classList.add('show');
   document.getElementById('sheet-backdrop').classList.add('show');
 }

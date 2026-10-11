@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v94'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v104'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -368,7 +368,7 @@ function openCittaSheet(id){
   // Công thức đầy đủ: "36 tâm sở = (An tịnh tâm + An tịnh thân + Cần + ...)" — xếp theo vần
   // theo đúng thứ tự Bảng Nêu (thứ tự trong CETASIKA_DATA)
   const names = CETASIKA_DATA.filter(x=>c.ceta.includes(x.id)).map(x=>x.ten.replace(/ \(sở hữu\)/,''));
-  const html = `
+  let html = `
     <div class="sheet-head"><h2>${cittaFullName(c)} <span style="font-weight:600;font-size:.62em;color:var(--ink-soft)">(${glossCitta(c)})</span></h2></div>
     <p class="sheet-pali">${c.groupLabel} · Cảm thọ: ${c.vedanaLabel}</p>
     <div class="big-count"><span class="big-num">${c.ceta.length}</span><span class="big-unit">tâm sở phối hợp</span></div>
@@ -388,7 +388,10 @@ function openCittaSheet(id){
       </div>`;
     })()}
   `;
+  const ci = CITTA_DATA.indexOf(c);
+  html += sheetNavHTML(ci, CITTA_DATA.length, j=>`openCittaSheet(${CITTA_DATA[j].id})`, j=>`${CITTA_DATA[j].id}. Tâm ${CITTA_DATA[j].name}`);
   document.getElementById('sheet-content').innerHTML = html;
+  document.getElementById('sheet-content').scrollTop = 0;
   document.getElementById('sheet').classList.add('show');
   document.getElementById('sheet-backdrop').classList.add('show');
 }
@@ -457,7 +460,7 @@ function openCetasikaSheet(id){
 
   const dn4 = (typeof DACTINH_DATA!=='undefined' && DACTINH_DATA[id]) ? DACTINH_DATA[id].dt : '';
   const tenDay = 'Tâm sở ' + ces.ten.replace(/ \(sở hữu\)/,'');
-  const html = `
+  let html = `
     <div class="sheet-head"><h2>${tenDay}${dn4?` <span style="font-weight:600;font-size:.62em;color:var(--ink-soft)">(${dn4.charAt(0).toLowerCase()+dn4.slice(1)})</span>`:''}</h2></div>
     <p class="sheet-pali">${ces.pali}</p>
     <div class="big-count"><span class="big-num">${bigNum}</span><span class="big-unit">${bigUnit}</span></div>
@@ -469,7 +472,10 @@ function openCetasikaSheet(id){
     ${ces.quyluat ? `<div class="info-note"><b>Công thức tính số tâm:</b> ${ces.quyluat}</div>` : ''}
     ${listHtml}
   `;
+  const ei = CETASIKA_DATA.indexOf(ces);
+  html += sheetNavHTML(ei, CETASIKA_DATA.length, j=>`openCetasikaSheet('${CETASIKA_DATA[j].id}')`, j=>`${j+1}. ${CETASIKA_DATA[j].ten}`);
   document.getElementById('sheet-content').innerHTML = html;
+  document.getElementById('sheet-content').scrollTop = 0;
   document.getElementById('sheet').classList.add('show');
   document.getElementById('sheet-backdrop').classList.add('show');
 }
@@ -533,7 +539,11 @@ function renderDacTinhPage(){
 
 function openDacTinhTL(gi, ii){
   const it = DACTINH_TL[gi].items[ii];
-  showAttrSheet(attrSheetHTML(it.ten, it.pali, it));
+  const flat = [];
+  DACTINH_TL.forEach((g,a)=>g.items.forEach((x,b)=>flat.push([a,b])));
+  const k = flat.findIndex(f=>f[0]===gi && f[1]===ii);
+  showAttrSheet(attrSheetHTML(it.ten, it.pali, it) +
+    sheetNavHTML(k, flat.length, j=>`openDacTinhTL(${flat[j][0]},${flat[j][1]})`, j=>`${j+1}. ${DACTINH_TL[flat[j][0]].items[flat[j][1]].ten}`));
 }
 
 function openChucNangTam(i){
@@ -549,6 +559,7 @@ function openChucNangTam(i){
       <div class="sec-label">Tâm đảm nhận chức năng này</div>
       <div class="sec-body">${c.tam}</div>
     </div>
+    ${sheetNavHTML(i, CHUCNANG_TAM_14.length, j=>`openChucNangTam(${j})`, j=>`${j+1}. ${CHUCNANG_TAM_14[j].ten}`)}
   `);
 }
 
@@ -591,8 +602,17 @@ function attrSheetHTML(headTitle, headSub, item){
   `;
 }
 
+// Nút "‹ mục trước / mục kế ›" ở cuối trang chi tiết — đọc hết một mục bấm đọc tiếp mục kế
+// (giống trang Ân Đức Tam Bảo). call(j) trả về lời gọi JS mở mục j; label(j) là tên hiển thị.
+function sheetNavHTML(i, n, call, label){
+  const prev = i>0 ? `<button class="qbtn" onclick="${call(i-1)}">‹ ${label(i-1)}</button>` : '';
+  const next = i<n-1 ? `<button class="qbtn" onclick="${call(i+1)}">${label(i+1)} ›</button>` : '';
+  return (prev||next) ? `<div class="ad-nav">${prev}${next}</div>` : '';
+}
+
 function showAttrSheet(html){
   document.getElementById('sheet-content').innerHTML = html;
+  document.getElementById('sheet-content').scrollTop = 0;
   document.getElementById('sheet').classList.add('show');
   document.getElementById('sheet-backdrop').classList.add('show');
 }
@@ -634,14 +654,17 @@ function renderCanhPage(){
 
 function openCanhSheet(id){
   const c = CANH_DATA.find(x=>x.id===id);
-  const html = `
+  let html = `
     <div class="sheet-head"><h2>${c.ten}</h2></div>
     <p class="sheet-pali">${c.pali}</p>
     ${c.biet ? `<div class="sec"><div class="sec-label">Tâm biết cảnh này</div><div class="sec-body">${c.biet}</div></div>` : ''}
     ${c.codinh ? `<div class="sec"><div class="sec-label">Tâm biết cảnh này cố định</div><div class="sec-body">${c.codinh}</div></div>` : ''}
     ${c.ghichu ? `<div class="info-note"><b>Ghi chú:</b> ${c.ghichu}</div>` : ''}
   `;
+  const ci = CANH_DATA.indexOf(c);
+  html += sheetNavHTML(ci, CANH_DATA.length, j=>`openCanhSheet('${CANH_DATA[j].id}')`, j=>`${j+1}. ${CANH_DATA[j].ten}`);
   document.getElementById('sheet-content').innerHTML = html;
+  document.getElementById('sheet-content').scrollTop = 0;
   document.getElementById('sheet').classList.add('show');
   document.getElementById('sheet-backdrop').classList.add('show');
 }
@@ -994,7 +1017,7 @@ function openDuyenKhoiSheet(i){
       <div class="qbtn-row">${btns}</div>
     </div>`;
   }
-  const html = `
+  let html = `
     <div class="sheet-head"><h2>${i+1}. ${d.ten}</h2></div>
     <p class="sheet-pali">${d.pali}</p>
     <div class="sec"><div class="sec-label">Chi pháp</div><div class="sec-body">${d.chiphap}</div></div>
@@ -1003,7 +1026,9 @@ function openDuyenKhoiSheet(i){
     ${duyenheHtml}
     ${extraHtml}
   `;
+  html += sheetNavHTML(i, DUYENKHOI_DATA.length, j=>`openDuyenKhoiSheet(${j})`, j=>`${j+1}. ${DUYENKHOI_DATA[j].ten}`);
   document.getElementById('sheet-content').innerHTML = html;
+  document.getElementById('sheet-content').scrollTop = 0;
   document.getElementById('sheet').classList.add('show');
   document.getElementById('sheet-backdrop').classList.add('show');
 }
@@ -1416,7 +1441,9 @@ function openDuyenHeSheet(i){
       }
     }
   }
+  html += sheetNavHTML(i, DUYENHE_DATA.length, j=>`openDuyenHeSheet(${j})`, j=>`${j+1}. ${DUYENHE_DATA[j].ten}`);
   document.getElementById('sheet-content').innerHTML = html;
+  document.getElementById('sheet-content').scrollTop = 0;
   document.getElementById('sheet').classList.add('show');
   document.getElementById('sheet-backdrop').classList.add('show');
 }
@@ -1543,6 +1570,9 @@ function renderXuGioiPage(){
   `;
 }
 
+// Thứ tự hiển thị 12 Xứ: 6 nội xứ rồi 6 ngoại xứ
+const XU_ORDER = [...XU_DATA.filter(d=>d.nhom==='noi'), ...XU_DATA.filter(d=>d.nhom!=='noi')].map(d=>XU_DATA.indexOf(d));
+
 function openXuSheet(i){
   const d = XU_DATA[i];
   const nhomLabel = d.nhom==='noi' ? 'Nội xứ (ajjhattikāyatana) — căn bên trong' : 'Ngoại xứ (bāhirāyatana) — cảnh bên ngoài';
@@ -1555,6 +1585,7 @@ function openXuSheet(i){
     <p class="sheet-pali">${d.pali} · ${nhomLabel}</p>
     <div class="sec"><div class="sec-label">Chi pháp</div><div class="sec-body">${d.chiphap}</div></div>
     <div class="sec" style="margin-top:12px"><div class="sec-label">Đối chiếu với 18 Giới</div><div class="sec-body">${doichieu}</div></div>
+    ${sheetNavHTML(XU_ORDER.indexOf(i), XU_ORDER.length, j=>`openXuSheet(${XU_ORDER[j]})`, j=>`${j+1}. ${XU_DATA[XU_ORDER[j]].ten}`)}
   `);
 }
 
@@ -1565,6 +1596,7 @@ function openGioiSheet(i){
     <div class="sheet-head"><span class="num">${i+1}</span><h2>${d.ten}</h2></div>
     <p class="sheet-pali">${d.pali} · ${NL[d.nhom]}</p>
     <div class="sec"><div class="sec-label">Chi pháp / Số pháp</div><div class="sec-body">${d.chiphap}</div></div>
+    ${sheetNavHTML(i, GIOI_DATA.length, j=>`openGioiSheet(${j})`, j=>`${j+1}. ${GIOI_DATA[j].ten}`)}
   `);
 }
 
@@ -1882,6 +1914,9 @@ function renderDeMucThienPage(){
     </div>
   `;
 }
+// Danh sách phẳng 40 đề mục [nhóm, mục] để nút đọc tiếp
+const DMT_FLAT = DEMUC_THIEN.flatMap((g,gi)=>g.items.map((x,ii)=>[gi,ii]));
+
 function openDeMucThien(gi, ii){
   const g = DEMUC_THIEN[gi], it = g.items[ii];
   let stt = 0;
@@ -1894,6 +1929,7 @@ function openDeMucThien(gi, ii){
     <div class="sec"><div class="sec-label">Mức định chứng đắc</div><div class="sec-body">${DMT_MUC_LABEL[it.muc]}.</div></div>
     <div class="sec"><div class="sec-label">Ấn tướng (Nimitta)</div><div class="sec-body">${DMT_NIMITTA_LABEL[it.nimitta]}</div></div>
     <div class="sec"><div class="sec-label">Tánh nết phù hợp</div><div class="sec-body">${it.tanh}.</div></div>
+    ${sheetNavHTML(stt-1, DMT_FLAT.length, j=>`openDeMucThien(${DMT_FLAT[j][0]},${DMT_FLAT[j][1]})`, j=>`${j+1}. ${DEMUC_THIEN[DMT_FLAT[j][0]].items[DMT_FLAT[j][1]].ten}`)}
   `);
 }
 
@@ -2233,7 +2269,7 @@ function renderCoi31Page(){
 function openCoi31Sheet(i){
   const d = COI31_DATA[i];
   const h = C31_HANG[d.hang];
-  const html = `
+  let html = `
     <div class="sheet-head"><h2>${i+1}. ${d.ten}</h2></div>
     <p class="sheet-pali">${d.pali}</p>
     <div class="sec"><div class="sec-label">Thuộc cõi giới nào</div><div class="sec-body">${d.gioi}</div></div>
@@ -2242,7 +2278,9 @@ function openCoi31Sheet(i){
     <div class="sec"><div class="sec-label">Hạng người — có ${h.so}/12 hạng</div><div class="sec-body">${h.ds}</div></div>
     ${d.ghichu ? `<div class="info-note"><b>Ghi chú:</b> ${d.ghichu}</div>` : ''}
   `;
+  html += sheetNavHTML(i, COI31_DATA.length, j=>`openCoi31Sheet(${j})`, j=>`${j+1}. ${COI31_DATA[j].ten}`);
   document.getElementById('sheet-content').innerHTML = html;
+  document.getElementById('sheet-content').scrollTop = 0;
   document.getElementById('sheet').classList.add('show');
   document.getElementById('sheet-backdrop').classList.add('show');
 }
@@ -2400,6 +2438,9 @@ function renderTroDaoPage(){
   extra.innerHTML = html;
 }
 
+// Thứ tự hiển thị 37 phẩm: theo từng nhóm
+const TD_ORDER = TD_GROUPS.flatMap((gr,gi)=>TRODAO_DATA.map((d,i)=>({d,i})).filter(x=>x.d.g===gi).map(x=>x.i));
+
 function openTroDaoSheet(i){
   const d = TRODAO_DATA[i];
   const gr = TD_GROUPS[d.g];
@@ -2410,6 +2451,7 @@ function openTroDaoSheet(i){
     <div class="sec" style="margin-top:12px"><div class="sec-label">Nội dung</div><div class="sec-body">${d.dn}</div></div>
     <div class="sec" style="margin-top:12px"><div class="sec-label">Về nhóm ${gr.ten}</div>
       <div class="qbtn-row" style="margin-top:6px"><button class="qbtn" onclick="openTDGroupSheet(${d.g})">Xem giảng giải nhóm ${gr.ten}</button></div></div>
+    ${sheetNavHTML(TD_ORDER.indexOf(i), TD_ORDER.length, j=>`openTroDaoSheet(${TD_ORDER[j]})`, j=>`${j+1}. ${TRODAO_DATA[TD_ORDER[j]].ten}`)}
   `);
 }
 
@@ -2423,6 +2465,7 @@ function openTDGroupSheet(gi){
     <div class="sec"><div class="sec-label">Giảng giải (Bodhipakkhiya Dīpanī — Ledi Sayadaw)</div><div class="sec-body">${gr.body}</div></div>
     <div class="sec" style="margin-top:12px"><div class="sec-label">Các phẩm trong nhóm</div>
       <div class="qbtn-row" style="margin-top:6px">${btns}</div></div>
+    ${sheetNavHTML(gi, TD_GROUPS.length, j=>`openTDGroupSheet(${j})`, j=>TD_GROUPS[j].ten)}
   `);
 }
 
