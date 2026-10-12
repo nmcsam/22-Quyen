@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v105'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v106'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -2988,11 +2988,9 @@ function showTapInfoByKey(key){
   if(kind==='ci') showTapInfoCitta(parseInt(rawId,10));
   else if(kind==='ce') showTapInfoCet(rawId);
 }
-// Chạm 1: chọn ô (viền xanh + sáng ô phối hợp). Chạm 2: hiện bảng động mô tả.
-// Chạm 3 (bảng động đang mở cho đúng ô này): mở bảng đầy đủ.
+// Chạm 1: chọn ô (viền xanh + sáng ô phối hợp). Chạm 2: mở bảng đầy đủ.
 function tapNeuCitta(id){
-  if(_neuLastTap==='ci'+id){ hideTapInfo(); openCittaSheet(id); }
-  else showTapInfoCitta(id);
+  hideTapInfo(); openCittaSheet(id);
 }
 function aniyataOfCitta(id){
   const out = [];
@@ -3022,8 +3020,7 @@ function showTapInfoCitta(id){
   `);
 }
 function tapNeuCet(id){
-  if(_neuLastTap==='ce'+id){ hideTapInfo(); openCetasikaSheet(id); }
-  else showTapInfoCet(id);
+  hideTapInfo(); openCetasikaSheet(id);
 }
 function showTapInfoCet(id){
   _neuLastTap = 'ce'+id;
