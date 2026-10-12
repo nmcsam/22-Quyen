@@ -111,9 +111,9 @@ document.addEventListener('click', function(e){
   document.querySelectorAll('.pdot-selected').forEach(x=>x.classList.remove('pdot-selected'));
   clearTamsoLit();
   dot.classList.add('pdot-selected');
+  if(typeof hideTapInfo==='function') hideTapInfo(); // chuyển sang ô khác thì đóng bảng động của ô cũ
   if(dot.dataset.k){
-    tamsoHighlight(dot.dataset.k); // trang Tâm↔Tâm sở: sáng các ô phối hợp
-    if(typeof showTapInfoByKey==='function') showTapInfoByKey(dot.dataset.k); // + bảng động mô tả
+    tamsoHighlight(dot.dataset.k); // trang Tâm↔Tâm sở: chạm 1 chỉ làm sáng các ô phối hợp
   }
 }, true);
 

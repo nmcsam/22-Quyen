@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v104'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v105'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -2970,7 +2970,7 @@ function abBkRestore(day){
 }
 setTimeout(abBkCheckAuto, 4500);
 
-// ===== BẢNG ĐỘNG mô tả nút vừa chạm trên Bảng Nêu (chạm lần 2 mở bảng đầy đủ) =====
+// ===== BẢNG ĐỘNG mô tả nút vừa chạm trên Bảng Nêu (hiện ở lần chạm 2) =====
 var _neuLastTap = null;
 function hideTapInfo(){
   const p = document.getElementById('tap-info');
@@ -2988,9 +2988,11 @@ function showTapInfoByKey(key){
   if(kind==='ci') showTapInfoCitta(parseInt(rawId,10));
   else if(kind==='ce') showTapInfoCet(rawId);
 }
+// Chạm 1: chọn ô (viền xanh + sáng ô phối hợp). Chạm 2: hiện bảng động mô tả.
+// Chạm 3 (bảng động đang mở cho đúng ô này): mở bảng đầy đủ.
 function tapNeuCitta(id){
-  // tới được đây nghĩa là ô đã được chọn từ lần chạm 1 (capture đã hiện bảng động) -> mở bảng đầy đủ
-  hideTapInfo(); openCittaSheet(id);
+  if(_neuLastTap==='ci'+id){ hideTapInfo(); openCittaSheet(id); }
+  else showTapInfoCitta(id);
 }
 function aniyataOfCitta(id){
   const out = [];
@@ -3020,7 +3022,8 @@ function showTapInfoCitta(id){
   `);
 }
 function tapNeuCet(id){
-  hideTapInfo(); openCetasikaSheet(id);
+  if(_neuLastTap==='ce'+id){ hideTapInfo(); openCetasikaSheet(id); }
+  else showTapInfoCet(id);
 }
 function showTapInfoCet(id){
   _neuLastTap = 'ce'+id;
