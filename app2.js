@@ -1,5 +1,5 @@
 // ===== Điều phối 3 phần chính của app =====
-const APP_VERSION = 'v106'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
+const APP_VERSION = 'v107'; // nhớ nâng cùng CACHE_NAME trong sw.js mỗi lần cập nhật
 let currentSection = 'quyen22';
 let tamsoMode = 'tam2so';
 
@@ -1353,7 +1353,7 @@ function tkCanh(){
     return tkRow(i+1, c.ten, c.pali, badge, '');
   }).join('');
   const NHOM7 = [
-    ['25 tâm chỉ biết cảnh Dục giới','23 tâm quả Dục giới (10 Ngũ song thức + 2 Tiếp thâu + 3 Quan sát + 8 Đại quả) + tâm Khai ngũ môn + tâm Tiếu sinh.'],
+    ['25 tâm chỉ biết cảnh Dục giới','23 tâm quả Dục giới (Ngũ song thức (10 tâm) + 2 Tiếp thâu + 3 Quan sát + 8 Đại quả) + tâm Khai ngũ môn + tâm Tiếu sinh.'],
     ['20 tâm biết cảnh Dục giới, Đáo đại, Chế định — không biết cảnh Siêu thế','12 tâm Bất thiện + 4 Đại thiện ly trí + 4 Đại tố ly trí.'],
     ['5 tâm biết mọi cảnh — trừ Đạo và Quả A-la-hán','4 Đại thiện hợp trí + tâm Diệu trí thiện (thông thiện).'],
     ['6 tâm biết tất cả 21 cảnh','4 Đại tố hợp trí + tâm Diệu trí tố (thông tố) + tâm Khai ý môn.'],
@@ -1418,7 +1418,7 @@ function tkDuyenKhoi(){
 function tkXuGioi(){
   const SO = [1,1,2,1,1,2,1,1,2,1,1,2,1,3,2,3,69,76];
   const rows = GIOI_DATA.map((d,i)=>tkRow(i+1, d.ten, d.pali, `${SO[i]} pháp`, d.chiphap)).join('');
-  return tkBlock('Tổng kết 18 Giới', 'Số pháp chân đế của từng giới. Cộng toàn bộ: <b>12 sắc thô</b> (5 căn + 7 cảnh, trong đó Xúc giới = 3 pháp) + <b>89 tâm</b> (10 Ngũ song thức + 3 Ý giới + 76 Ý thức giới) + <b>69 pháp thuộc Pháp giới</b> (52 tâm sở + 16 sắc tế + Níp-bàn) — trọn vẹn 28 sắc + 89 tâm + 52 tâm sở + Níp-bàn.', rows, '');
+  return tkBlock('Tổng kết 18 Giới', 'Số pháp chân đế của từng giới. Cộng toàn bộ: <b>12 sắc thô</b> (5 căn + 7 cảnh, trong đó Xúc giới = 3 pháp) + <b>89 tâm</b> (Ngũ song thức (10 tâm) + 3 Ý giới + 76 Ý thức giới) + <b>69 pháp thuộc Pháp giới</b> (52 tâm sở + 16 sắc tế + Níp-bàn) — trọn vẹn 28 sắc + 89 tâm + 52 tâm sở + Níp-bàn.', rows, '');
 }
 
 function openDuyenHeSheet(i){
@@ -1542,7 +1542,7 @@ const GIOI_DATA = [
  {ten:'Thân thức giới', pali:'Kāya-viññāṇa-dhātu', nhom:'thuc', chiphap:'2 tâm: Thân thức quả thiện (thọ lạc) + Thân thức quả bất thiện (thọ khổ).'},
  {ten:'Ý giới', pali:'Mano-dhātu', nhom:'thuc', chiphap:'<b>3 tâm</b> tiếp nhận cảnh nơi ngũ môn: tâm Hướng ngũ môn (pañcadvārāvajjana) + 2 tâm Tiếp thâu (sampaṭicchana quả thiện và quả bất thiện).'},
  {ten:'Pháp giới', pali:'Dhamma-dhātu', nhom:'canh', chiphap:'<b>69 pháp</b>: 52 tâm sở + 16 sắc tế (sukhuma-rūpa) + Níp-bàn. Không gồm 12 sắc thô (đã có ở các giới căn – cảnh) và không gồm tâm (đã thuộc 7 giới về thức).'},
- {ten:'Ý thức giới', pali:'Mano-viññāṇa-dhātu', nhom:'thuc', chiphap:'<b>76 tâm</b>: tất cả tâm còn lại = 89 tâm − 10 tâm ngũ song thức (giới 3, 6, 9, 12, 15) − 3 tâm Ý giới (giới 16).'}
+ {ten:'Ý thức giới', pali:'Mano-viññāṇa-dhātu', nhom:'thuc', chiphap:'<b>76 tâm</b>: tất cả tâm còn lại = 89 tâm − ngũ song thức (10 tâm) (giới 3, 6, 9, 12, 15) − 3 tâm Ý giới (giới 16).'}
 ];
 
 function renderXuGioiPage(){
@@ -1615,7 +1615,7 @@ function openXGTomTat(){
   showAttrSheet(`
     <div class="sheet-head"><h2>Tóm tắt số pháp</h2></div>
     <p class="sheet-pali">Bảng tổng số pháp của hai hệ thống</p>
-    <div class="sec"><div class="sec-label">18 Giới → tổng số pháp</div><div class="sec-body">10 sắc thô làm căn + cảnh (giới 1–2, 4–5, 7–8, 10–11, 13) + 3 pháp Xúc giới (giới 14: đất – lửa – gió) + <b>89 tâm</b> (10 ngũ song thức + 3 Ý giới + 76 Ý thức giới) + 52 tâm sở + 16 sắc tế + Níp-bàn (Pháp giới).</div></div>
+    <div class="sec"><div class="sec-label">18 Giới → tổng số pháp</div><div class="sec-body">10 sắc thô làm căn + cảnh (giới 1–2, 4–5, 7–8, 10–11, 13) + 3 pháp Xúc giới (giới 14: đất – lửa – gió) + <b>89 tâm</b> (ngũ song thức (10 tâm) + 3 Ý giới + 76 Ý thức giới) + 52 tâm sở + 16 sắc tế + Níp-bàn (Pháp giới).</div></div>
     <div class="sec" style="margin-top:12px"><div class="sec-label">12 Xứ → tổng số pháp</div><div class="sec-body">10 xứ sắc thô (nội xứ 1–5 + ngoại xứ 7–11, trong đó Xúc xứ gồm 3 pháp) + <b>89 tâm</b> (Ý xứ) + 52 tâm sở + 16 sắc tế + Níp-bàn (Pháp xứ).</div></div>
     <p class="info-note">Cả hai hệ thống đều bao quát toàn bộ thực tại: 28 sắc pháp (12 sắc thô + 16 sắc tế) + 89 tâm + 52 tâm sở + Níp-bàn — chỉ khác cách nhóm.</p>
   `);
